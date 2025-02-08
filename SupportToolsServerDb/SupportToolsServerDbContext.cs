@@ -1,32 +1,37 @@
-//Created by DbContextClassCreator at 2/4/2025 7:31:10 PM
-
-using SupportToolsServerDb.Models;
-using SystemToolsShared;
 using Microsoft.EntityFrameworkCore;
+using SupportToolsServerDb.Models;
 
 namespace SupportToolsServerDb;
 
 public sealed class SupportToolsServerDbContext : DbContext
 {
-    public SupportToolsServerDbContext(DbContextOptions options, bool isDesignTime) : base(options)
+    public SupportToolsServerDbContext(DbContextOptions<SupportToolsServerDbContext> options, bool isDesignTime)
     {
+        //Console.WriteLine("SupportToolsServerDbContext Constructor 2...");
     }
 
-    public SupportToolsServerDbContext(DbContextOptions<SupportToolsServerDbContext> options) : base(options)
+    public SupportToolsServerDbContext(DbContextOptions<SupportToolsServerDbContext> options, int int1)
     {
+        //Console.WriteLine("SupportToolsServerDbContext Constructor 3...");
     }
+
+    public SupportToolsServerDbContext(DbContextOptions<SupportToolsServerDbContext> options)
+    {
+        //Console.WriteLine("SupportToolsServerDbContext Constructor 4...");
+    }
+
+    //ბაზაში არსებული ცხრილები წარმოდგენილი DbSet-ების სახით
+    public DbSet<GitData> GitData => Set<GitData>();
+    public DbSet<GitIgnoreFileType> GitIgnoreFileTypes => Set<GitIgnoreFileType>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<TestModel>(entity =>
-        {
-            string tableName = nameof(TestModel).Pluralize();
-            entity.HasKey(e => e.TestId);
-            entity.ToTable(tableName.UnCapitalize());
-            entity.HasIndex(e => e.TestName)
-                .HasDatabaseName($"IX_{tableName}_{nameof(TestModel.TestName).UnCapitalize()}").IsUnique();
-            entity.Property(e => e.TestId).HasColumnName(nameof(TestModel.TestId).UnCapitalize());
-            entity.Property(e => e.TestName).HasColumnName(nameof(TestModel.TestName).UnCapitalize()).HasMaxLength(50);
-        });
+        //Console.WriteLine("AppGrammarGeDbContext OnModelCreating Start...");
+
+        base.OnModelCreating(modelBuilder);
+
+        //Console.WriteLine("AppGrammarGeDbContext OnModelCreating Pass 1...");
+
+        modelBuilder.ApplyConfigurationsFromAssembly(AssemblyReference.Assembly);
     }
 }

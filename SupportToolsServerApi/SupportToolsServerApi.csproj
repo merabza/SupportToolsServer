@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Endpoints\V1\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerContracts\SupportToolsServerContracts.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
   </ItemGroup>
