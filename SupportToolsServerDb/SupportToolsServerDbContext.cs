@@ -5,17 +5,18 @@ namespace SupportToolsServerDb;
 
 public sealed class SupportToolsServerDbContext : DbContext
 {
-    public SupportToolsServerDbContext(DbContextOptions<SupportToolsServerDbContext> options, bool isDesignTime)
+    public SupportToolsServerDbContext(DbContextOptions<SupportToolsServerDbContext> options, bool isDesignTime) :
+        base(options)
     {
         //Console.WriteLine("SupportToolsServerDbContext Constructor 2...");
     }
 
-    public SupportToolsServerDbContext(DbContextOptions<SupportToolsServerDbContext> options, int int1)
+    public SupportToolsServerDbContext(DbContextOptions<SupportToolsServerDbContext> options, int int1) : base(options)
     {
         //Console.WriteLine("SupportToolsServerDbContext Constructor 3...");
     }
 
-    public SupportToolsServerDbContext(DbContextOptions<SupportToolsServerDbContext> options)
+    public SupportToolsServerDbContext(DbContextOptions<SupportToolsServerDbContext> options) : base(options)
     {
         //Console.WriteLine("SupportToolsServerDbContext Constructor 4...");
     }

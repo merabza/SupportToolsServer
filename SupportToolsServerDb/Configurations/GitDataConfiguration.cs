@@ -19,6 +19,7 @@ public class GitDataConfiguration : IEntityTypeConfiguration<GitData>
         builder.Property(e => e.GitAddress).IsRequired().HasColumnName(nameof(GitData.GitAddress)).HasMaxLength(128);
         builder.Property(e => e.GitIgnoreFileTypeId).IsRequired().HasColumnName(nameof(GitData.GitIgnoreFileTypeId));
 
-        builder.HasOne(h => h.GitIgnoreFileType).WithMany(w => w.GitData).HasForeignKey(f => f.GitIgnoreFileTypeId);
+        builder.HasOne(h => h.GitIgnoreFileTypeNavigation).WithMany(w => w.GitData)
+            .HasForeignKey(f => f.GitIgnoreFileTypeId);
     }
 }
