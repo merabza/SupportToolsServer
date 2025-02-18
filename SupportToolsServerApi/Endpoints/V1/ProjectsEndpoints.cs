@@ -1,15 +1,11 @@
-﻿using System.Diagnostics;
-using System.Text;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Builder;
 using SupportToolsServerContracts.V1.Routes;
 using WebInstallers;
 
 namespace SupportToolsServerApi.Endpoints.V1;
 
-
 public sealed class ProjectsEndpoints : IInstaller
+
 {
     public int InstallPriority => 50;
     public int ServiceUsePriority => 50;
