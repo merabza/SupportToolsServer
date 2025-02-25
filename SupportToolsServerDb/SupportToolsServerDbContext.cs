@@ -24,6 +24,7 @@ public sealed class SupportToolsServerDbContext : DbContext
     //ბაზაში არსებული ცხრილები წარმოდგენილი DbSet-ების სახით
     public DbSet<GitData> GitData => Set<GitData>();
     public DbSet<GitIgnoreFileType> GitIgnoreFileTypes => Set<GitIgnoreFileType>();
+    public DbSet<ApiKeyByRemoteIpAddress> ApiKeysByRemoteIpAddresses => Set<ApiKeyByRemoteIpAddress>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

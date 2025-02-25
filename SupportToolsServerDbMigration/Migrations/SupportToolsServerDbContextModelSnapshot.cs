@@ -16,35 +16,58 @@ namespace SupportToolsServerDbMigration.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("SupportToolsServerDb.Models.ApiKeyByRemoteIpAddress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApiKey")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("RemoteIpAddress")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApiKey", "RemoteIpAddress")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ApiKeyByRemoteIpAddresses_remoteIpAddress_apiKey_Unique");
+
+                    b.ToTable("ApiKeysByRemoteIpAddresses");
+                });
 
             modelBuilder.Entity("SupportToolsServerDb.Models.GitData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("GitAddress")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)")
-                        .HasColumnName("GitAddress");
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("GitIgnoreFileTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("GitIgnoreFileTypeId");
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("Name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -54,29 +77,26 @@ namespace SupportToolsServerDbMigration.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_GitDatas_name_Unique");
 
-                    b.ToTable("gitDatas", (string)null);
+                    b.ToTable("GitData");
                 });
 
             modelBuilder.Entity("SupportToolsServerDb.Models.GitIgnoreFileType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(16384)
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Content");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("Name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -84,7 +104,7 @@ namespace SupportToolsServerDbMigration.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_GitIgnoreFileTypes_name_Unique");
 
-                    b.ToTable("gitIgnoreFileTypes", (string)null);
+                    b.ToTable("GitIgnoreFileTypes");
                 });
 
             modelBuilder.Entity("SupportToolsServerDb.Models.GitData", b =>

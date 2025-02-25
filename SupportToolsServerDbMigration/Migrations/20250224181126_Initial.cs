@@ -11,7 +11,21 @@ namespace SupportToolsServerDbMigration.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "gitIgnoreFileTypes",
+                name: "ApiKeysByRemoteIpAddresses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ApiKey = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    RemoteIpAddress = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApiKeysByRemoteIpAddresses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GitIgnoreFileTypes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -21,11 +35,11 @@ namespace SupportToolsServerDbMigration.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_gitIgnoreFileTypes", x => x.Id);
+                    table.PrimaryKey("PK_GitIgnoreFileTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "gitDatas",
+                name: "GitData",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -36,29 +50,35 @@ namespace SupportToolsServerDbMigration.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_gitDatas", x => x.Id);
+                    table.PrimaryKey("PK_GitData", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_gitDatas_gitIgnoreFileTypes_GitIgnoreFileTypeId",
+                        name: "FK_GitData_GitIgnoreFileTypes_GitIgnoreFileTypeId",
                         column: x => x.GitIgnoreFileTypeId,
-                        principalTable: "gitIgnoreFileTypes",
+                        principalTable: "GitIgnoreFileTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_gitDatas_GitIgnoreFileTypeId",
-                table: "gitDatas",
+                name: "IX_ApiKeyByRemoteIpAddresses_remoteIpAddress_apiKey_Unique",
+                table: "ApiKeysByRemoteIpAddresses",
+                columns: new[] { "ApiKey", "RemoteIpAddress" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GitData_GitIgnoreFileTypeId",
+                table: "GitData",
                 column: "GitIgnoreFileTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GitDatas_name_Unique",
-                table: "gitDatas",
+                table: "GitData",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_GitIgnoreFileTypes_name_Unique",
-                table: "gitIgnoreFileTypes",
+                table: "GitIgnoreFileTypes",
                 column: "Name",
                 unique: true);
         }
@@ -67,10 +87,13 @@ namespace SupportToolsServerDbMigration.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "gitDatas");
+                name: "ApiKeysByRemoteIpAddresses");
 
             migrationBuilder.DropTable(
-                name: "gitIgnoreFileTypes");
+                name: "GitData");
+
+            migrationBuilder.DropTable(
+                name: "GitIgnoreFileTypes");
         }
     }
 }
