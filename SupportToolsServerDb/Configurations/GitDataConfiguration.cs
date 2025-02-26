@@ -12,7 +12,7 @@ public class GitDataConfiguration : IEntityTypeConfiguration<GitData>
         var tableName = nameof(GitData).Pluralize();
 
         builder.HasKey(e => e.Id);
-        builder.HasIndex(e => e.Name).HasDatabaseName(tableName.CreateIndexName(true, nameof(GitData.Name))).IsUnique();
+        builder.HasIndex(e => e.Name).IsUnique();
 
         builder.Property(e => e.Name).IsRequired().HasMaxLength(50);
         builder.Property(e => e.GitAddress).IsRequired().HasMaxLength(128);

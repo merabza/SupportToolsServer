@@ -1,9 +1,9 @@
 //Created by RepositoryClassCreator at 2/4/2025 7:31:10 PM
 
 using System;
-using SupportToolsServerDb;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
+using SupportToolsServerDb;
 
 namespace LibSupportToolsServerRepositories;
 
@@ -35,10 +35,10 @@ public sealed class SupportToolsServerRepository : ISupportToolsServerRepository
     {
         try
         {
-            using IDbContextTransaction transaction = GetTransaction();
+            using var transaction = GetTransaction();
             try
             {
-                int ret = _context.SaveChanges();
+                var ret = _context.SaveChanges();
                 transaction.Commit();
                 return ret;
             }

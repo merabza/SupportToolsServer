@@ -16,7 +16,7 @@ public sealed class SupportToolsServerRepositoryCreatorFabric : ISupportToolsSer
 
     public ISupportToolsServerRepository GetSupportToolsServerRepository()
     {
-        IServiceScope scope = _services.CreateScope();
+        var scope = _services.CreateScope();
         return scope.ServiceProvider.GetRequiredService<ISupportToolsServerRepository>();
     }
 }

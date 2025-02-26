@@ -4,12 +4,12 @@ namespace SupportToolsServerDb.Models;
 
 public sealed class GitData
 {
+    private GitIgnoreFileType? _gitIgnoreFileType;
     public int Id { get; set; }
     public required string GitAddress { get; set; }
     public required string Name { get; set; }
     public int GitIgnoreFileTypeId { get; set; }
 
-    private GitIgnoreFileType? _gitIgnoreFileType;
     public GitIgnoreFileType GitIgnoreFileTypeNavigation
     {
         get =>

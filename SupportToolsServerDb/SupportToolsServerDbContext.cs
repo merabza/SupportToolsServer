@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SupportToolsServerDb.Conventions;
 using SupportToolsServerDb.Models;
 
 namespace SupportToolsServerDb;
@@ -35,5 +36,10 @@ public sealed class SupportToolsServerDbContext : DbContext
         //Console.WriteLine("AppGrammarGeDbContext OnModelCreating Pass 1...");
 
         modelBuilder.ApplyConfigurationsFromAssembly(AssemblyReference.Assembly);
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Conventions.Add(_ => new DatabaseEntitiesDefaultConvention());
     }
 }

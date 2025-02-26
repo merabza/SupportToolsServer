@@ -12,8 +12,7 @@ public class ApiKeyByRemoteIpAddressConfiguration : IEntityTypeConfiguration<Api
         var tableName = nameof(ApiKeyByRemoteIpAddress).Pluralize();
 
         builder.HasKey(e => e.Id);
-        builder.HasIndex(e => new { e.ApiKey, e.RemoteIpAddress }).HasDatabaseName(tableName.CreateIndexName(true,
-            nameof(ApiKeyByRemoteIpAddress.RemoteIpAddress), nameof(ApiKeyByRemoteIpAddress.ApiKey))).IsUnique();
+        builder.HasIndex(e => new { e.ApiKey, e.RemoteIpAddress }).IsUnique();
 
         builder.Property(e => e.ApiKey).IsRequired().HasMaxLength(50);
         builder.Property(e => e.RemoteIpAddress).IsRequired().HasMaxLength(50);
