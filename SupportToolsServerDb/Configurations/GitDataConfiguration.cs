@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SupportToolsServerDb.Models;
-using SystemToolsShared;
 
 namespace SupportToolsServerDb.Configurations;
 
@@ -9,8 +8,6 @@ public class GitDataConfiguration : IEntityTypeConfiguration<GitData>
 {
     public void Configure(EntityTypeBuilder<GitData> builder)
     {
-        var tableName = nameof(GitData).Pluralize();
-
         builder.HasKey(e => e.Id);
         builder.HasIndex(e => e.Name).IsUnique();
 

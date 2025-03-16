@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SupportToolsServerDb.Models;
-using SystemToolsShared;
 
 namespace SupportToolsServerDb.Configurations;
 
@@ -9,8 +8,6 @@ public class ApiKeyByRemoteIpAddressConfiguration : IEntityTypeConfiguration<Api
 {
     public void Configure(EntityTypeBuilder<ApiKeyByRemoteIpAddress> builder)
     {
-        var tableName = nameof(ApiKeyByRemoteIpAddress).Pluralize();
-
         builder.HasKey(e => e.Id);
         builder.HasIndex(e => new { e.ApiKey, e.RemoteIpAddress }).IsUnique();
 

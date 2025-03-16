@@ -60,7 +60,7 @@ namespace SupportToolsServerDbMigration.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApiKeyByRemoteIpAddresses_remoteIpAddress_apiKey_Unique",
+                name: "IX_ApiKeysByRemoteIpAddresses_ApiKey_RemoteIpAddress",
                 table: "ApiKeysByRemoteIpAddresses",
                 columns: new[] { "ApiKey", "RemoteIpAddress" },
                 unique: true);
@@ -71,13 +71,13 @@ namespace SupportToolsServerDbMigration.Migrations
                 column: "GitIgnoreFileTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GitDatas_name_Unique",
+                name: "IX_GitData_Name",
                 table: "GitData",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_GitIgnoreFileTypes_name_Unique",
+                name: "IX_GitIgnoreFileTypes_Name",
                 table: "GitIgnoreFileTypes",
                 column: "Name",
                 unique: true);

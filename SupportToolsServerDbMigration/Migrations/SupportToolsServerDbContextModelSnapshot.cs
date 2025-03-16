@@ -16,7 +16,7 @@ namespace SupportToolsServerDbMigration.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.2")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -25,25 +25,27 @@ namespace SupportToolsServerDbMigration.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApiKey")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("ApiKey");
 
                     b.Property<string>("RemoteIpAddress")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("RemoteIpAddress");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApiKey", "RemoteIpAddress")
-                        .IsUnique()
-                        .HasDatabaseName("IX_ApiKeyByRemoteIpAddresses_remoteIpAddress_apiKey_Unique");
+                        .IsUnique();
 
                     b.ToTable("ApiKeysByRemoteIpAddresses");
                 });
@@ -52,30 +54,33 @@ namespace SupportToolsServerDbMigration.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("GitAddress")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasColumnName("GitAddress");
 
                     b.Property<int>("GitIgnoreFileTypeId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("GitIgnoreFileTypeId");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("Name");
 
                     b.HasKey("Id");
 
                     b.HasIndex("GitIgnoreFileTypeId");
 
                     b.HasIndex("Name")
-                        .IsUnique()
-                        .HasDatabaseName("IX_GitDatas_name_Unique");
+                        .IsUnique();
 
                     b.ToTable("GitData");
                 });
@@ -84,25 +89,27 @@ namespace SupportToolsServerDbMigration.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(16384)
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Content");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("Name");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique()
-                        .HasDatabaseName("IX_GitIgnoreFileTypes_name_Unique");
+                        .IsUnique();
 
                     b.ToTable("GitIgnoreFileTypes");
                 });
