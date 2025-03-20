@@ -53,6 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerApiContra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiKeyIdentity", "..\WebSystemTools\ApiKeyIdentity\ApiKeyIdentity.csproj", "{CCACD52F-6A98-A9F6-990D-50E9FC231E81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediatRMessagingAbstractions", "..\SystemTools\MediatRMessagingAbstractions\MediatRMessagingAbstractions.csproj", "{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -147,6 +149,10 @@ Global
 		{CCACD52F-6A98-A9F6-990D-50E9FC231E81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCACD52F-6A98-A9F6-990D-50E9FC231E81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCACD52F-6A98-A9F6-990D-50E9FC231E81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -168,6 +174,7 @@ Global
 		{0A9DC8C3-2ED4-4C1A-BA54-53EB866E20D9} = {15FBC5D6-C759-477D-BF9F-2D3533930FB0}
 		{F5304D27-B320-6AEE-7697-8FF92BBBFBF1} = {5A76657F-CF5D-46C7-961B-23384AC50A23}
 		{CCACD52F-6A98-A9F6-990D-50E9FC231E81} = {15FBC5D6-C759-477D-BF9F-2D3533930FB0}
+		{401389A9-72ED-5AE8-A533-8BA7BF15D5ED} = {CB720E79-FAF5-485B-84EF-8C1CAC0FB5E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {078FEA0B-DE8E-488E-A3DF-7B91C67E1E5A}
