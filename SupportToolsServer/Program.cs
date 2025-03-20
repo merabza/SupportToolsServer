@@ -19,7 +19,6 @@ try
     var header = $"{appName} {Assembly.GetEntryAssembly()?.GetName().Version}";
     Console.WriteLine(FiggleFonts.Standard.Render(header));
 
-
     var parameters = new Dictionary<string, string>
     {
         { ConfigurationEncryptInstaller.AppKeyKey, "3081adaf7a5d472a88cd5149671a1922" },
@@ -42,12 +41,16 @@ try
             AssemblyReference.Assembly,
 
 //WebSystemTools
-            ApiExceptionHandler.AssemblyReference.Assembly, ConfigurationEncrypt.AssemblyReference.Assembly,
-            SerilogLogger.AssemblyReference.Assembly, StaticFilesTools.AssemblyReference.Assembly,
-            SwaggerTools.AssemblyReference.Assembly, TestToolsApi.AssemblyReference.Assembly,
-            WindowsServiceTools.AssemblyReference.Assembly))
+            ApiExceptionHandler.AssemblyReference.Assembly, ApiKeyIdentity.AssemblyReference.Assembly,
+            ConfigurationEncrypt.AssemblyReference.Assembly, SerilogLogger.AssemblyReference.Assembly,
+            StaticFilesTools.AssemblyReference.Assembly, SignalRMessages.AssemblyReference.Assembly, SwaggerTools.AssemblyReference.Assembly,
+            TestToolsApi.AssemblyReference.Assembly, WindowsServiceTools.AssemblyReference.Assembly))
         return 2;
 
+    builder.Services.AddMediatR(cfg =>
+    {
+        cfg.RegisterServicesFromAssembly(SupportToolsServerApi.AssemblyReference.Assembly);
+    });
 
     //ReSharper disable once using
 

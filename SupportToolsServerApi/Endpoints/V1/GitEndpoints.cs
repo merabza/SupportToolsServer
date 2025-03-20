@@ -1,5 +1,11 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using SupportToolsServerContracts.V1.Routes;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using SupportToolsServerApiContracts.Models;
+using SupportToolsServerApiContracts.V1.Routes;
+using System.Diagnostics;
+using ApiKeyIdentity;
+using SystemToolsShared;
 using WebInstallers;
 
 namespace SupportToolsServerApi.Endpoints.V1;
@@ -20,10 +26,10 @@ internal class GitEndpoints : IInstaller
         if (debugMode)
             Console.WriteLine($"{GetType().Name}.{nameof(UseServices)} Started");
 
-        var group = app.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Projects.ProjectBase)
+        var group = app.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase)
             .RequireAuthorization();
 
-        //group.MapGet(ProjectsApiRoutes.Projects.GetAppSettingsVersion, GetAppSettingsVersion);
+        group.MapGet(SupportToolsServerApiRoutes.Git.UploadGitRepos, UploadGitRepos);
         //group.MapGet(ProjectsApiRoutes.Projects.GetVersion, GetVersion);
         //group.MapDelete(ProjectsApiRoutes.Projects.RemoveProjectService, RemoveProjectService);
         //group.MapPost(ProjectsApiRoutes.Projects.StartService, StartService);
@@ -37,4 +43,31 @@ internal class GitEndpoints : IInstaller
 
         return true;
     }
+
+    private Task<ActionResult> UploadGitRepos([FromBody]List<GitDataDomain> gits, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+
+    
+    // POST api/git/uploadgitrepos
+    private static async Task<IResult> UploadGitRepos([FromBody] List<GitDataDomain> gits,
+        ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
+        CancellationToken cancellationToken = default)
+    {
+        var userName = currentUserByApiKey.Name;
+        await messagesDataManager.SendMessage(userName, $"{nameof(UploadGitRepos)} started", cancellationToken);
+        Debug.WriteLine($"Call {nameof(UploadGitReposCommandHandler)} from {nameof(UploadGitRepos)}");
+
+        var command = UploadGitReposCommandRequest.Create(userName);
+        var result = await mediator.Send(command, cancellationToken);
+
+        await messagesDataManager.SendMessage(userName, $"{nameof(UploadGitRepos)} finished", cancellationToken);
+        return result.Match(_ => Results.Ok(), Results.BadRequest);
+    }
+
+
+
+
 }
