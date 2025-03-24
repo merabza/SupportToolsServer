@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Diagnostics;
+using ApiKeyIdentity;
+using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SupportToolsServerApi.CommandRequests;
+using SupportToolsServerApi.Handlers;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Routes;
-using System.Diagnostics;
-using ApiKeyIdentity;
 using SystemToolsShared;
 using WebInstallers;
 
@@ -44,15 +47,8 @@ internal class GitEndpoints : IInstaller
         return true;
     }
 
-    private Task<ActionResult> UploadGitRepos([FromBody]List<GitDataDomain> gits, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-
-    
     // POST api/git/uploadgitrepos
-    private static async Task<IResult> UploadGitRepos([FromBody] List<GitDataDomain> gits,
+    private static async Task<IResult> UploadGitRepos([FromBody] SyncGitRequest syncGitData,
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
@@ -60,14 +56,11 @@ internal class GitEndpoints : IInstaller
         await messagesDataManager.SendMessage(userName, $"{nameof(UploadGitRepos)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(UploadGitReposCommandHandler)} from {nameof(UploadGitRepos)}");
 
-        var command = UploadGitReposCommandRequest.Create(userName);
+        var command =
+            new UploadGitReposCommandRequest { Gits = syncGitData.Gits, GitIgnoreFiles = syncGitData.GitIgnoreFiles };
         var result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(UploadGitRepos)} finished", cancellationToken);
         return result.Match(_ => Results.Ok(), Results.BadRequest);
     }
-
-
-
-
 }

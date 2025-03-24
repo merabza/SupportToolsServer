@@ -55,6 +55,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiKeyIdentity", "..\WebSys
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediatRMessagingAbstractions", "..\SystemTools\MediatRMessagingAbstractions\MediatRMessagingAbstractions.csproj", "{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerDom", "SupportToolsServerDom\SupportToolsServerDom.csproj", "{E97C7400-DD03-495C-A20B-33B004203DAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerRepositories", "SupportToolsServerRepositories\SupportToolsServerRepositories.csproj", "{7E98BABB-DCB3-4EFF-8D41-87B639140D3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +157,14 @@ Global
 		{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E97C7400-DD03-495C-A20B-33B004203DAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E97C7400-DD03-495C-A20B-33B004203DAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E97C7400-DD03-495C-A20B-33B004203DAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E97C7400-DD03-495C-A20B-33B004203DAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E98BABB-DCB3-4EFF-8D41-87B639140D3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E98BABB-DCB3-4EFF-8D41-87B639140D3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E98BABB-DCB3-4EFF-8D41-87B639140D3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E98BABB-DCB3-4EFF-8D41-87B639140D3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

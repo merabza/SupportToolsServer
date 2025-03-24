@@ -4,6 +4,7 @@ using System.Reflection;
 using ConfigurationEncrypt;
 using Figgle;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SwaggerTools;
