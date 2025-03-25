@@ -9,7 +9,7 @@ namespace SupportToolsServerApi.Handlers;
 
 public class UploadGitReposCommandHandler : ICommandHandler<UploadGitReposCommandRequest>
 {
-    private IGitsRepository _gitsRepo;
+    private readonly IGitsRepository _gitsRepo;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public UploadGitReposCommandHandler(IGitsRepository gitsRepo)
@@ -17,9 +17,10 @@ public class UploadGitReposCommandHandler : ICommandHandler<UploadGitReposComman
         _gitsRepo = gitsRepo;
     }
 
-    public Task<OneOf<Unit, IEnumerable<Err>>> Handle(UploadGitReposCommandRequest request, CancellationToken cancellationToken)
+    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(UploadGitReposCommandRequest request, CancellationToken cancellationToken)
     {
         var gitDataUpdater = new GitDataUpdater(request.Gits, request.GitIgnoreFiles, _gitsRepo);
-        gitDataUpdater.Run();
+        await gitDataUpdater.Run();
+        return Unit.Value;
     }
 }
