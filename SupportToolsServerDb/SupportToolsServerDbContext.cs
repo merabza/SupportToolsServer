@@ -1,5 +1,5 @@
+using DatabaseToolsShared;
 using Microsoft.EntityFrameworkCore;
-using SupportToolsServerDb.Conventions;
 using SupportToolsServerDb.Models;
 
 namespace SupportToolsServerDb;

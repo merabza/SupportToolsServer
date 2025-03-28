@@ -11,7 +11,7 @@ using SupportToolsServerDb;
 namespace SupportToolsServerDbMigration.Migrations
 {
     [DbContext(typeof(SupportToolsServerDbContext))]
-    [Migration("20250316150948_Initial")]
+    [Migration("20250328075817_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -28,22 +28,19 @@ namespace SupportToolsServerDbMigration.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApiKey")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("ApiKey");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("RemoteIpAddress")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("RemoteIpAddress");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -57,26 +54,22 @@ namespace SupportToolsServerDbMigration.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("GitAddress")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)")
-                        .HasColumnName("GitAddress");
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("GitIgnoreFileTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("GitIgnoreFileTypeId");
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("Name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -92,22 +85,19 @@ namespace SupportToolsServerDbMigration.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(16384)
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Content");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("Name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 

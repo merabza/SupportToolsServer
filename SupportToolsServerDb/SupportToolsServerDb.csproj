@@ -2,6 +2,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
+        <ProjectReference Include="..\..\SystemTools\DatabaseToolsShared\DatabaseToolsShared.csproj" />
         <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
     </ItemGroup>
@@ -9,9 +10,6 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Conventions\" />
     </ItemGroup>
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>

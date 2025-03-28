@@ -17,10 +17,11 @@ public class UploadGitReposCommandHandler : ICommandHandler<UploadGitReposComman
         _gitsRepo = gitsRepo;
     }
 
-    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(UploadGitReposCommandRequest request, CancellationToken cancellationToken)
+    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(UploadGitReposCommandRequest request,
+        CancellationToken cancellationToken)
     {
         var gitDataUpdater = new GitDataUpdater(request.Gits, request.GitIgnoreFiles, _gitsRepo);
-        await gitDataUpdater.Run();
+        await gitDataUpdater.Run(cancellationToken);
         return Unit.Value;
     }
 }

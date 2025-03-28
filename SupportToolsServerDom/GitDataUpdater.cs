@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerDb.Models;
@@ -12,23 +13,23 @@ public class GitDataUpdater
     private readonly IGitsRepository _gitsRepo;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitDataUpdater(Dictionary<string, GitDataDomain> gits, List<GitIgnoreFile> GitIgnoreFiles,
+    public GitDataUpdater(Dictionary<string, GitDataDomain> gits, List<GitIgnoreFile> gitIgnoreFiles,
         IGitsRepository gitsRepo)
     {
         _gits = gits;
-        _gitIgnoreFiles = GitIgnoreFiles;
+        _gitIgnoreFiles = gitIgnoreFiles;
         _gitsRepo = gitsRepo;
     }
 
-    public Task Run()
+    public async Task Run(CancellationToken cancellationToken = default)
     {
-        SyncGitData(SyncGitIgnoreFiles());
-        return Task.CompletedTask;
+        await SyncGitData(await SyncGitIgnoreFiles(cancellationToken), cancellationToken);
     }
 
-    private void SyncGitData(List<GitIgnoreFileType> gitIgnoreFileTypes)
+    private async Task SyncGitData(List<GitIgnoreFileType> gitIgnoreFileTypes,
+        CancellationToken cancellationToken = default)
     {
-        var dbGits = _gitsRepo.GetAllGitsFromDb();
+        var dbGits = await _gitsRepo.GetAllGitsFromDb(cancellationToken);
 
         foreach (var git in _gits)
         {
@@ -45,7 +46,7 @@ public class GitDataUpdater
                     GitAddress = git.Value.GitProjectAddress,
                     GitIgnoreFileTypeNavigation = gitIgnoreFileType
                 };
-                _gitsRepo.AddGit(newGitData);
+                await _gitsRepo.AddGit(newGitData, cancellationToken);
             }
             else if (dbGitByAddress is not null && dbGitByName is not null)
             {
@@ -61,9 +62,9 @@ public class GitDataUpdater
         }
     }
 
-    private List<GitIgnoreFileType> SyncGitIgnoreFiles()
+    private async Task<List<GitIgnoreFileType>> SyncGitIgnoreFiles(CancellationToken cancellationToken = default)
     {
-        var dbGitIgnorePaths = _gitsRepo.GetAllGitIgnorePathsFromDb();
+        var dbGitIgnorePaths = await _gitsRepo.GetAllGitIgnorePathsFromDb(cancellationToken);
 
         foreach (var gitIgnoreFile in _gitIgnoreFiles)
         {
@@ -74,7 +75,7 @@ public class GitDataUpdater
                 {
                     Name = gitIgnoreFile.Name, Content = gitIgnoreFile.Content
                 };
-                _gitsRepo.AddGitIgnorePath(newGitIgnorePath);
+                await _gitsRepo.AddGitIgnorePath(newGitIgnorePath, cancellationToken);
                 dbGitIgnorePaths.Add(newGitIgnorePath);
             }
             else
@@ -82,7 +83,7 @@ public class GitDataUpdater
                 if (dbGitIgnorePath.Content == gitIgnoreFile.Content)
                     continue;
                 dbGitIgnorePath.Content = gitIgnoreFile.Content;
-                _gitsRepo.UpdateGitIgnorePath(dbGitIgnorePath);
+                _gitsRepo.UpdateGitIgnorePath(dbGitIgnorePath, cancellationToken);
             }
         }
 

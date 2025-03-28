@@ -11,6 +11,7 @@
         <ProjectReference Include="..\..\WebSystemTools\WindowsServiceTools\WindowsServiceTools.csproj" />
         <ProjectReference Include="..\SupportToolsServerApi\SupportToolsServerApi.csproj" />
         <ProjectReference Include="..\SupportToolsServerDb\SupportToolsServerDb.csproj" />
+        <ProjectReference Include="..\SupportToolsServerRepositories\SupportToolsServerRepositories.csproj" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Figgle" Version="0.5.1" />
