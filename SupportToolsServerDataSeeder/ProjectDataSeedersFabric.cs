@@ -1,19 +1,16 @@
-﻿using CarcassDataSeeding.Seeders;
-using CarcassMasterDataDom.Models;
+﻿using CarcassDataSeeding;
 using DatabaseToolsShared;
-using Microsoft.AspNetCore.Identity;
 
-namespace CarcassDataSeeding;
+namespace SupportToolsServerDataSeeder;
 
-public /*open*/ class DataSeedersFabric
+public /*open*/ class ProjectDataSeedersFabric
 {
     private readonly IDataSeederRepository _repo;
     protected readonly string DataSeedFolder;
     protected readonly RoleManager<AppRole> MyRoleManager;
     protected readonly string SecretDataFolder;
 
-    protected DataSeedersFabric(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager,
-        string secretDataFolder, string dataSeedFolder, IDataSeederRepository repo)
+    protected ProjectDataSeedersFabric(string secretDataFolder, string dataSeedFolder, IDataSeederRepository repo)
     {
         SecretDataFolder = secretDataFolder;
         DataSeedFolder = dataSeedFolder;
