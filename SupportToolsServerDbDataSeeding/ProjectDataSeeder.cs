@@ -2,7 +2,7 @@
 
 namespace SupportToolsServerDbDataSeeding;
 
-public class ProjectDataSeeder
+public /*open*/ class ProjectDataSeeder
 {
     protected readonly ILogger Logger;
     private readonly StsDataSeedersFabric _dataSeedersFabric;

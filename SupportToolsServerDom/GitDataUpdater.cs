@@ -6,7 +6,7 @@ using SupportToolsServerDb.Models;
 
 namespace SupportToolsServerDom;
 
-public class GitDataUpdater
+public sealed class GitDataUpdater
 {
     private readonly List<GitIgnoreFile> _gitIgnoreFiles;
     private readonly Dictionary<string, GitDataDomain> _gits;

@@ -7,7 +7,7 @@ using SupportToolsServerMappers;
 
 namespace SupportToolsServerRepositories;
 
-public class ApiKeyByDatabaseFinder : IApiKeyFinder
+public sealed class ApiKeyByDatabaseFinder : IApiKeyFinder
 {
     private readonly SupportToolsServerDbContext _dbContext;
 

@@ -4,7 +4,7 @@ using SupportToolsServerDb.Models;
 
 namespace SupportToolsServerDb.Configurations;
 
-public class GitDataConfiguration : IEntityTypeConfiguration<GitData>
+public sealed class GitDataConfiguration : IEntityTypeConfiguration<GitData>
 {
     public void Configure(EntityTypeBuilder<GitData> builder)
     {

@@ -4,7 +4,7 @@ using SupportToolsServerDb.Models;
 
 namespace SupportToolsServerDb.Configurations;
 
-public class GitIgnoreFileTypeConfiguration : IEntityTypeConfiguration<GitIgnoreFileType>
+public sealed class GitIgnoreFileTypeConfiguration : IEntityTypeConfiguration<GitIgnoreFileType>
 {
     public void Configure(EntityTypeBuilder<GitIgnoreFileType> builder)
     {

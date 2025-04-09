@@ -4,7 +4,7 @@ using SupportToolsServerDb.Models;
 
 namespace SupportToolsServerDb.Configurations;
 
-public class ApiKeyByRemoteIpAddressConfiguration : IEntityTypeConfiguration<ApiKeyByRemoteIpAddress>
+public sealed class ApiKeyByRemoteIpAddressConfiguration : IEntityTypeConfiguration<ApiKeyByRemoteIpAddress>
 {
     public void Configure(EntityTypeBuilder<ApiKeyByRemoteIpAddress> builder)
     {

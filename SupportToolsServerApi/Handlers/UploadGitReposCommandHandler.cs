@@ -7,7 +7,7 @@ using SystemToolsShared.Errors;
 
 namespace SupportToolsServerApi.Handlers;
 
-public class UploadGitReposCommandHandler : ICommandHandler<UploadGitReposCommandRequest>
+public sealed class UploadGitReposCommandHandler : ICommandHandler<UploadGitReposCommandRequest>
 {
     private readonly IGitsRepository _gitsRepo;
 

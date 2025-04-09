@@ -8,7 +8,7 @@ using SupportToolsServerDom;
 
 namespace SupportToolsServerRepositories;
 
-public class GitsRepository : IGitsRepository
+public sealed class GitsRepository : IGitsRepository
 {
     private readonly SupportToolsServerDbContext _dbContext;
 

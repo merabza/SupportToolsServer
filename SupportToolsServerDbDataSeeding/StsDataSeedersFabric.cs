@@ -1,6 +1,6 @@
 ﻿namespace SupportToolsServerDbDataSeeding;
 
-public class StsDataSeedersFabric
+public /*open*/ class StsDataSeedersFabric
 {
     protected IStsDataSeederRepository Repo { get; }
 

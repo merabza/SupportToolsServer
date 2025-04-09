@@ -18,7 +18,7 @@ namespace SupportToolsServerDb;
 //ბაზასთან დაკავშირების სტრიქონის გადმოწოდება არასწორია, რადგან მომიწევდა ამ სტრიქონის გამშვები პროექტის კოდში ჩაშენება.
 //რაც უსაფრთხოების თვალსაზრისით არასწორია
 
-public class DesignTimeDbContextFactory<T> : IDesignTimeDbContextFactory<T> where T : DbContext
+public /*open*/ class DesignTimeDbContextFactory<T> : IDesignTimeDbContextFactory<T> where T : DbContext
 {
     private readonly string _assemblyName;
     private readonly string _connectionParamName;
