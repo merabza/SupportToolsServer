@@ -1,22 +1,26 @@
-﻿namespace SupportToolsNewDataSeeding;
+﻿using Microsoft.Extensions.Logging;
+using SupportToolsNewDataSeeding;
+using SupportToolsServerDbDataSeeding;
+
+namespace SupportToolsServerDbNewDataSeeding;
 
 public sealed class ProjectNewDataSeeder : ProjectDataSeeder
 {
     private readonly IDataFixRepository _dataFixRepository;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectNewDataSeeder(ILogger<CarcassDataSeeder> logger, DataSeedersFabric dataSeedersFabric,
+    public ProjectNewDataSeeder(ILogger logger, StsNewDataSeedersFabric dataSeedersFabric,
         IDataFixRepository dataFixRepository, bool checkOnly) : base(logger, dataSeedersFabric, checkOnly)
     {
         _dataFixRepository = dataFixRepository;
     }
 
-    protected override bool SeedProjectSpecificData()
+    public override bool SeedData()
     {
-        Logger.LogInformation("Seed Agr Project New Data Seeder Started");
-
-        if (!base.SeedProjectSpecificData())
+        if (!base.SeedData())
             return false;
+
+        Logger.LogInformation("Seed Sts Project New Data Seeder Started");
 
         var afterSeeDataFixer = new DataFixer(Logger, _dataFixRepository);
 

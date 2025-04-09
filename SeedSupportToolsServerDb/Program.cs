@@ -1,10 +1,12 @@
-using System;
 using CliParameters;
-using DbContextAnalyzer.Models;
+using LibDatabaseParameters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SeedSupportToolsServerDb;
 using Serilog.Events;
-using SupportToolsServerDbSeeder;
+using SupportToolsNewDataSeeding;
+using SupportToolsServerDbDataSeeding;
+using SupportToolsServerDbNewDataSeeding;
 using SystemToolsShared;
 
 ILogger<Program>? logger = null;
@@ -12,7 +14,7 @@ try
 {
     Console.WriteLine("Seeds data in new database");
     var argParser =
-        new ArgumentsParser<SeederParameters>(args, nameof(SupportToolsServerDbSeeder), null, "--CheckOnly");
+        new ArgumentsParser<SeederParameters>(args, nameof(SeedSupportToolsServerDb), null, "--CheckOnly");
     switch (argParser.Analysis())
     {
         case EParseResult.Ok: break;
@@ -53,6 +55,22 @@ try
         return 5;
     }
 
+    var stsDataSeederRepository = serviceProvider.GetService<IStsDataSeederRepository>();
+
+    if (stsDataSeederRepository is null)
+    {
+        StShared.WriteErrorLine("stsDataSeederRepository is null", true);
+        return 9;
+    }
+
+    var dataFixRepository = serviceProvider.GetService<IDataFixRepository>();
+
+    if (dataFixRepository is null)
+    {
+        StShared.WriteErrorLine("dataFixRepository is null", true);
+        return 10;
+    }
+
     if (string.IsNullOrWhiteSpace(par.SecretDataFolder))
     {
         StShared.WriteErrorLine("par.SecretDataFolder is empty", true);
@@ -67,9 +85,9 @@ try
 
     var checkOnly = argParser.Switches.Contains("--CheckOnly");
 
-    var seeder = new ProjectNewDataSeeder(carcassDataSeeder,
-        new GrgNewDataSeedersFabric(userManager, roleManager, par.SecretDataFolder, par.JsonFolderName,
-            grgDataSeederRepository), dataFixRepository, checkOnly);
+    var seeder = new ProjectNewDataSeeder(logger,
+        new StsNewDataSeedersFabric(par.SecretDataFolder, par.JsonFolderName, stsDataSeederRepository),
+        dataFixRepository, checkOnly);
 
     return seeder.SeedData() ? 0 : 1;
 }
