@@ -1,4 +1,5 @@
-﻿using MediatRMessagingAbstractions;
+﻿using System.Collections.Generic;
+using MediatRMessagingAbstractions;
 using SupportToolsServerApiContracts.Models;
 
 namespace SupportToolsServerApi.CommandRequests;
