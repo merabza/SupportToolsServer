@@ -41,7 +41,6 @@ try
             // @formatter:off
 
 //SupportToolsServerDbPart
-            SupportToolsServerDb.AssemblyReference.Assembly,
             SupportToolsServerDb.AssemblyReference.Assembly, 
             SupportToolsServerRepositories.AssemblyReference.Assembly,
 

@@ -35,6 +35,7 @@ public sealed class SupportToolsServerRepository : ISupportToolsServerRepository
     {
         try
         {
+            // ReSharper disable once using
             using var transaction = GetTransaction();
             try
             {

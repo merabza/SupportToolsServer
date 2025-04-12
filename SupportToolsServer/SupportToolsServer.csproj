@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
     <ItemGroup>
+        <ProjectReference Include="..\..\SupportToolsServerDbPart\SupportToolsServerDb\SupportToolsServerDb.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\ApiExceptionHandler\ApiExceptionHandler.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\ApiKeyIdentity\ApiKeyIdentity.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\SignalRMessages\SignalRMessages.csproj" />
@@ -10,7 +11,6 @@
         <ProjectReference Include="..\..\WebSystemTools\SerilogLogger\SerilogLogger.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\SwaggerTools\SwaggerTools.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\WindowsServiceTools\WindowsServiceTools.csproj" />
-        <ProjectReference Include="..\SupportToolsServerDb\SupportToolsServerDb.csproj" />
         <ProjectReference Include="..\SupportToolsServerRepositories\SupportToolsServerRepositories.csproj" />
     </ItemGroup>
     <ItemGroup>
