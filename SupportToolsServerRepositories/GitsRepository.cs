@@ -2,18 +2,19 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using RepositoriesDom;
 using SupportToolsServerDb;
 using SupportToolsServerDb.Models;
 using SupportToolsServerDom;
 
 namespace SupportToolsServerRepositories;
 
-public sealed class GitsRepository : IGitsRepository
+public sealed class GitsRepository : AbstractRepository, IGitsRepository
 {
     private readonly SupportToolsServerDbContext _dbContext;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitsRepository(SupportToolsServerDbContext dbContext)
+    public GitsRepository(SupportToolsServerDbContext dbContext) : base(dbContext)
     {
         _dbContext = dbContext;
     }

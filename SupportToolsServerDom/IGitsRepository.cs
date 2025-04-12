@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using RepositoriesDom;
 using SupportToolsServerDb.Models;
 
 namespace SupportToolsServerDom;
 
-public interface IGitsRepository
+public interface IGitsRepository : IAbstractRepository
 {
     Task<List<GitData>> GetAllGitsFromDb(CancellationToken cancellationToken = default);
     Task<List<GitIgnoreFileType>> GetAllGitIgnorePathsFromDb(CancellationToken cancellationToken = default);

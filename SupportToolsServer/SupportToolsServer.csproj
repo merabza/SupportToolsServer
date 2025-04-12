@@ -11,6 +11,7 @@
         <ProjectReference Include="..\..\WebSystemTools\SerilogLogger\SerilogLogger.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\SwaggerTools\SwaggerTools.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\WindowsServiceTools\WindowsServiceTools.csproj" />
+        <ProjectReference Include="..\SupportToolsServerApi\SupportToolsServerApi.csproj" />
         <ProjectReference Include="..\SupportToolsServerRepositories\SupportToolsServerRepositories.csproj" />
     </ItemGroup>
     <ItemGroup>

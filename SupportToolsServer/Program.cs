@@ -9,7 +9,6 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using SwaggerTools;
 using WebInstallers;
-using AssemblyReference = ConfigurationEncrypt.AssemblyReference;
 
 try
 {
@@ -38,28 +37,32 @@ try
 
     if (!builder.InstallServices(debugMode, args, parameters,
 
-            // @formatter:off
+        // @formatter:off
 
-//SupportToolsServerDbPart
-            SupportToolsServerDb.AssemblyReference.Assembly, 
-            SupportToolsServerRepositories.AssemblyReference.Assembly,
+        //SupportToolsServerDbPart
+        SupportToolsServerDb.AssemblyReference.Assembly, 
+        SupportToolsServerRepositories.AssemblyReference.Assembly,
+        SupportToolsServerApi.AssemblyReference.Assembly,
 
-//WebSystemTools
-            ApiExceptionHandler.AssemblyReference.Assembly, 
-            ApiKeyIdentity.AssemblyReference.Assembly,
-            AssemblyReference.Assembly, 
-            SerilogLogger.AssemblyReference.Assembly,
-            SignalRMessages.AssemblyReference.Assembly,
-            StaticFilesTools.AssemblyReference.Assembly, 
-            SwaggerTools.AssemblyReference.Assembly, 
-            TestToolsApi.AssemblyReference.Assembly,
-            WindowsServiceTools.AssemblyReference.Assembly))
+        //WebSystemTools
+        ApiExceptionHandler.AssemblyReference.Assembly, 
+        ApiKeyIdentity.AssemblyReference.Assembly,
+        ConfigurationEncrypt.AssemblyReference.Assembly, 
+        SerilogLogger.AssemblyReference.Assembly,
+        SignalRMessages.AssemblyReference.Assembly,
+        StaticFilesTools.AssemblyReference.Assembly, 
+        SwaggerTools.AssemblyReference.Assembly, 
+        TestToolsApi.AssemblyReference.Assembly,
+        WindowsServiceTools.AssemblyReference.Assembly))
 
         // @formatter:on
 
         return 2;
 
-    builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssembly(AssemblyReference.Assembly); });
+    builder.Services.AddMediatR(cfg =>
+    {
+        cfg.RegisterServicesFromAssembly(SupportToolsServerApi.AssemblyReference.Assembly);
+    });
 
     //ReSharper disable once using
 

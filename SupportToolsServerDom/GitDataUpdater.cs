@@ -60,6 +60,7 @@ public sealed class GitDataUpdater
                 dbGitByName.GitAddress = git.Value.GitProjectAddress;
             }
         }
+        await _gitsRepo.SaveChangesAsync(cancellationToken);
     }
 
     private async Task<List<GitIgnoreFileType>> SyncGitIgnoreFiles(CancellationToken cancellationToken = default)
@@ -69,7 +70,7 @@ public sealed class GitDataUpdater
         foreach (var gitIgnoreFile in _gitIgnoreFiles)
         {
             var dbGitIgnorePath = dbGitIgnorePaths.Find(g => g.Name == gitIgnoreFile.Name);
-            if (dbGitIgnorePath == null)
+            if (dbGitIgnorePath is null)
             {
                 var newGitIgnorePath = new GitIgnoreFileType
                 {
@@ -89,4 +90,32 @@ public sealed class GitDataUpdater
 
         return dbGitIgnorePaths;
     }
+
+    //private async Task<List<GitIgnoreFileType>> SyncGitIgnoreFiles(CancellationToken cancellationToken = default)
+    //{
+    //    var dbGitIgnorePaths = await _gitsRepo.GetAllGitIgnorePathsFromDb(cancellationToken);
+
+    //    foreach (var gitIgnoreFile in _gitIgnoreFiles)
+    //    {
+    //        var dbGitIgnorePath = dbGitIgnorePaths.Find(g => g.Name == gitIgnoreFile.Name);
+    //        if (dbGitIgnorePath is null)
+    //        {
+    //            var newGitIgnorePath = new GitIgnoreFileType
+    //            {
+    //                Name = gitIgnoreFile.Name, Content = gitIgnoreFile.Content
+    //            };
+    //            await _gitsRepo.AddGitIgnorePath(newGitIgnorePath, cancellationToken);
+    //            dbGitIgnorePaths.Add(newGitIgnorePath);
+    //        }
+    //        else
+    //        {
+    //            if (dbGitIgnorePath.Content == gitIgnoreFile.Content)
+    //                continue;
+    //            dbGitIgnorePath.Content = gitIgnoreFile.Content;
+    //            _gitsRepo.UpdateGitIgnorePath(dbGitIgnorePath, cancellationToken);
+    //        }
+    //    }
+
+    //    return dbGitIgnorePaths;
+    //}
 }

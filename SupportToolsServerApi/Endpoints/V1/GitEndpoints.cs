@@ -17,7 +17,8 @@ using WebInstallers;
 
 namespace SupportToolsServerApi.Endpoints.V1;
 
-internal class GitEndpoints : IInstaller
+// ReSharper disable once UnusedType.Global
+public class GitEndpoints : IInstaller
 {
     public int InstallPriority => 50;
     public int ServiceUsePriority => 50;
@@ -36,8 +37,8 @@ internal class GitEndpoints : IInstaller
         var group = app.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase)
             .RequireAuthorization();
 
-        group.MapGet(SupportToolsServerApiRoutes.Git.UploadGitRepos, UploadGitRepos);
-        //group.MapGet(ProjectsApiRoutes.Projects.GetVersion, GetVersion);
+        group.MapPost(SupportToolsServerApiRoutes.Git.UploadGitRepos, UploadGitRepos);
+        //group.MapGet(SupportToolsServerApiRoutes.Git.TestGitRepos, TestGitRepos);
         //group.MapDelete(ProjectsApiRoutes.Projects.RemoveProjectService, RemoveProjectService);
         //group.MapPost(ProjectsApiRoutes.Projects.StartService, StartService);
         //group.MapPost(ProjectsApiRoutes.Projects.StopService, StopService);
@@ -67,4 +68,10 @@ internal class GitEndpoints : IInstaller
         await messagesDataManager.SendMessage(userName, $"{nameof(UploadGitRepos)} finished", cancellationToken);
         return result.Match(_ => Results.Ok(), Results.BadRequest);
     }
+
+    //// GET api/git/testgitrepos
+    //private static IResult TestGitRepos()
+    //{
+    //    return Results.Ok(true);
+    //}
 }

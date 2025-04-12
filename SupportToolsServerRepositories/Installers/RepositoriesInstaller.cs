@@ -24,7 +24,6 @@ public sealed class RepositoriesInstaller : IInstaller
 
         //builder.Services.AddScoped<IRootsCrudRepository, RootsCrudRepository>();
         builder.Services.AddScoped<IGitsRepository, GitsRepository>();
-        builder.Services.AddScoped<IApiKeyFinder, ApiKeyByDatabaseFinder>();
 
         if (debugMode)
             Console.WriteLine($"{GetType().Name}.{nameof(InstallServices)} Finished");
