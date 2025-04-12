@@ -43,8 +43,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerApi", "Su
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SupportToolsServerShared", "SupportToolsServerShared", "{5A76657F-CF5D-46C7-961B-23384AC50A23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeHost", "FakeConsole\FakeHost.csproj", "{138D1007-05D9-4184-98BD-7081BD10F1C9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerApiContracts", "..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj", "{F5304D27-B320-6AEE-7697-8FF92BBBFBF1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiKeyIdentity", "..\WebSystemTools\ApiKeyIdentity\ApiKeyIdentity.csproj", "{CCACD52F-6A98-A9F6-990D-50E9FC231E81}"
@@ -98,6 +96,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerDbMigration", "..\SupportToolsServerDbPart\SupportToolsServerDbMigration\SupportToolsServerDbMigration.csproj", "{0293C561-84ED-3CE3-7C9C-073394141137}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerDbNewDataSeeding", "..\SupportToolsServerDbPart\SupportToolsServerDbNewDataSeeding\SupportToolsServerDbNewDataSeeding.csproj", "{C230B1E9-4B27-A9E4-CF26-3677A684761D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeHost", "..\SupportToolsServerDbPart\FakeHost\FakeHost.csproj", "{363DCD79-2348-0F2F-FD9A-8F703DE58C2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -173,10 +173,6 @@ Global
 		{28D32CAA-5A81-4B4F-9646-EAB563A34641}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28D32CAA-5A81-4B4F-9646-EAB563A34641}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28D32CAA-5A81-4B4F-9646-EAB563A34641}.Release|Any CPU.Build.0 = Release|Any CPU
-		{138D1007-05D9-4184-98BD-7081BD10F1C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{138D1007-05D9-4184-98BD-7081BD10F1C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{138D1007-05D9-4184-98BD-7081BD10F1C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{138D1007-05D9-4184-98BD-7081BD10F1C9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F5304D27-B320-6AEE-7697-8FF92BBBFBF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F5304D27-B320-6AEE-7697-8FF92BBBFBF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5304D27-B320-6AEE-7697-8FF92BBBFBF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -265,6 +261,10 @@ Global
 		{C230B1E9-4B27-A9E4-CF26-3677A684761D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C230B1E9-4B27-A9E4-CF26-3677A684761D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C230B1E9-4B27-A9E4-CF26-3677A684761D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{363DCD79-2348-0F2F-FD9A-8F703DE58C2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{363DCD79-2348-0F2F-FD9A-8F703DE58C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{363DCD79-2348-0F2F-FD9A-8F703DE58C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{363DCD79-2348-0F2F-FD9A-8F703DE58C2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -303,6 +303,7 @@ Global
 		{02461C50-FCC1-1618-C494-3BFAB32169D8} = {2A39B18C-3190-4F69-989D-4B8ED0C59397}
 		{0293C561-84ED-3CE3-7C9C-073394141137} = {2A39B18C-3190-4F69-989D-4B8ED0C59397}
 		{C230B1E9-4B27-A9E4-CF26-3677A684761D} = {2A39B18C-3190-4F69-989D-4B8ED0C59397}
+		{363DCD79-2348-0F2F-FD9A-8F703DE58C2A} = {2A39B18C-3190-4F69-989D-4B8ED0C59397}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {078FEA0B-DE8E-488E-A3DF-7B91C67E1E5A}
