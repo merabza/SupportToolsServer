@@ -19,9 +19,9 @@ public sealed class GitsRepository : AbstractRepository, IGitsRepository
         _dbContext = dbContext;
     }
 
-    public Task<List<GitData>> GetAllGitsFromDb(CancellationToken cancellationToken = default)
+    public async Task<List<GitData>> GetAllGitsFromDb(CancellationToken cancellationToken = default)
     {
-        return _dbContext.GitData.ToListAsync(cancellationToken);
+        return await _dbContext.GitData.ToListAsync(cancellationToken);
     }
 
     public Task<List<GitIgnoreFileType>> GetAllGitIgnorePathsFromDb(CancellationToken cancellationToken = default)
