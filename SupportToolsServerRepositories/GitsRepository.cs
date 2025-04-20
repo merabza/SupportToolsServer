@@ -1,11 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using RepositoriesDom;
+using SupportToolsServerApiContracts.Models;
 using SupportToolsServerDb;
 using SupportToolsServerDb.Models;
 using SupportToolsServerDom;
+using SystemToolsShared.Errors;
 
 namespace SupportToolsServerRepositories;
 
@@ -43,5 +48,17 @@ public sealed class GitsRepository : AbstractRepository, IGitsRepository
     public async Task AddGit(GitData gitData, CancellationToken cancellationToken = default)
     {
         await _dbContext.GitData.AddAsync(gitData, cancellationToken);
+    }
+
+    public Task<List<GitDataDomain>> GetGitRepos(CancellationToken cancellationToken = default)
+    {
+        return _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation).Select(s =>
+            new GitDataDomain
+            {
+                GitIgnorePathName = s.GitIgnoreFileTypeNavigation.Name,
+                GitProjectAddress = s.GdGitAddress,
+                GitProjectFolderName = s.GdFolderName,
+                GitProjectName = s.GdName
+            }).ToListAsync(cancellationToken);
     }
 }

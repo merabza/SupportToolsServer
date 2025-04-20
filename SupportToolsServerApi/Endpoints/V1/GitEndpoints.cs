@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SupportToolsServerApi.CommandRequests;
 using SupportToolsServerApi.Handlers;
+using SupportToolsServerApi.QueryRequests;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Routes;
 using SystemToolsShared;
@@ -38,7 +39,7 @@ public class GitEndpoints : IInstaller
             .RequireAuthorization();
 
         group.MapPost(SupportToolsServerApiRoutes.Git.UploadGitRepos, UploadGitRepos);
-        //group.MapGet(SupportToolsServerApiRoutes.Git.TestGitRepos, TestGitRepos);
+        group.MapGet(SupportToolsServerApiRoutes.Git.GetGitRepos, GetGitRepos);
         //group.MapDelete(ProjectsApiRoutes.Projects.RemoveProjectService, RemoveProjectService);
         //group.MapPost(ProjectsApiRoutes.Projects.StartService, StartService);
         //group.MapPost(ProjectsApiRoutes.Projects.StopService, StopService);
@@ -69,9 +70,15 @@ public class GitEndpoints : IInstaller
         return result.Match(_ => Results.Ok(), Results.BadRequest);
     }
 
-    //// GET api/git/testgitrepos
-    //private static IResult TestGitRepos()
-    //{
-    //    return Results.Ok(true);
-    //}
+    // GET api/git/testgitrepos
+    private static async Task<IResult> GetGitRepos(IMediator mediator, CancellationToken cancellationToken = default)
+    {
+        Debug.WriteLine($"Call {nameof(GetGitReposQueryHandler)} from {nameof(UploadGitRepos)}");
+
+        var command =
+            new GetGitReposQueryRequest();
+        var result = await mediator.Send(command, cancellationToken);
+
+        return result.Match(_ => Results.Ok(), Results.BadRequest);
+    }
 }

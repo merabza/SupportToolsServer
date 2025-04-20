@@ -36,28 +36,29 @@ public sealed class GitDataUpdater
             var gitIgnoreFileType = gitIgnoreFileTypes.Find(f => f.Name == git.Value.GitIgnorePathName);
             if (gitIgnoreFileType is null)
                 continue;
-            var dbGitByAddress = dbGits.Find(g => g.GitAddress == git.Value.GitProjectAddress);
-            var dbGitByName = dbGits.Find(g => g.GitAddress == git.Key);
+            var dbGitByAddress = dbGits.Find(g => g.GdGitAddress == git.Value.GitProjectAddress);
+            var dbGitByName = dbGits.Find(g => g.GdGitAddress == git.Key);
             if (dbGitByAddress is null && dbGitByName is null)
             {
                 var newGitData = new GitData
                 {
-                    Name = git.Key,
-                    GitAddress = git.Value.GitProjectAddress,
-                    GitIgnoreFileTypeNavigation = gitIgnoreFileType
+                    GdName = git.Key,
+                    GdGitAddress = git.Value.GitProjectAddress,
+                    GitIgnoreFileTypeNavigation = gitIgnoreFileType,
+                    GdFolderName = git.Value.GitProjectFolderName
                 };
                 await _gitsRepo.AddGit(newGitData, cancellationToken);
             }
             else if (dbGitByAddress is not null && dbGitByName is not null)
             {
-                if (dbGitByAddress.Id != dbGitByName.Id)
+                if (dbGitByAddress.GdId != dbGitByName.GdId)
                     continue;
 
                 if (dbGitByName.GitIgnoreFileTypeId == gitIgnoreFileType.Id &&
-                    dbGitByName.GitAddress == git.Value.GitProjectAddress)
+                    dbGitByName.GdGitAddress == git.Value.GitProjectAddress)
                     continue;
                 dbGitByName.GitIgnoreFileTypeNavigation = gitIgnoreFileType;
-                dbGitByName.GitAddress = git.Value.GitProjectAddress;
+                dbGitByName.GdGitAddress = git.Value.GitProjectAddress;
             }
         }
         await _gitsRepo.SaveChangesAsync(cancellationToken);
