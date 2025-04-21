@@ -75,10 +75,9 @@ public class GitEndpoints : IInstaller
     {
         Debug.WriteLine($"Call {nameof(GetGitReposQueryHandler)} from {nameof(UploadGitRepos)}");
 
-        var command =
-            new GetGitReposQueryRequest();
+        var command = new GetGitReposQueryRequest();
         var result = await mediator.Send(command, cancellationToken);
 
-        return result.Match(_ => Results.Ok(), Results.BadRequest);
+        return result.Match(Results.Ok, Results.BadRequest);
     }
 }
