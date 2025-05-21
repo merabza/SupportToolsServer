@@ -39,7 +39,7 @@ public class GitEndpoints : IInstaller
             .RequireAuthorization();
 
         group.MapPost(SupportToolsServerApiRoutes.Git.UploadGitRepos, UploadGitRepos);
-        group.MapGet(SupportToolsServerApiRoutes.Git.GetGitRepos, GetGitRepos);
+        group.MapGet(SupportToolsServerApiRoutes.Git.GitRepos, GetGitRepos);
         //group.MapDelete(ProjectsApiRoutes.Projects.RemoveProjectService, RemoveProjectService);
         //group.MapPost(ProjectsApiRoutes.Projects.StartService, StartService);
         //group.MapPost(ProjectsApiRoutes.Projects.StopService, StopService);
