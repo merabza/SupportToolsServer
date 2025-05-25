@@ -8,12 +8,12 @@ namespace SupportToolsServerDom;
 
 public sealed class GitDataUpdater
 {
-    private readonly List<GitIgnoreFile> _gitIgnoreFiles;
-    private readonly Dictionary<string, GitDataDomain> _gits;
+    private readonly List<GitIgnoreFileDto> _gitIgnoreFiles;
+    private readonly Dictionary<string, GitDataDto> _gits;
     private readonly IGitsRepository _gitsRepo;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitDataUpdater(Dictionary<string, GitDataDomain> gits, List<GitIgnoreFile> gitIgnoreFiles,
+    public GitDataUpdater(Dictionary<string, GitDataDto> gits, List<GitIgnoreFileDto> gitIgnoreFiles,
         IGitsRepository gitsRepo)
     {
         _gits = gits;

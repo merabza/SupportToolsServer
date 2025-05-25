@@ -6,7 +6,7 @@ namespace SupportToolsServerApi.CommandRequests;
 
 public sealed class UploadGitReposCommandRequest : ICommand
 {
-    public required Dictionary<string, GitDataDomain> Gits { get; set; }
-    public required List<GitIgnoreFile> GitIgnoreFiles { get; set; }
+    public required Dictionary<string, GitDataDto> Gits { get; set; }
+    public required List<GitIgnoreFileDto> GitIgnoreFiles { get; set; }
 
 }

@@ -50,10 +50,10 @@ public sealed class GitsRepository : AbstractRepository, IGitsRepository
         await _dbContext.GitData.AddAsync(gitData, cancellationToken);
     }
 
-    public Task<List<GitDataDomain>> GetGitRepos(CancellationToken cancellationToken = default)
+    public Task<List<GitDataDto>> GetGitRepos(CancellationToken cancellationToken = default)
     {
         return _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation).Select(s =>
-            new GitDataDomain
+            new GitDataDto
             {
                 GitIgnorePathName = s.GitIgnoreFileTypeNavigation.Name,
                 GitProjectAddress = s.GdGitAddress,

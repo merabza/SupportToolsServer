@@ -11,7 +11,7 @@ using SystemToolsShared.Errors;
 namespace SupportToolsServerApi.Handlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class GetGitReposQueryHandler : IQueryHandler<GetGitReposQueryRequest, List<GitDataDomain>>
+public sealed class GetGitReposQueryHandler : IQueryHandler<GetGitReposQueryRequest, List<GitDataDto>>
 {
     private readonly IGitsRepository _gitsRepo;
 
@@ -21,7 +21,7 @@ public sealed class GetGitReposQueryHandler : IQueryHandler<GetGitReposQueryRequ
         _gitsRepo = gitsRepo;
     }
 
-    public async Task<OneOf<List<GitDataDomain>, IEnumerable<Err>>> Handle(GetGitReposQueryRequest request,
+    public async Task<OneOf<List<GitDataDto>, IEnumerable<Err>>> Handle(GetGitReposQueryRequest request,
         CancellationToken cancellationToken = default)
     {
         //ჩაიტვირთოს დერივაციის ფორმულები, ყველა

@@ -4,4 +4,4 @@ using SupportToolsServerApiContracts.Models;
 
 namespace SupportToolsServerApi.QueryRequests;
 
-public sealed class GetGitReposQueryRequest : IQuery<List<GitDataDomain>>;
+public sealed class GetGitReposQueryRequest : IQuery<List<GitDataDto>>;

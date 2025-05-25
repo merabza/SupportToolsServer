@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using SupportToolsServerApi.CommandRequests;
 using SupportToolsServerApi.Handlers;
 using SupportToolsServerApi.QueryRequests;
-using SupportToolsServerApiContracts.Models;
+using SupportToolsServerApiContracts.V1.Requests;
 using SupportToolsServerApiContracts.V1.Routes;
 using SystemToolsShared;
 using WebInstallers;
@@ -40,6 +40,16 @@ public class GitEndpoints : IInstaller
 
         group.MapPost(SupportToolsServerApiRoutes.Git.UploadGitRepos, UploadGitRepos);
         group.MapGet(SupportToolsServerApiRoutes.Git.GitRepos, GetGitRepos);
+
+        //git repos
+        group.MapGet(SupportToolsServerApiRoutes.Git.GitRepo, GetOneGitRepo);
+        group.MapPost(SupportToolsServerApiRoutes.Git.UpdateGitRepo, UpdateGitRepo);
+        group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitRepo, DeleteGitRepo);
+
+        //gitIgnore FileTypes
+        group.MapGet(SupportToolsServerApiRoutes.Git.GitIgnoreFileTypesList, GetGitIgnoreFileTypesList);
+        group.MapPost(SupportToolsServerApiRoutes.Git.AddGitIgnoreFileTypeNameIfNotExists, AddGitIgnoreFileTypeNameIfNotExists);
+        group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitIgnoreFileType, DeleteGitIgnoreFileType);
         //group.MapDelete(ProjectsApiRoutes.Projects.RemoveProjectService, RemoveProjectService);
         //group.MapPost(ProjectsApiRoutes.Projects.StartService, StartService);
         //group.MapPost(ProjectsApiRoutes.Projects.StopService, StopService);
@@ -70,7 +80,7 @@ public class GitEndpoints : IInstaller
         return result.Match(_ => Results.Ok(), Results.BadRequest);
     }
 
-    // GET api/git/testgitrepos
+    // GET api/git/gitrepos
     private static async Task<IResult> GetGitRepos(IMediator mediator, CancellationToken cancellationToken = default)
     {
         Debug.WriteLine($"Call {nameof(GetGitReposQueryHandler)} from {nameof(UploadGitRepos)}");
@@ -80,4 +90,16 @@ public class GitEndpoints : IInstaller
 
         return result.Match(Results.Ok, Results.BadRequest);
     }
+
+    // GET api/git/GitRepo
+    private static async Task<IResult> GetOneGitRepo(IMediator mediator, CancellationToken cancellationToken = default)
+    {
+        Debug.WriteLine($"Call {nameof(GetOneGitRepoQueryHandler)} from {nameof(GetOneGitRepo)}");
+
+        var command = new GetOneGitRepoQueryRequest();
+        var result = await mediator.Send(command, cancellationToken);
+
+        return result.Match(Results.Ok, Results.BadRequest);
+    }
+
 }
