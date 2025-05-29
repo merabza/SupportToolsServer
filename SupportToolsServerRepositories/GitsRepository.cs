@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -60,5 +59,29 @@ public sealed class GitsRepository : AbstractRepository, IGitsRepository
                 GitProjectFolderName = s.GdFolderName,
                 GitProjectName = s.GdName
             }).ToListAsync(cancellationToken);
+    }
+
+    public async Task<OneOf<GitDataDto, IEnumerable<Err>>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
+    {
+        var gitData = await _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation)
+            .FirstOrDefaultAsync(x => x.GdName == gitKey, cancellationToken);
+
+        if (gitData is null)
+            return new List<Err>
+            {
+                new()
+                {
+                    ErrorCode = "GitWithThisNameNotFound",
+                    ErrorMessage = $"Git With This Name {gitKey} Not Found"
+                }
+            };
+
+        return new GitDataDto
+        {
+            GitIgnorePathName = gitData.GitIgnoreFileTypeNavigation.Name,
+            GitProjectAddress = gitData.GdGitAddress,
+            GitProjectFolderName = gitData.GdFolderName,
+            GitProjectName = gitData.GdName
+        };
     }
 }

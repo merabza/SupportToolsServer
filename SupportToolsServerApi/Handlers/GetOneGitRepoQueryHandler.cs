@@ -25,6 +25,6 @@ public sealed class GetOneGitRepoQueryHandler : IQueryHandler<GetOneGitRepoQuery
         CancellationToken cancellationToken = default)
     {
         // Assumes request.RecordKey exists; adjust as needed
-        return await _gitsRepo.GetGitRepoByKey(request.RecordKey, cancellationToken);
+        return await _gitsRepo.GetGitRepoByKey(request.GitKey, cancellationToken);
     }
 }

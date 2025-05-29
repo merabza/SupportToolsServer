@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using SupportToolsServerApi.CommandRequests;
 using SupportToolsServerApi.Handlers;
 using SupportToolsServerApi.QueryRequests;
+using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Requests;
 using SupportToolsServerApiContracts.V1.Routes;
 using SystemToolsShared;
@@ -48,7 +49,8 @@ public class GitEndpoints : IInstaller
 
         //gitIgnore FileTypes
         group.MapGet(SupportToolsServerApiRoutes.Git.GitIgnoreFileTypesList, GetGitIgnoreFileTypesList);
-        group.MapPost(SupportToolsServerApiRoutes.Git.AddGitIgnoreFileTypeNameIfNotExists, AddGitIgnoreFileTypeNameIfNotExists);
+        group.MapPost(SupportToolsServerApiRoutes.Git.AddGitIgnoreFileTypeNameIfNotExists,
+            AddGitIgnoreFileTypeNameIfNotExists);
         group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitIgnoreFileType, DeleteGitIgnoreFileType);
         //group.MapDelete(ProjectsApiRoutes.Projects.RemoveProjectService, RemoveProjectService);
         //group.MapPost(ProjectsApiRoutes.Projects.StartService, StartService);
@@ -92,14 +94,41 @@ public class GitEndpoints : IInstaller
     }
 
     // GET api/git/GitRepo
-    private static async Task<IResult> GetOneGitRepo(IMediator mediator, CancellationToken cancellationToken = default)
+    private static async Task<IResult> GetOneGitRepo([FromRoute] string gitKey, IMediator mediator,
+        CancellationToken cancellationToken = default)
     {
         Debug.WriteLine($"Call {nameof(GetOneGitRepoQueryHandler)} from {nameof(GetOneGitRepo)}");
 
-        var command = new GetOneGitRepoQueryRequest();
+        var command = new GetOneGitRepoQueryRequest(gitKey);
         var result = await mediator.Send(command, cancellationToken);
 
         return result.Match(Results.Ok, Results.BadRequest);
     }
 
+    private static async Task<IResult> UpdateGitRepo(
+        [FromRoute] string gitKey,
+        [FromBody] GitDataDto newRecord,
+        IMediator mediator,
+        CancellationToken cancellationToken = default)
+    {
+        Debug.WriteLine($"Call UpdateGitRepo for key {gitKey}");
+
+        var command = new UpdateGitRepoCommandRequest(gitKey, newRecord);
+        var result = await mediator.Send(command, cancellationToken);
+
+        return result.Match(_ => Results.Ok(), Results.BadRequest);
+    }
+
+    private static async Task<IResult> DeleteGitRepo(
+        [FromRoute] string gitKey,
+        IMediator mediator,
+        CancellationToken cancellationToken = default)
+    {
+        Debug.WriteLine($"Call DeleteGitRepo for key {gitKey}");
+
+        var command = new DeleteGitRepoCommandRequest(gitKey);
+        var result = await mediator.Send(command, cancellationToken);
+
+        return result.Match(_ => Results.Ok(), Results.BadRequest);
+    }
 }
