@@ -15,9 +15,9 @@
         <ProjectReference Include="..\SupportToolsServerRepositories\SupportToolsServerRepositories.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Figgle" Version="0.6.1" />
+        <PackageReference Include="Figgle" Version="0.6.2" />
         <PackageReference Include="MediatR" Version="12.5.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
