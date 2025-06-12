@@ -15,7 +15,6 @@ namespace SupportToolsServerApiKeyIdentity.Installers;
 // ReSharper disable once UnusedType.Global
 public sealed class ApiKeysInstaller : IInstaller
 {
-
     public int InstallPriority => 30;
     public int ServiceUsePriority => 30;
 
@@ -28,7 +27,7 @@ public sealed class ApiKeysInstaller : IInstaller
         builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         builder.Services.AddScoped<ICurrentUserByApiKey, CurrentUserByApiKey>();
 
-            builder.Services.AddScoped<IApiKeyFinder, ApiKeyByDatabaseFinder>();
+        builder.Services.AddScoped<IApiKeyFinder, ApiKeyByDatabaseFinder>();
 
         builder.Services
             .AddAuthentication(x => x.DefaultAuthenticateScheme = AuthenticationSchemaNames.ApiKeyAuthentication)

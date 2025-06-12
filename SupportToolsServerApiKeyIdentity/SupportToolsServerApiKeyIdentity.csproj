@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\WebSystemTools\ApiKeyIdentity\ApiKeyIdentity.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
+    <ProjectReference Include="..\SupportToolsServerRepositories\SupportToolsServerRepositories.csproj" />
   </ItemGroup>
 
 </Project>
