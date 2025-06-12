@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using ConfigurationEncrypt;
-using Figgle;
+using Figgle.Fonts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -46,7 +46,7 @@ try
 
         //WebSystemTools
         ApiExceptionHandler.AssemblyReference.Assembly, 
-        ApiKeyIdentity.AssemblyReference.Assembly,
+        SupportToolsServerApiKeyIdentity.AssemblyReference.Assembly,
         ConfigurationEncrypt.AssemblyReference.Assembly, 
         SerilogLogger.AssemblyReference.Assembly,
         SignalRMessages.AssemblyReference.Assembly,

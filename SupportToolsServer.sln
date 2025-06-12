@@ -101,6 +101,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeHost", "..\SupportTools
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoriesDom", "..\SystemTools\RepositoriesDom\RepositoriesDom.csproj", "{12049C24-EDDC-BC88-CFCC-413C78EAEF29}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerApiKeyIdentity", "SupportToolsServerApiKeyIdentity\SupportToolsServerApiKeyIdentity.csproj", "{703D90CF-F225-4831-B64D-38DFF2BB009B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -271,6 +273,10 @@ Global
 		{12049C24-EDDC-BC88-CFCC-413C78EAEF29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12049C24-EDDC-BC88-CFCC-413C78EAEF29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12049C24-EDDC-BC88-CFCC-413C78EAEF29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{703D90CF-F225-4831-B64D-38DFF2BB009B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{703D90CF-F225-4831-B64D-38DFF2BB009B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{703D90CF-F225-4831-B64D-38DFF2BB009B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{703D90CF-F225-4831-B64D-38DFF2BB009B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

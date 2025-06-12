@@ -2,7 +2,6 @@
     <ItemGroup>
         <ProjectReference Include="..\..\SupportToolsServerDbPart\SupportToolsServerDb\SupportToolsServerDb.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\ApiExceptionHandler\ApiExceptionHandler.csproj" />
-        <ProjectReference Include="..\..\WebSystemTools\ApiKeyIdentity\ApiKeyIdentity.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\SignalRMessages\SignalRMessages.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\TestToolsApi\TestToolsApi.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\StaticFilesTools\StaticFilesTools.csproj" />
@@ -11,11 +10,12 @@
         <ProjectReference Include="..\..\WebSystemTools\SerilogLogger\SerilogLogger.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\SwaggerTools\SwaggerTools.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\WindowsServiceTools\WindowsServiceTools.csproj" />
+        <ProjectReference Include="..\SupportToolsServerApiKeyIdentity\SupportToolsServerApiKeyIdentity.csproj" />
         <ProjectReference Include="..\SupportToolsServerApi\SupportToolsServerApi.csproj" />
         <ProjectReference Include="..\SupportToolsServerRepositories\SupportToolsServerRepositories.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Figgle" Version="0.6.2" />
+        <PackageReference Include="Figgle.Fonts" Version="0.6.2" />
         <PackageReference Include="MediatR" Version="12.5.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
