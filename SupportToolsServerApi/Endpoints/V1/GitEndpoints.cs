@@ -44,20 +44,14 @@ public class GitEndpoints : IInstaller
 
         //git repos
         group.MapGet(SupportToolsServerApiRoutes.Git.GitRepo, GetOneGitRepo);
-        //group.MapPost(SupportToolsServerApiRoutes.Git.UpdateGitRepo, UpdateGitRepo);
-        //group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitRepo, DeleteGitRepo);
+        group.MapPost(SupportToolsServerApiRoutes.Git.UpdateGitRepo, UpdateGitRepo);
+        group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitRepo, DeleteGitRepo);
 
         //gitIgnore FileTypes
         //group.MapGet(SupportToolsServerApiRoutes.Git.GitIgnoreFileTypesList, GetGitIgnoreFileTypesList);
         //group.MapPost(SupportToolsServerApiRoutes.Git.AddGitIgnoreFileTypeNameIfNotExists,
         //    AddGitIgnoreFileTypeNameIfNotExists);
         //group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitIgnoreFileType, DeleteGitIgnoreFileType);
-        //group.MapDelete(ProjectsApiRoutes.Projects.RemoveProjectService, RemoveProjectService);
-        //group.MapPost(ProjectsApiRoutes.Projects.StartService, StartService);
-        //group.MapPost(ProjectsApiRoutes.Projects.StopService, StopService);
-        //group.MapPost(ProjectsApiRoutes.Projects.Update, Update);
-        //group.MapPost(ProjectsApiRoutes.Projects.UpdateService, UpdateService);
-        //group.MapPost(ProjectsApiRoutes.Projects.UpdateSettings, UpdateSettings);
 
         if (debugMode)
             Console.WriteLine($"{GetType().Name}.{nameof(UseServices)} Finished");
@@ -105,30 +99,30 @@ public class GitEndpoints : IInstaller
         return result.Match(Results.Ok, Results.BadRequest);
     }
 
-    //private static async Task<IResult> UpdateGitRepo(
-    //    [FromRoute] string gitKey,
-    //    [FromBody] GitDataDto newRecord,
-    //    IMediator mediator,
-    //    CancellationToken cancellationToken = default)
-    //{
-    //    Debug.WriteLine($"Call UpdateGitRepo for key {gitKey}");
+    private static async Task<IResult> UpdateGitRepo(
+        [FromRoute] string gitKey,
+        [FromBody] GitDataDto newRecord,
+        IMediator mediator,
+        CancellationToken cancellationToken = default)
+    {
+        Debug.WriteLine($"Call UpdateGitRepo for key {gitKey}");
 
-    //    var command = new UpdateGitRepoCommandRequest(gitKey, newRecord);
-    //    var result = await mediator.Send(command, cancellationToken);
+        var command = new UpdateOneGitRepoCommandRequest(gitKey, newRecord);
+        var result = await mediator.Send(command, cancellationToken);
 
-    //    return result.Match(_ => Results.Ok(), Results.BadRequest);
-    //}
+        return result.Match(_ => Results.Ok(), Results.BadRequest);
+    }
 
-    //private static async Task<IResult> DeleteGitRepo(
-    //    [FromRoute] string gitKey,
-    //    IMediator mediator,
-    //    CancellationToken cancellationToken = default)
-    //{
-    //    Debug.WriteLine($"Call DeleteGitRepo for key {gitKey}");
+    private static async Task<IResult> DeleteGitRepo(
+        [FromRoute] string gitKey,
+        IMediator mediator,
+        CancellationToken cancellationToken = default)
+    {
+        Debug.WriteLine($"Call DeleteGitRepo for key {gitKey}");
 
-    //    var command = new DeleteGitRepoCommandRequest(gitKey);
-    //    var result = await mediator.Send(command, cancellationToken);
+        var command = new DeleteOneGitRepoCommandRequest(gitKey);
+        var result = await mediator.Send(command, cancellationToken);
 
-    //    return result.Match(_ => Results.Ok(), Results.BadRequest);
-    //}
+        return result.Match(_ => Results.Ok(), Results.BadRequest);
+    }
 }
