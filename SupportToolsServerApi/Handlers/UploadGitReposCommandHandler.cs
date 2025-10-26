@@ -20,7 +20,7 @@ public sealed class UploadGitReposCommandHandler : ICommandHandler<UploadGitRepo
         _gitsRepo = gitsRepo;
     }
 
-    public async Task<OneOf<Unit, IEnumerable<Err>>> Handle(UploadGitReposCommandRequest request,
+    public async Task<OneOf<Unit, Err[]>> Handle(UploadGitReposCommandRequest request,
         CancellationToken cancellationToken)
     {
         var gitDataUpdater = new GitDataUpdater(request.Gits, request.GitIgnoreFiles, _gitsRepo);

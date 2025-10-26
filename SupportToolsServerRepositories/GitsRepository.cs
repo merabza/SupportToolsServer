@@ -61,7 +61,7 @@ public sealed class GitsRepository : AbstractRepository, IGitsRepository
             }).ToListAsync(cancellationToken);
     }
 
-    public async Task<OneOf<GitDataDto, IEnumerable<Err>>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
+    public async Task<OneOf<GitDataDto, Err[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
     {
         var gitData = await _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation)
             .FirstOrDefaultAsync(x => x.GdName == gitKey, cancellationToken);

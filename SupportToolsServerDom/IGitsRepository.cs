@@ -17,5 +17,5 @@ public interface IGitsRepository : IAbstractRepository
     void UpdateGitIgnorePath(GitIgnoreFileType dbGitIgnorePath, CancellationToken cancellationToken = default);
     Task AddGit(GitData gitData, CancellationToken cancellationToken = default);
     Task<List<GitDataDto>> GetGitRepos(CancellationToken cancellationToken = default);
-    Task<OneOf<GitDataDto, IEnumerable<Err>>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken);
+    Task<OneOf<GitDataDto, Err[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken);
 }

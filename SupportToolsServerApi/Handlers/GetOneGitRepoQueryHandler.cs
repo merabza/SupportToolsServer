@@ -21,7 +21,7 @@ public sealed class GetOneGitRepoQueryHandler : IQueryHandler<GetOneGitRepoQuery
         _gitsRepo = gitsRepo;
     }
 
-    public async Task<OneOf<GitDataDto, IEnumerable<Err>>> Handle(GetOneGitRepoQueryRequest request,
+    public async Task<OneOf<GitDataDto, Err[]>> Handle(GetOneGitRepoQueryRequest request,
         CancellationToken cancellationToken = default)
     {
         // Assumes request.RecordKey exists; adjust as needed

@@ -62,7 +62,7 @@ public class GitEndpoints : IInstaller
     }
 
     // POST api/git/uploadgitrepos
-    public static async Task<Results<Ok, BadRequest<IEnumerable<Err>>>> UploadGitRepos(
+    public static async Task<Results<Ok, BadRequest<Err[]>>> UploadGitRepos(
         [FromBody] SyncGitRequest syncGitData, ICurrentUserByApiKey currentUserByApiKey, IMediator mediator,
         IMessagesDataManager messagesDataManager, CancellationToken cancellationToken = default)
     {
@@ -76,12 +76,12 @@ public class GitEndpoints : IInstaller
 
         await messagesDataManager.SendMessage(userName, $"{nameof(UploadGitRepos)} finished", cancellationToken);
 
-        return result.Match<Results<Ok, BadRequest<IEnumerable<Err>>>>(_ => TypedResults.Ok(),
+        return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));
     }
 
     // GET api/git/gitrepos
-    public static async Task<Results<Ok<List<GitDataDto>>, BadRequest<IEnumerable<Err>>>> GetGitRepos(
+    public static async Task<Results<Ok<List<GitDataDto>>, BadRequest<Err[]>>> GetGitRepos(
         IMediator mediator, CancellationToken cancellationToken = default)
     {
         Debug.WriteLine($"Call {nameof(GetGitReposQueryHandler)} from {nameof(GetGitRepos)}");
@@ -89,12 +89,12 @@ public class GitEndpoints : IInstaller
         var command = new GetGitReposQueryRequest();
         var result = await mediator.Send(command, cancellationToken);
 
-        return result.Match<Results<Ok<List<GitDataDto>>, BadRequest<IEnumerable<Err>>>>(res => TypedResults.Ok(res),
+        return result.Match<Results<Ok<List<GitDataDto>>, BadRequest<Err[]>>>(res => TypedResults.Ok(res),
             errors => TypedResults.BadRequest(errors));
     }
 
     // GET api/git/GitRepo
-    public static async Task<Results<Ok<GitDataDto>, BadRequest<IEnumerable<Err>>>> GetOneGitRepo(
+    public static async Task<Results<Ok<GitDataDto>, BadRequest<Err[]>>> GetOneGitRepo(
         [FromRoute] string gitKey, IMediator mediator, CancellationToken cancellationToken = default)
     {
         Debug.WriteLine($"Call {nameof(GetOneGitRepoQueryHandler)} from {nameof(GetOneGitRepo)}");
@@ -102,12 +102,12 @@ public class GitEndpoints : IInstaller
         var command = new GetOneGitRepoQueryRequest(gitKey);
         var result = await mediator.Send(command, cancellationToken);
 
-        return result.Match<Results<Ok<GitDataDto>, BadRequest<IEnumerable<Err>>>>(res => TypedResults.Ok(res),
+        return result.Match<Results<Ok<GitDataDto>, BadRequest<Err[]>>>(res => TypedResults.Ok(res),
             errors => TypedResults.BadRequest(errors));
     }
 
     // POST api/git/updategitrepo/{gitKey}
-    public static async Task<Results<Ok, BadRequest<IEnumerable<Err>>>> UpdateOneGitRepo([FromRoute] string gitKey,
+    public static async Task<Results<Ok, BadRequest<Err[]>>> UpdateOneGitRepo([FromRoute] string gitKey,
         [FromBody] GitDataDto newRecord, IMediator mediator, CancellationToken cancellationToken = default)
     {
         Debug.WriteLine($"Call {nameof(UpdateOneGitRepoCommandHandler)} for key {gitKey} from {nameof(UpdateOneGitRepo)}");
@@ -115,12 +115,12 @@ public class GitEndpoints : IInstaller
         var command = new UpdateOneGitRepoCommandRequest(gitKey, newRecord);
         var result = await mediator.Send(command, cancellationToken);
 
-        return result.Match<Results<Ok, BadRequest<IEnumerable<Err>>>>(_ => TypedResults.Ok(),
+        return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));
     }
 
     // DELETE api/git/deletegitrepo/{gitKey}
-    public static async Task<Results<Ok, BadRequest<IEnumerable<Err>>>> DeleteOneGitRepo([FromRoute] string gitKey,
+    public static async Task<Results<Ok, BadRequest<Err[]>>> DeleteOneGitRepo([FromRoute] string gitKey,
         IMediator mediator, CancellationToken cancellationToken = default)
     {
         Debug.WriteLine($"Call {nameof(DeleteOneGitRepoCommandHandler)} for key {gitKey} from {nameof(DeleteOneGitRepo)}");
@@ -128,14 +128,14 @@ public class GitEndpoints : IInstaller
         var command = new DeleteOneGitRepoCommandRequest(gitKey);
         var result = await mediator.Send(command, cancellationToken);
 
-        return result.Match<Results<Ok, BadRequest<IEnumerable<Err>>>>(_ => TypedResults.Ok(),
+        return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));
     }
 
     
     //gitIgnore FileTypes
     // GET api/git/gitignorefiletypeslist
-    public static async Task<Results<Ok<List<GitDataDto>>, BadRequest<IEnumerable<Err>>>> GetGitIgnoreFileTypesList(
+    public static async Task<Results<Ok<List<GitDataDto>>, BadRequest<Err[]>>> GetGitIgnoreFileTypesList(
         IMediator mediator, CancellationToken cancellationToken = default)
     {
         Debug.WriteLine($"Call {nameof(GetGitIgnoreFileTypesQueryHandler)} from {nameof(GetGitIgnoreFileTypesList)}");
@@ -143,12 +143,12 @@ public class GitEndpoints : IInstaller
         var command = new GetGitIgnoreFileTypesQueryRequest();
         var result = await mediator.Send(command, cancellationToken);
 
-        return result.Match<Results<Ok<List<GitDataDto>>, BadRequest<IEnumerable<Err>>>>(res => TypedResults.Ok(res),
+        return result.Match<Results<Ok<List<GitDataDto>>, BadRequest<Err[]>>>(res => TypedResults.Ok(res),
             errors => TypedResults.BadRequest(errors));
     }
 
     // POST api/git/addgitignorefiletypenameifnotexists/{gitIgnoreFileTypeName}
-    public static async Task<Results<Ok, BadRequest<IEnumerable<Err>>>> AddGitIgnoreFileTypeNameIfNotExists([FromRoute] string gitKey,
+    public static async Task<Results<Ok, BadRequest<Err[]>>> AddGitIgnoreFileTypeNameIfNotExists([FromRoute] string gitKey,
         [FromBody] GitDataDto newRecord, IMediator mediator, CancellationToken cancellationToken = default)
     {
         Debug.WriteLine($"Call {nameof(AddGitIgnoreFileTypeNameIfNotExistsCommandHandler)} for key {gitKey} from {nameof(AddGitIgnoreFileTypeNameIfNotExists)}");
@@ -156,12 +156,12 @@ public class GitEndpoints : IInstaller
         var command = new AddGitIgnoreFileTypeNameIfNotExistsCommandRequest(gitKey, newRecord);
         var result = await mediator.Send(command, cancellationToken);
 
-        return result.Match<Results<Ok, BadRequest<IEnumerable<Err>>>>(_ => TypedResults.Ok(),
+        return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));
     }
 
     // DELETE api/git/deletegitignorefiletype/{gitIgnoreFileTypeName}
-    public static async Task<Results<Ok, BadRequest<IEnumerable<Err>>>> DeleteGitIgnoreFileType([FromRoute] string gitKey,
+    public static async Task<Results<Ok, BadRequest<Err[]>>> DeleteGitIgnoreFileType([FromRoute] string gitKey,
         IMediator mediator, CancellationToken cancellationToken = default)
     {
         Debug.WriteLine($"Call {nameof(DeleteGitIgnoreFileTypeCommandHandler)} for key {gitKey} from {nameof(DeleteGitIgnoreFileType)}");
@@ -169,7 +169,7 @@ public class GitEndpoints : IInstaller
         var command = new DeleteGitIgnoreFileTypeCommandRequest(gitKey);
         var result = await mediator.Send(command, cancellationToken);
 
-        return result.Match<Results<Ok, BadRequest<IEnumerable<Err>>>>(_ => TypedResults.Ok(),
+        return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));
     }
 

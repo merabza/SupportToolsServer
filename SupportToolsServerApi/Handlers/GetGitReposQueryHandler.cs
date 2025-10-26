@@ -21,7 +21,7 @@ public sealed class GetGitReposQueryHandler : IQueryHandler<GetGitReposQueryRequ
         _gitsRepo = gitsRepo;
     }
 
-    public async Task<OneOf<List<GitDataDto>, IEnumerable<Err>>> Handle(GetGitReposQueryRequest request,
+    public async Task<OneOf<List<GitDataDto>, Err[]>> Handle(GetGitReposQueryRequest request,
         CancellationToken cancellationToken = default)
     {
         //ჩაიტვირთოს დერივაციის ფორმულები, ყველა
