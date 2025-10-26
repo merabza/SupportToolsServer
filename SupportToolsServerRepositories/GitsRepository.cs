@@ -67,7 +67,7 @@ public sealed class GitsRepository : AbstractRepository, IGitsRepository
             .FirstOrDefaultAsync(x => x.GdName == gitKey, cancellationToken);
 
         if (gitData is null)
-            return new List<Err>
+            return new Err[]
             {
                 new()
                 {
