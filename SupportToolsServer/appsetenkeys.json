@@ -1,7 +1,8 @@
 {
-    "Keys": [
-        "Data:SupportToolsServerDatabase:ConnectionString",
-        "IdentitySettings:JwtSecret",
-        "Serilog:WriteTo:1:Args:path"
-    ]
+  "Keys": [
+    "Data:SupportToolsServerDatabase:ConnectionString",
+    "IdentitySettings:JwtSecret",
+    "Serilog:WriteTo:1:Args:path",
+    "MediatRLicenseKey"
+  ]
 }

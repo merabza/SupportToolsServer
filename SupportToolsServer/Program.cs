@@ -4,11 +4,13 @@ using System.Reflection;
 using ConfigurationEncrypt;
 using Figgle.Fonts;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SwaggerTools;
 using WebInstallers;
+using AssemblyReference = SupportToolsServerDb.AssemblyReference;
 
 try
 {
@@ -40,7 +42,7 @@ try
         // @formatter:off
 
         //SupportToolsServerDbPart
-        SupportToolsServerDb.AssemblyReference.Assembly, 
+        AssemblyReference.Assembly, 
         SupportToolsServerRepositories.AssemblyReference.Assembly,
         SupportToolsServerApi.AssemblyReference.Assembly,
 
@@ -59,8 +61,13 @@ try
 
         return 2;
 
+    var mediatRSettings = builder.Configuration.GetSection("MediatRLicenseKey");
+
+    var mediatRLicenseKey = mediatRSettings.Get<string>();
+
     builder.Services.AddMediatR(cfg =>
     {
+        cfg.LicenseKey = mediatRLicenseKey;
         cfg.RegisterServicesFromAssembly(SupportToolsServerApi.AssemblyReference.Assembly);
     });
 
