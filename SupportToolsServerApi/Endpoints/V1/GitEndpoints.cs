@@ -23,7 +23,7 @@ namespace SupportToolsServerApi.Endpoints.V1;
 
 // ReSharper disable once UnusedMember.Global
 // ReSharper disable once UnusedType.Global
-public class GitEndpoints : IInstaller
+public sealed class GitEndpoints : IInstaller
 {
     public int InstallPriority => 50;
     public int ServiceUsePriority => 50;
