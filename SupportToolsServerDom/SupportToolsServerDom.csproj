@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="13.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\SupportToolsServerDbPart\SupportToolsServerDb\SupportToolsServerDb.csproj" />
     <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
     <ProjectReference Include="..\..\SystemTools\RepositoriesDom\RepositoriesDom.csproj" />

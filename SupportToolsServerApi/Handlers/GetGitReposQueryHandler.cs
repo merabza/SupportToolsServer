@@ -13,10 +13,10 @@ namespace SupportToolsServerApi.Handlers;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class GetGitReposQueryHandler : IQueryHandler<GetGitReposQueryRequest, List<GitDataDto>>
 {
-    private readonly IGitsRepository _gitsRepo;
+    private readonly IGitsQueriesRepository _gitsRepo;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GetGitReposQueryHandler(IGitsRepository gitsRepo)
+    public GetGitReposQueryHandler(IGitsQueriesRepository gitsRepo)
     {
         _gitsRepo = gitsRepo;
     }

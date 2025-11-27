@@ -46,8 +46,8 @@ public sealed class GitEndpoints : IInstaller
         group.MapPost(SupportToolsServerApiRoutes.Git.UploadGitRepos, UploadGitRepos);
         group.MapGet(SupportToolsServerApiRoutes.Git.GitRepos, GetGitRepos);
         group.MapGet(SupportToolsServerApiRoutes.Git.GitRepo, GetOneGitRepo);
-        group.MapPost(SupportToolsServerApiRoutes.Git.UpdateGitRepo, UpdateGitRepo);
-        group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitRepo, DeleteGitRepo);
+        group.MapPost(SupportToolsServerApiRoutes.Git.UpdateGitRepo, UpdateOneGitRepo);
+        group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitRepo, DeleteOneGitRepo);
 
         //gitIgnore FileTypes
         group.MapGet(SupportToolsServerApiRoutes.Git.GitIgnoreFileTypesList, GetGitIgnoreFileTypesList);

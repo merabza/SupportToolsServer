@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using ApiKeysManagement;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SupportToolsServerDom;
@@ -22,8 +21,8 @@ public sealed class RepositoriesInstaller : IInstaller
         if (debugMode)
             Console.WriteLine($"{GetType().Name}.{nameof(InstallServices)} Started");
 
-        //builder.Services.AddScoped<IRootsCrudRepository, RootsCrudRepository>();
-        builder.Services.AddScoped<IGitsRepository, GitsRepository>();
+        builder.Services.AddScoped<IGitsQueriesRepository, GitsQueriesRepository>();
+        builder.Services.AddScoped<IGitsCommandsRepository, GitsCommandsRepository>();
 
         if (debugMode)
             Console.WriteLine($"{GetType().Name}.{nameof(InstallServices)} Finished");
