@@ -10,15 +10,17 @@ public sealed class GitDataUpdater
 {
     private readonly List<GitIgnoreFileDto> _gitIgnoreFiles;
     private readonly Dictionary<string, GitDataDto> _gits;
-    private readonly IGitsRepository _gitsRepo;
+    private readonly IGitsQueriesRepository _gitsQueriesRepo;
+    private readonly IGitsCommandsRepository _gitsCommandsRepo;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitDataUpdater(Dictionary<string, GitDataDto> gits, List<GitIgnoreFileDto> gitIgnoreFiles,
-        IGitsRepository gitsRepo)
+        IGitsQueriesRepository gitsQueriesRepo, IGitsCommandsRepository gitsCommandsRepo)
     {
         _gits = gits;
         _gitIgnoreFiles = gitIgnoreFiles;
-        _gitsRepo = gitsRepo;
+        _gitsQueriesRepo = gitsQueriesRepo;
+        _gitsCommandsRepo = gitsCommandsRepo;
     }
 
     public async Task Run(CancellationToken cancellationToken = default)
@@ -29,7 +31,7 @@ public sealed class GitDataUpdater
     private async Task SyncGitData(List<GitIgnoreFileType> gitIgnoreFileTypes,
         CancellationToken cancellationToken = default)
     {
-        var dbGits = await _gitsRepo.GetAllGitsFromDb(cancellationToken);
+        var dbGits = await _gitsQueriesRepo.GetAllGitsFromDb(cancellationToken);
 
         foreach (var git in _gits)
         {
@@ -47,7 +49,7 @@ public sealed class GitDataUpdater
                     GitIgnoreFileTypeNavigation = gitIgnoreFileType,
                     GdFolderName = git.Value.GitProjectFolderName
                 };
-                await _gitsRepo.AddGit(newGitData, cancellationToken);
+                await _gitsCommandsRepo.AddGit(newGitData, cancellationToken);
             }
             else if (dbGitByAddress is not null && dbGitByName is not null)
             {
@@ -61,12 +63,12 @@ public sealed class GitDataUpdater
                 dbGitByName.GdGitAddress = git.Value.GitProjectAddress;
             }
         }
-        await _gitsRepo.SaveChangesAsync(cancellationToken);
+        await _gitsQueriesRepo.SaveChangesAsync(cancellationToken);
     }
 
     private async Task<List<GitIgnoreFileType>> SyncGitIgnoreFiles(CancellationToken cancellationToken = default)
     {
-        var dbGitIgnorePaths = await _gitsRepo.GetAllGitIgnorePathsFromDb(cancellationToken);
+        var dbGitIgnorePaths = await _gitsQueriesRepo.GetAllGitIgnorePathsFromDb(cancellationToken);
 
         foreach (var gitIgnoreFile in _gitIgnoreFiles)
         {
@@ -77,7 +79,7 @@ public sealed class GitDataUpdater
                 {
                     Name = gitIgnoreFile.Name, Content = gitIgnoreFile.Content
                 };
-                await _gitsRepo.AddGitIgnorePath(newGitIgnorePath, cancellationToken);
+                await _gitsCommandsRepo.AddGitIgnorePath(newGitIgnorePath, cancellationToken);
                 dbGitIgnorePaths.Add(newGitIgnorePath);
             }
             else
@@ -85,7 +87,7 @@ public sealed class GitDataUpdater
                 if (dbGitIgnorePath.Content == gitIgnoreFile.Content)
                     continue;
                 dbGitIgnorePath.Content = gitIgnoreFile.Content;
-                _gitsRepo.UpdateGitIgnorePath(dbGitIgnorePath, cancellationToken);
+                _gitsCommandsRepo.UpdateGitIgnorePath(dbGitIgnorePath, cancellationToken);
             }
         }
 

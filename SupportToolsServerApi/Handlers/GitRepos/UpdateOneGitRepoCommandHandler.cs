@@ -7,23 +7,23 @@ using SupportToolsServerApi.CommandRequests;
 using SupportToolsServerDom;
 using SystemToolsShared.Errors;
 
-namespace SupportToolsServerApi.Handlers;
+namespace SupportToolsServerApi.Handlers.GitRepos;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class DeleteOneGitRepoCommandHandler : ICommandHandler<DeleteOneGitRepoCommandRequest>
+public sealed class UpdateOneGitRepoCommandHandler : ICommandHandler<UpdateOneGitRepoCommandRequest>
 {
     private readonly IGitsCommandsRepository _gitsRepo;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DeleteOneGitRepoCommandHandler(IGitsCommandsRepository gitsRepo)
+    public UpdateOneGitRepoCommandHandler(IGitsCommandsRepository gitsRepo)
     {
         _gitsRepo = gitsRepo;
     }
 
-    public async Task<OneOf<Unit, Err[]>> Handle(DeleteOneGitRepoCommandRequest request, CancellationToken cancellationToken)
+    public async Task<OneOf<Unit, Err[]>> Handle(UpdateOneGitRepoCommandRequest request, CancellationToken cancellationToken)
     {
         // Assumes request.RecordKey exists; adjust as needed
-        await _gitsRepo.DeleteGitRepo(request.GitKey, cancellationToken);
+        await _gitsRepo.UpdateGitRepo(request.GitKey, request.NewRecord, cancellationToken);
         return Unit.Value;
     }
 }

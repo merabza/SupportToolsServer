@@ -1,4 +1,3 @@
-﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatRMessagingAbstractions;
@@ -8,23 +7,23 @@ using SupportToolsServerApiContracts.Models;
 using SupportToolsServerDom;
 using SystemToolsShared.Errors;
 
-namespace SupportToolsServerApi.Handlers;
+namespace SupportToolsServerApi.Handlers.GitRepos;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class GetGitReposQueryHandler : IQueryHandler<GetGitReposQueryRequest, List<GitDataDto>>
+public sealed class GetOneGitRepoQueryHandler : IQueryHandler<GetOneGitRepoQueryRequest, GitDataDto>
 {
     private readonly IGitsQueriesRepository _gitsRepo;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GetGitReposQueryHandler(IGitsQueriesRepository gitsRepo)
+    public GetOneGitRepoQueryHandler(IGitsQueriesRepository gitsRepo)
     {
         _gitsRepo = gitsRepo;
     }
 
-    public async Task<OneOf<List<GitDataDto>, Err[]>> Handle(GetGitReposQueryRequest request,
+    public async Task<OneOf<GitDataDto, Err[]>> Handle(GetOneGitRepoQueryRequest request,
         CancellationToken cancellationToken = default)
     {
-        //ჩაიტვირთოს დერივაციის ფორმულები, ყველა
-        return await _gitsRepo.GetGitRepos(cancellationToken);
+        // Assumes request.RecordKey exists; adjust as needed
+        return await _gitsRepo.GetGitRepoByKey(request.GitKey, cancellationToken);
     }
 }

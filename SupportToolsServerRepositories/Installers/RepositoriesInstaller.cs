@@ -1,10 +1,12 @@
 //Created by CarcassRepositoriesInstallerClassCreator at 8/1/2022 9:35:56 PM
 
-using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using RepositoriesDom;
 using SupportToolsServerDom;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using WebInstallers;
 
 namespace SupportToolsServerRepositories.Installers;
@@ -23,6 +25,9 @@ public sealed class RepositoriesInstaller : IInstaller
 
         builder.Services.AddScoped<IGitsQueriesRepository, GitsQueriesRepository>();
         builder.Services.AddScoped<IGitsCommandsRepository, GitsCommandsRepository>();
+
+        builder.Services.AddScoped<IGitIgnoreFileTypesQueriesRepository, GitIgnoreFileTypesQueriesRepository>();
+        builder.Services.AddScoped<IGitIgnoreFileTypesCommandsRepository, GitIgnoreFileTypesCommandsRepository>();
 
         if (debugMode)
             Console.WriteLine($"{GetType().Name}.{nameof(InstallServices)} Finished");
