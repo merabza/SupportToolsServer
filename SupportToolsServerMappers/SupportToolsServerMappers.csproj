@@ -8,7 +8,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SupportToolsServerDbPart\SupportToolsServerDb\SupportToolsServerDb.csproj" />
+    <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
     <ProjectReference Include="..\..\SystemTools\ApiKeysManagement\ApiKeysManagement.csproj" />
+    <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
   </ItemGroup>
 
 </Project>

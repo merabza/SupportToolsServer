@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using SwaggerTools;
 using WebInstallers;
-using AssemblyReference = SupportToolsServerDb.AssemblyReference;
 
 try
 {
@@ -42,13 +41,15 @@ try
         // @formatter:off
 
         //SupportToolsServerDbPart
-        AssemblyReference.Assembly, 
-        SupportToolsServerRepositories.AssemblyReference.Assembly,
         SupportToolsServerApi.AssemblyReference.Assembly,
+        SupportToolsServerApiKeyIdentity.AssemblyReference.Assembly,
+        SupportToolsServerApplication.AssemblyReference.Assembly,
+        SupportToolsServerCommandRepositories.AssemblyReference.Assembly,
+        SupportToolsServerQueryRepositories.AssemblyReference.Assembly,
+        SupportToolsServerDb.AssemblyReference.Assembly,
 
         //WebSystemTools
         ApiExceptionHandler.AssemblyReference.Assembly, 
-        SupportToolsServerApiKeyIdentity.AssemblyReference.Assembly,
         ConfigurationEncrypt.AssemblyReference.Assembly, 
         SerilogLogger.AssemblyReference.Assembly,
         SignalRMessages.AssemblyReference.Assembly,

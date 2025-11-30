@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11222.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServer", "SupportToolsServer\SupportToolsServer.csproj", "{4FD40ED6-E14D-4B2F-9C2F-A1753BDA92CA}"
 EndProject
@@ -48,10 +48,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiKeyIdentity", "..\WebSystemTools\ApiKeyIdentity\ApiKeyIdentity.csproj", "{CCACD52F-6A98-A9F6-990D-50E9FC231E81}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediatRMessagingAbstractions", "..\SystemTools\MediatRMessagingAbstractions\MediatRMessagingAbstractions.csproj", "{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerDom", "SupportToolsServerDom\SupportToolsServerDom.csproj", "{E97C7400-DD03-495C-A20B-33B004203DAD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerRepositories", "SupportToolsServerRepositories\SupportToolsServerRepositories.csproj", "{7E98BABB-DCB3-4EFF-8D41-87B639140D3B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiKeysManagement", "..\SystemTools\ApiKeysManagement\ApiKeysManagement.csproj", "{03AA1305-F1AF-0F4D-A8DF-D94A1E5A3BD0}"
 EndProject
@@ -102,6 +98,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoriesDom", "..\SystemTools\RepositoriesDom\RepositoriesDom.csproj", "{12049C24-EDDC-BC88-CFCC-413C78EAEF29}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerApiKeyIdentity", "SupportToolsServerApiKeyIdentity\SupportToolsServerApiKeyIdentity.csproj", "{703D90CF-F225-4831-B64D-38DFF2BB009B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerQueryRepositories", "SupportToolsServerQueryRepositories\SupportToolsServerQueryRepositories.csproj", "{592C1F05-8165-4DA5-94B0-05E67EEAEA2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerCommandRepositories", "SupportToolsServerCommandRepositories\SupportToolsServerCommandRepositories.csproj", "{5CFC2F32-C16F-4334-BAA1-3C901E197BA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportToolsServerApplication", "SupportToolsServerApplication\SupportToolsServerApplication.csproj", "{56F66622-D21F-4700-AF31-7A93E2DF23D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerDbTools", "..\DatabaseTools\SqlServerDbTools\SqlServerDbTools.csproj", "{E0A8DCD9-1DD3-5AEC-8AFB-19F75A256C0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -189,14 +193,6 @@ Global
 		{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{401389A9-72ED-5AE8-A533-8BA7BF15D5ED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E97C7400-DD03-495C-A20B-33B004203DAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E97C7400-DD03-495C-A20B-33B004203DAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E97C7400-DD03-495C-A20B-33B004203DAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E97C7400-DD03-495C-A20B-33B004203DAD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7E98BABB-DCB3-4EFF-8D41-87B639140D3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7E98BABB-DCB3-4EFF-8D41-87B639140D3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7E98BABB-DCB3-4EFF-8D41-87B639140D3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7E98BABB-DCB3-4EFF-8D41-87B639140D3B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{03AA1305-F1AF-0F4D-A8DF-D94A1E5A3BD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{03AA1305-F1AF-0F4D-A8DF-D94A1E5A3BD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03AA1305-F1AF-0F4D-A8DF-D94A1E5A3BD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -277,6 +273,22 @@ Global
 		{703D90CF-F225-4831-B64D-38DFF2BB009B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{703D90CF-F225-4831-B64D-38DFF2BB009B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{703D90CF-F225-4831-B64D-38DFF2BB009B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{592C1F05-8165-4DA5-94B0-05E67EEAEA2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{592C1F05-8165-4DA5-94B0-05E67EEAEA2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{592C1F05-8165-4DA5-94B0-05E67EEAEA2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{592C1F05-8165-4DA5-94B0-05E67EEAEA2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CFC2F32-C16F-4334-BAA1-3C901E197BA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CFC2F32-C16F-4334-BAA1-3C901E197BA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CFC2F32-C16F-4334-BAA1-3C901E197BA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CFC2F32-C16F-4334-BAA1-3C901E197BA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56F66622-D21F-4700-AF31-7A93E2DF23D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56F66622-D21F-4700-AF31-7A93E2DF23D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56F66622-D21F-4700-AF31-7A93E2DF23D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56F66622-D21F-4700-AF31-7A93E2DF23D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0A8DCD9-1DD3-5AEC-8AFB-19F75A256C0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0A8DCD9-1DD3-5AEC-8AFB-19F75A256C0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0A8DCD9-1DD3-5AEC-8AFB-19F75A256C0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0A8DCD9-1DD3-5AEC-8AFB-19F75A256C0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -317,6 +329,7 @@ Global
 		{C230B1E9-4B27-A9E4-CF26-3677A684761D} = {2A39B18C-3190-4F69-989D-4B8ED0C59397}
 		{363DCD79-2348-0F2F-FD9A-8F703DE58C2A} = {2A39B18C-3190-4F69-989D-4B8ED0C59397}
 		{12049C24-EDDC-BC88-CFCC-413C78EAEF29} = {CB720E79-FAF5-485B-84EF-8C1CAC0FB5E8}
+		{E0A8DCD9-1DD3-5AEC-8AFB-19F75A256C0C} = {BE189D4D-47E3-47AF-91B3-4AEF806735A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {078FEA0B-DE8E-488E-A3DF-7B91C67E1E5A}

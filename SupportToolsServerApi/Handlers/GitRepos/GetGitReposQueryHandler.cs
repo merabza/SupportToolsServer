@@ -1,30 +1,32 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatRMessagingAbstractions;
 using OneOf;
 using SupportToolsServerApi.QueryRequests;
 using SupportToolsServerApiContracts.Models;
-using SupportToolsServerDom;
+using SupportToolsServerApplication.Services.Gits.List;
+using SupportToolsServerMappers;
 using SystemToolsShared.Errors;
 
 namespace SupportToolsServerApi.Handlers.GitRepos;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class GetGitReposQueryHandler : IQueryHandler<GetGitReposQueryRequest, List<GitDataDto>>
+public sealed class GetGitReposQueryHandler : IQueryHandler<GetGitReposRequestQuery, List<StsGitDataModel>>
 {
-    private readonly IGitsQueriesRepository _gitsRepo;
+    private readonly GitsListService _gitsListService;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GetGitReposQueryHandler(IGitsQueriesRepository gitsRepo)
+    public GetGitReposQueryHandler(GitsListService gitsListService)
     {
-        _gitsRepo = gitsRepo;
+        _gitsListService = gitsListService;
     }
 
-    public async Task<OneOf<List<GitDataDto>, Err[]>> Handle(GetGitReposQueryRequest request,
+    public async Task<OneOf<List<StsGitDataModel>, Err[]>> Handle(GetGitReposRequestQuery request,
         CancellationToken cancellationToken = default)
     {
-        //ჩაიტვირთოს დერივაციის ფორმულები, ყველა
-        return await _gitsRepo.GetGitRepos(cancellationToken);
+        return (await _gitsListService.GetGits(cancellationToken)).Match<OneOf<List<StsGitDataModel>, Err[]>>(
+            f0 => f0.Select(x => x.ToContractModel()).ToList(), f1 => f1);
     }
 }

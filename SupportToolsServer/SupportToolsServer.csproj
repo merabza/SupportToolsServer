@@ -12,7 +12,9 @@
         <ProjectReference Include="..\..\WebSystemTools\WindowsServiceTools\WindowsServiceTools.csproj" />
         <ProjectReference Include="..\SupportToolsServerApiKeyIdentity\SupportToolsServerApiKeyIdentity.csproj" />
         <ProjectReference Include="..\SupportToolsServerApi\SupportToolsServerApi.csproj" />
-        <ProjectReference Include="..\SupportToolsServerRepositories\SupportToolsServerRepositories.csproj" />
+        <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
+        <ProjectReference Include="..\SupportToolsServerCommandRepositories\SupportToolsServerCommandRepositories.csproj" />
+        <ProjectReference Include="..\SupportToolsServerQueryRepositories\SupportToolsServerQueryRepositories.csproj" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Figgle.Fonts" Version="0.6.5" />
