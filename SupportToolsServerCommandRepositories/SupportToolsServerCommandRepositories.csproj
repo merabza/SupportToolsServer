@@ -14,7 +14,6 @@
     <ProjectReference Include="..\..\DatabaseTools\SqlServerDbTools\SqlServerDbTools.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
     <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
-    <ProjectReference Include="..\SupportToolsServerDom\SupportToolsServerDom.csproj" />
   </ItemGroup>
 
 </Project>
