@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using OneOf;
@@ -11,6 +12,6 @@ public class GitDeleteService : IScopedService
 {
     public Task<OneOf<Unit, Err[]>> DeleteGitRepo(string requestRecordKey, CancellationToken cancellationToken)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using SwaggerTools;
 using WebInstallers;
+using AssemblyReference = SupportToolsServerApi.AssemblyReference;
 
 try
 {
@@ -41,7 +42,7 @@ try
         // @formatter:off
 
         //SupportToolsServerDbPart
-        SupportToolsServerApi.AssemblyReference.Assembly,
+        AssemblyReference.Assembly,
         SupportToolsServerApiKeyIdentity.AssemblyReference.Assembly,
         SupportToolsServerApplication.AssemblyReference.Assembly,
         SupportToolsServerCommandRepositories.AssemblyReference.Assembly,
@@ -69,7 +70,7 @@ try
     builder.Services.AddMediatR(cfg =>
     {
         cfg.LicenseKey = mediatRLicenseKey;
-        cfg.RegisterServicesFromAssembly(SupportToolsServerApi.AssemblyReference.Assembly);
+        cfg.RegisterServicesFromAssembly(AssemblyReference.Assembly);
     });
 
     //ReSharper disable once using

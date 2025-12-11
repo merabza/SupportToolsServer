@@ -37,5 +37,5 @@ public static class GitMapper
             GitProjectFolderName = gitRepoModel.GitProjectFolderName,
             GitIgnorePathName = gitRepoModel.GitIgnorePathName
         };
-    }   
+    }
 }

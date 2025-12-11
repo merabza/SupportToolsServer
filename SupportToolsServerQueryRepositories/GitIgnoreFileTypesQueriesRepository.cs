@@ -25,6 +25,18 @@ public sealed class GitIgnoreFileTypesQueriesRepository : AbstractRepository, IG
         _dbContext = dbContext;
     }
 
+    public async Task<OneOf<List<GitIgnoreFileTypeDto>, Err[]>> GetGitIgnoreFileTypes(
+        CancellationToken cancellationToken)
+    {
+        return await _dbContext.GitIgnoreFileTypes.Select(s =>
+            new GitIgnoreFileTypeDto { Name = s.Name, Content = s.Content }).ToListAsync(cancellationToken);
+    }
+
+    public async Task<OneOf<List<string>, Err[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
+    {
+        return await _dbContext.GitIgnoreFileTypes.Select(s => s.Name).ToListAsync(cancellationToken);
+    }
+
     public Task<List<GitIgnoreFileType>> GetAllGitIgnorePathsFromDb(CancellationToken cancellationToken = default)
     {
         return _dbContext.GitIgnoreFileTypes.ToListAsync(cancellationToken);
@@ -80,21 +92,6 @@ public sealed class GitIgnoreFileTypesQueriesRepository : AbstractRepository, IG
             GitProjectFolderName = gitData.GdFolderName,
             GitProjectName = gitData.GdName
         };
-    }
-
-    public async Task<OneOf<List<GitIgnoreFileTypeDto>, Err[]>> GetGitIgnoreFileTypes(CancellationToken cancellationToken)
-    {
-        return await _dbContext.GitIgnoreFileTypes.Select(s =>
-            new GitIgnoreFileTypeDto
-            {
-                Name = s.Name,
-                Content = s.Content
-            }).ToListAsync(cancellationToken);
-    }
-
-    public async Task<OneOf<List<string>, Err[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
-    {
-        return await _dbContext.GitIgnoreFileTypes.Select(s =>s.Name).ToListAsync(cancellationToken);
     }
 
     public Task<List<GitData>> GetAllGitsFromDb(CancellationToken cancellationToken = default)

@@ -21,7 +21,8 @@ public sealed class UpdateOneGitRepoCommandHandler : ICommandHandler<UpdateOneGi
         _gitsRepo = gitsRepo;
     }
 
-    public async Task<OneOf<Unit, Err[]>> Handle(UpdateOneGitRepoRequestCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Unit, Err[]>> Handle(UpdateOneGitRepoRequestCommand request,
+        CancellationToken cancellationToken)
     {
         // Assumes request.RecordKey exists; adjust as needed
         await _gitsRepo.UpdateGitRepo(request.NewRecord.AdaptTo(), cancellationToken);

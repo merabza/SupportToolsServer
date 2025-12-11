@@ -22,6 +22,7 @@ public class GitsListService : IScopedService
     {
         return await _repo.GetGitRepos(cancellationToken);
     }
+
     public async Task<OneOf<GitDataDto, Err[]>> GetOneGit(string requestGitKey, CancellationToken cancellationToken)
     {
         return await _repo.GetGitRepoByKey(requestGitKey, cancellationToken);

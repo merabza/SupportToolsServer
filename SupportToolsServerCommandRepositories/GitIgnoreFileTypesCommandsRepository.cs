@@ -30,18 +30,18 @@ public sealed class GitIgnoreFileTypesCommandsRepository : IGitIgnoreFileTypesCo
         using var dbConnection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
 
         return await dbConnection.QuerySingleOrDefaultAsync<int>("""
-                                                          IF NOT EXISTS (SELECT * FROM GitIgnoreFileType WHERE [Name] = @Name)
-                                                          	BEGIN
-                                                          		INSERT INTO GitIgnoreFileType ( [Name], [Content])
-                                                          		VALUES (@Name, @Content)
-                                                          	END
-                                                          ELSE
-                                                          	BEGIN
-                                                          		UPDATE GitIgnoreFileType SET [Content] = @Content
-                                                          		WHERE [Name] = @Name
-                                                          	END
-                                                          SELECT Id FROM GitIgnoreFileType WHERE [Name] = @Name
-                                                          """, dbGitIgnorePath);
+                                                                 IF NOT EXISTS (SELECT * FROM GitIgnoreFileType WHERE [Name] = @Name)
+                                                                 	BEGIN
+                                                                 		INSERT INTO GitIgnoreFileType ( [Name], [Content])
+                                                                 		VALUES (@Name, @Content)
+                                                                 	END
+                                                                 ELSE
+                                                                 	BEGIN
+                                                                 		UPDATE GitIgnoreFileType SET [Content] = @Content
+                                                                 		WHERE [Name] = @Name
+                                                                 	END
+                                                                 SELECT Id FROM GitIgnoreFileType WHERE [Name] = @Name
+                                                                 """, dbGitIgnorePath);
     }
 
     //public async Task AddGitIgnorePath(GitIgnoreFileType newGitIgnorePath,

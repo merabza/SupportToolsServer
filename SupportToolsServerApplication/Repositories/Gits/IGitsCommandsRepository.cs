@@ -1,7 +1,7 @@
-﻿using OneOf;
-using SupportToolsServerApplication.Services.Gits.Models;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using OneOf;
+using SupportToolsServerApplication.Services.Gits.Models;
 using SystemToolsShared.Errors;
 
 namespace SupportToolsServerApplication.Repositories.Gits;

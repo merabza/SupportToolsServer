@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using OneOf;
@@ -9,8 +10,9 @@ namespace SupportToolsServerApplication.Services.GitIgnoreFileTypes.Delete;
 
 public class GitIgnoreFileTypeDeleteService : IScopedService
 {
-    public Task<OneOf<Unit, Err[]>> DeleteGitIgnoreFileType(string requestRecordKey, CancellationToken cancellationToken)
+    public Task<OneOf<Unit, Err[]>> DeleteGitIgnoreFileType(string requestRecordKey,
+        CancellationToken cancellationToken)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }

@@ -12,5 +12,4 @@ public static class ApiKeyMapper
             ApiKey = adaptFrom.ApiKey, RemoteIpAddress = adaptFrom.RemoteIpAddress
         };
     }
-
 }

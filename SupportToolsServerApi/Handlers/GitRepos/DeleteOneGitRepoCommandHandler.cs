@@ -21,7 +21,8 @@ public sealed class DeleteOneGitRepoCommandHandler : ICommandHandler<DeleteOneGi
         _gitDeleteService = gitDeleteService;
     }
 
-    public async Task<OneOf<Unit, Err[]>> Handle(DeleteOneGitRepoRequestCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Unit, Err[]>> Handle(DeleteOneGitRepoRequestCommand request,
+        CancellationToken cancellationToken)
     {
         // Assumes request.RecordKey exists; adjust as needed
         return await _gitDeleteService.DeleteGitRepo(request.GitKey, cancellationToken);
