@@ -7,7 +7,10 @@ public static class GitIgnoreFileTypeMapper
 {
     public static StsGitIgnoreFileTypeDataModel ToContractModel(this GitIgnoreFileTypeDto gitIgnoreFileType)
     {
-        return new StsGitIgnoreFileTypeDataModel { Name = gitIgnoreFileType.Name, Content = gitIgnoreFileType.Content };
+        return new StsGitIgnoreFileTypeDataModel
+        {
+            Name = gitIgnoreFileType.Name, Content = gitIgnoreFileType.Content
+        }; //JsonSerializer.Serialize(gitIgnoreFileType.Content) 
     }
 
     public static GitIgnoreFileTypeForSave AdaptTo(this StsGitIgnoreFileTypeDataModel gitIgnoreFileTypeModel)
