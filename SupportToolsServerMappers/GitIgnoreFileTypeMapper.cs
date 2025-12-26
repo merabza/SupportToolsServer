@@ -9,15 +9,18 @@ public static class GitIgnoreFileTypeMapper
     {
         return new StsGitIgnoreFileTypeDataModel
         {
-            Name = gitIgnoreFileType.Name, Content = gitIgnoreFileType.Content
-        }; //JsonSerializer.Serialize(gitIgnoreFileType.Content) 
+            RowId = gitIgnoreFileType.RowId,
+            Name = gitIgnoreFileType.Name,
+            Content = gitIgnoreFileType.Content
+        };
     }
 
     public static GitIgnoreFileTypeForSave AdaptTo(this StsGitIgnoreFileTypeDataModel gitIgnoreFileTypeModel)
     {
         return new GitIgnoreFileTypeForSave
         {
-            Name = gitIgnoreFileTypeModel.Name, Content = gitIgnoreFileTypeModel.Content
+            Name = gitIgnoreFileTypeModel.Name,
+            Content = gitIgnoreFileTypeModel.Content
         };
     }
 }

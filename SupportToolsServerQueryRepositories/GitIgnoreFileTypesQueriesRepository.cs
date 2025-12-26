@@ -29,7 +29,11 @@ public sealed class GitIgnoreFileTypesQueriesRepository : AbstractRepository, IG
         CancellationToken cancellationToken)
     {
         return await _dbContext.GitIgnoreFileTypes.Select(s =>
-            new GitIgnoreFileTypeDto { Name = s.Name, Content = s.Content }).ToListAsync(cancellationToken);
+            new GitIgnoreFileTypeDto
+            {
+                RowId = s.RowId,
+                Name = s.Name, Content = s.Content
+            }).ToListAsync(cancellationToken);
     }
 
     public async Task<OneOf<List<string>, Err[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
