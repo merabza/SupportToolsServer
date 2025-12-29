@@ -4,11 +4,10 @@ using System.Threading.Tasks;
 using MediatR;
 using OneOf;
 using SystemToolsShared.Errors;
-using WebInstallers;
 
 namespace SupportToolsServerApplication.Services.GitIgnoreFileTypes.Delete;
 
-public class GitIgnoreFileTypeDeleteService : IScopedService
+public class GitIgnoreFileTypeDeleteService : IScopedServiceSupportToolsServerApplication
 {
     public Task<OneOf<Unit, Err[]>> DeleteGitIgnoreFileType(string requestRecordKey,
         CancellationToken cancellationToken)

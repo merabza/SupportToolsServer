@@ -1,0 +1,3 @@
+﻿namespace SupportToolsServerApplication;
+
+public interface IScopedServiceSupportToolsServerApplication;

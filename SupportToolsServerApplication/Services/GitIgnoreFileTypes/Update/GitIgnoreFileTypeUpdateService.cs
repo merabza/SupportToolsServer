@@ -4,11 +4,10 @@ using OneOf;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
 using SystemToolsShared.Errors;
-using WebInstallers;
 
 namespace SupportToolsServerApplication.Services.GitIgnoreFileTypes.Update;
 
-public class GitIgnoreFileTypeUpdateService : IScopedService
+public class GitIgnoreFileTypeUpdateService : IScopedServiceSupportToolsServerApplication
 {
     private readonly IGitIgnoreFileTypesCommandsRepository _gitIgnoreFileTypesCommandsRepo;
 

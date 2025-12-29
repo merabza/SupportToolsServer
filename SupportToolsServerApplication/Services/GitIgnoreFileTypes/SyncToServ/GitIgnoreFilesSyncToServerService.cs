@@ -6,12 +6,11 @@ using OneOf;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
 using SystemToolsShared.Errors;
-using WebInstallers;
 
 namespace SupportToolsServerApplication.Services.GitIgnoreFileTypes.SyncToServ;
 
 // ReSharper disable once UnusedType.Global
-public class GitIgnoreFilesSyncToServerService : IScopedService
+public class GitIgnoreFilesSyncToServerService : IScopedServiceSupportToolsServerApplication
 {
     private readonly IGitIgnoreFileTypesCommandsRepository _gitIgnoreFileTypesCommandsRepo;
 

@@ -9,7 +9,7 @@ public static class GitIgnoreFileTypeMapper
     {
         return new StsGitIgnoreFileTypeDataModel
         {
-            RowId = gitIgnoreFileType.RowId,
+            Id = gitIgnoreFileType.RowId,
             Name = gitIgnoreFileType.Name,
             Content = gitIgnoreFileType.Content
         };

@@ -1,6 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
+using ApiExceptionHandler;
+using ApiKeyIdentity.Installers;
 using ConfigurationEncrypt;
 using Figgle.Fonts;
 using Microsoft.AspNetCore.Builder;
@@ -8,26 +9,32 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using SerilogLogger;
+using SignalRMessages.Endpoints.V1;
+using SignalRMessages.Installers;
+using StaticFilesTools;
+using SupportToolsServer.Api.Endpoints.V1;
+using SupportToolsServer.Application.Data;
+using SupportToolsServer.Persistence;
+using SupportToolsServer.Repositories;
+using SupportToolsServer.Repositories.Installers;
+using SupportToolsServerApiKeyIdentity;
+using SupportToolsServerApplication;
+using SupportToolsServerCommandRepositories.Installers;
+using SupportToolsServerQueryRepositories.Installers;
 using SwaggerTools;
-using WebInstallers;
-using AssemblyReference = SupportToolsServerApi.AssemblyReference;
+using TestToolsApi.Endpoints.V1;
+using WindowsServiceTools;
 
 try
 {
     Console.WriteLine("Loading...");
 
     const string appName = "Support Tools Server";
+    const int versionCount = 1;
 
     var header = $"{appName} {Assembly.GetEntryAssembly()?.GetName().Version}";
     Console.WriteLine(FiggleFonts.Standard.Render(header));
-
-    var parameters = new Dictionary<string, string>
-    {
-        { ConfigurationEncryptInstaller.AppKeyKey, "3081adaf7a5d472a88cd5149671a1922" },
-        { SwaggerInstaller.AppNameKey, appName },
-        { SwaggerInstaller.VersionCountKey, 1.ToString() },
-        { SwaggerInstaller.UseSwaggerWithJwtBearerKey, string.Empty } //Allow Swagger
-    };
 
     var builder =
         WebApplication.CreateBuilder(new WebApplicationOptions
@@ -37,31 +44,25 @@ try
 
     var debugMode = builder.Environment.IsDevelopment();
 
-    if (!builder.InstallServices(debugMode, args, parameters,
+    builder.Host.UseSerilogLogger(builder.Configuration, debugMode); //+
+    builder.Host.UseWindowsServiceOnWindows(debugMode, args); //+
 
-        // @formatter:off
+    builder.Configuration.AddConfigurationEncryption(debugMode, "3081adaf7a5d472a88cd5149671a1922"); //+
 
-        //SupportToolsServerDbPart
-        AssemblyReference.Assembly,
-        SupportToolsServerApiKeyIdentity.AssemblyReference.Assembly,
-        SupportToolsServerApplication.AssemblyReference.Assembly,
-        SupportToolsServerCommandRepositories.AssemblyReference.Assembly,
-        SupportToolsServerQueryRepositories.AssemblyReference.Assembly,
-        SupportToolsServerDb.AssemblyReference.Assembly,
-
-        //WebSystemTools
-        ApiExceptionHandler.AssemblyReference.Assembly, 
-        ConfigurationEncrypt.AssemblyReference.Assembly, 
-        SerilogLogger.AssemblyReference.Assembly,
-        SignalRMessages.AssemblyReference.Assembly,
-        StaticFilesTools.AssemblyReference.Assembly, 
-        SwaggerTools.AssemblyReference.Assembly, 
-        TestToolsApi.AssemblyReference.Assembly,
-        WindowsServiceTools.AssemblyReference.Assembly))
-
-        // @formatter:on
-
-        return 2;
+    // @formatter:off
+    builder.Services
+        .AddSwagger(debugMode, true, versionCount, appName) //+
+        .AddApiKeyAuthentication(debugMode)
+        .AddSignalRMessages(debugMode)
+        .AddSupportToolsServerRepositories(debugMode)
+        .AddSupportToolsServerPersistence(builder.Configuration, debugMode)
+        //.AddSupportToolsServerApiKeyIdentity(debugMode)
+        .AddAllScopedServiceSupportToolsServerApplication()
+        .AddSupportToolsServerQueryRepositories(debugMode)
+        .AddSupportToolsServerCommandRepositories(debugMode)
+        .AddSupportToolsServerForCommandsDatabase(builder.Configuration, debugMode)
+        .AddSupportToolsServer_Repositories(debugMode);
+    // @formatter:on
 
     var mediatRSettings = builder.Configuration.GetSection("MediatRLicenseKey");
 
@@ -70,14 +71,21 @@ try
     builder.Services.AddMediatR(cfg =>
     {
         cfg.LicenseKey = mediatRLicenseKey;
-        cfg.RegisterServicesFromAssembly(AssemblyReference.Assembly);
+        cfg.RegisterServicesFromAssembly(typeof(ISupportToolsServerDbContext).Assembly);
     });
 
     //ReSharper disable once using
 
     using var app = builder.Build();
 
-    if (!app.UseServices(debugMode)) return 1;
+    // ReSharper disable once RedundantArgumentDefaultValue
+    app.UseSwaggerServices(debugMode, versionCount); //+
+    app.UseGitIgnoreFileTypesEndpoints(debugMode);
+    app.UseApiExceptionHandler(debugMode); //+
+    app.UseApiKeysAuthorization(debugMode);
+    app.UseSignalRMessagesHub(debugMode); //+
+    app.UseTestEndpoints(debugMode); //+
+    app.UseDefaultAndStaticFiles(debugMode); //+
 
     app.Run();
     return 0;

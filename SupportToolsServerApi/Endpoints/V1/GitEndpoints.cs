@@ -18,22 +18,22 @@ using SupportToolsServerApiContracts.V1.Requests;
 using SupportToolsServerApiContracts.V1.Routes;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
-using WebInstallers;
+//using WebInstallers;
 
 namespace SupportToolsServerApi.Endpoints.V1;
 
 // ReSharper disable once UnusedMember.Global
 // ReSharper disable once UnusedType.Global
-public sealed class GitEndpoints : IInstaller
+public sealed class GitEndpoints// : IInstaller
 {
-    public int InstallPriority => 50;
-    public int ServiceUsePriority => 50;
+    //public int InstallPriority => 50;
+    //public int ServiceUsePriority => 50;
 
-    public bool InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args,
-        Dictionary<string, string> parameters)
-    {
-        return true;
-    }
+    //public bool InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args,
+    //    Dictionary<string, string> parameters)
+    //{
+    //    return true;
+    //}
 
     public bool UseServices(WebApplication app, bool debugMode)
     {

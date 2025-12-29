@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using RepositoriesDom;
+using SupportToolsServer.Domain.GitIgnoreFileTypes;
+using SupportToolsServer.Persistence;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
-using SupportToolsServerDb;
-using SupportToolsServerDb.Models;
 using SystemToolsShared.Errors;
 
 namespace SupportToolsServerQueryRepositories;
@@ -28,12 +28,14 @@ public sealed class GitIgnoreFileTypesQueriesRepository : AbstractRepository, IG
     public async Task<OneOf<List<GitIgnoreFileTypeDto>, Err[]>> GetGitIgnoreFileTypes(
         CancellationToken cancellationToken)
     {
-        return await _dbContext.GitIgnoreFileTypes.Select(s =>
-            new GitIgnoreFileTypeDto
-            {
-                RowId = s.RowId,
-                Name = s.Name, Content = s.Content
-            }).ToListAsync(cancellationToken);
+        //return await _dbContext.GitIgnoreFileTypes.Select(s =>
+        //    new GitIgnoreFileTypeDto
+        //    {
+        //        RowId = s.RowId,
+        //        Name = s.Name,
+        //        Content = s.Content
+        //    }).ToListAsync(cancellationToken);
+        throw new NotImplementedException();
     }
 
     public async Task<OneOf<List<string>, Err[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
@@ -62,46 +64,46 @@ public sealed class GitIgnoreFileTypesQueriesRepository : AbstractRepository, IG
     //    await _dbContext.GitData.AddAsync(gitData, cancellationToken);
     //}
 
-    public Task<List<StsGitDataModel>> GetGitRepos(CancellationToken cancellationToken = default)
-    {
-        return _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation).Select(s =>
-            new StsGitDataModel
-            {
-                GitIgnorePathName = s.GitIgnoreFileTypeNavigation.Name,
-                GitProjectAddress = s.GdGitAddress,
-                GitProjectFolderName = s.GdFolderName,
-                GitProjectName = s.GdName
-            }).ToListAsync(cancellationToken);
-    }
+    //public Task<List<StsGitDataModel>> GetGitRepos(CancellationToken cancellationToken = default)
+    //{
+    //    return _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation).Select(s =>
+    //        new StsGitDataModel
+    //        {
+    //            GitIgnorePathName = s.GitIgnoreFileTypeNavigation.Name,
+    //            GitProjectAddress = s.GdGitAddress,
+    //            GitProjectFolderName = s.GdFolderName,
+    //            GitProjectName = s.GdName
+    //        }).ToListAsync(cancellationToken);
+    //}
 
-    public async Task<OneOf<StsGitDataModel, Err[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
-    {
-        var gitData = await _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation)
-            .FirstOrDefaultAsync(x => x.GdName == gitKey, cancellationToken);
+    //public async Task<OneOf<StsGitDataModel, Err[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
+    //{
+    //    var gitData = await _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation)
+    //        .FirstOrDefaultAsync(x => x.GdName == gitKey, cancellationToken);
 
-        if (gitData is null)
-            return new Err[]
-            {
-                new()
-                {
-                    ErrorCode = "GitWithThisNameNotFound",
-                    ErrorMessage = $"Git With This Name {gitKey} Not Found"
-                }
-            };
+    //    if (gitData is null)
+    //        return new Err[]
+    //        {
+    //            new()
+    //            {
+    //                ErrorCode = "GitWithThisNameNotFound",
+    //                ErrorMessage = $"Git With This Name {gitKey} Not Found"
+    //            }
+    //        };
 
-        return new StsGitDataModel
-        {
-            GitIgnorePathName = gitData.GitIgnoreFileTypeNavigation.Name,
-            GitProjectAddress = gitData.GdGitAddress,
-            GitProjectFolderName = gitData.GdFolderName,
-            GitProjectName = gitData.GdName
-        };
-    }
+    //    return new StsGitDataModel
+    //    {
+    //        GitIgnorePathName = gitData.GitIgnoreFileTypeNavigation.Name,
+    //        GitProjectAddress = gitData.GdGitAddress,
+    //        GitProjectFolderName = gitData.GdFolderName,
+    //        GitProjectName = gitData.GdName
+    //    };
+    //}
 
-    public Task<List<GitData>> GetAllGitsFromDb(CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
+    //public Task<List<GitData>> GetAllGitsFromDb(CancellationToken cancellationToken = default)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
     //public async Task<List<GitData>> GetAllGitIgnoreFileTypesFromDb(CancellationToken cancellationToken = default)
     //{

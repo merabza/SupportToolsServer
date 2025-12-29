@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
     <ItemGroup>
-        <ProjectReference Include="..\..\SupportToolsServerDbPart\SupportToolsServerDb\SupportToolsServerDb.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\ApiExceptionHandler\ApiExceptionHandler.csproj" />
+        <ProjectReference Include="..\..\WebSystemTools\ApiKeyIdentity\ApiKeyIdentity.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\SignalRMessages\SignalRMessages.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\TestToolsApi\TestToolsApi.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\StaticFilesTools\StaticFilesTools.csproj" />
@@ -10,8 +10,11 @@
         <ProjectReference Include="..\..\WebSystemTools\SerilogLogger\SerilogLogger.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\SwaggerTools\SwaggerTools.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\WindowsServiceTools\WindowsServiceTools.csproj" />
+        <ProjectReference Include="..\SupportToolsServer.Api\SupportToolsServer.Api.csproj" />
+        <ProjectReference Include="..\SupportToolsServer.Application\SupportToolsServer.Application.csproj" />
+        <ProjectReference Include="..\SupportToolsServer.Persistence\SupportToolsServer.Persistence.csproj" />
+        <ProjectReference Include="..\SupportToolsServer.Repositories\SupportToolsServer.Repositories.csproj" />
         <ProjectReference Include="..\SupportToolsServerApiKeyIdentity\SupportToolsServerApiKeyIdentity.csproj" />
-        <ProjectReference Include="..\SupportToolsServerApi\SupportToolsServerApi.csproj" />
         <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
         <ProjectReference Include="..\SupportToolsServerCommandRepositories\SupportToolsServerCommandRepositories.csproj" />
         <ProjectReference Include="..\SupportToolsServerQueryRepositories\SupportToolsServerQueryRepositories.csproj" />

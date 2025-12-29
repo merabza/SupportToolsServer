@@ -5,11 +5,10 @@ using OneOf;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
 using SystemToolsShared.Errors;
-using WebInstallers;
 
 namespace SupportToolsServerApplication.Services.GitIgnoreFileTypes.List;
 
-public class GitIgnoreFileTypeListService : IScopedService
+public class GitIgnoreFileTypeListService : IScopedServiceSupportToolsServerApplication
 {
     private readonly IGitIgnoreFileTypesQueriesRepository _gitsRepo;
 

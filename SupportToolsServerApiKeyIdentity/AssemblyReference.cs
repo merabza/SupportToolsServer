@@ -1,8 +1,8 @@
-﻿using System.Reflection;
+﻿//using System.Reflection;
 
-namespace SupportToolsServerApiKeyIdentity;
+//namespace SupportToolsServerApiKeyIdentity;
 
-public static class AssemblyReference
-{
-    public static readonly Assembly Assembly = typeof(AssemblyReference).Assembly;
-}
+//public static class AssemblyReference
+//{
+//    public static readonly Assembly Assembly = typeof(AssemblyReference).Assembly;
+//}

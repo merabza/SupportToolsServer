@@ -7,11 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
+    <ProjectReference Include="..\SupportToolsServer.Persistence\SupportToolsServer.Persistence.csproj" />
     <ProjectReference Include="..\SupportToolsServerApiKeyIdentity\SupportToolsServerApiKeyIdentity.csproj" />
     <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
-    <ProjectReference Include="..\SupportToolsServerMappers\SupportToolsServerMappers.csproj" />
   </ItemGroup>
 
 </Project>

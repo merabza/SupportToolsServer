@@ -5,11 +5,10 @@ using OneOf;
 using SupportToolsServerApplication.Repositories.Gits;
 using SupportToolsServerApplication.Services.Gits.Models;
 using SystemToolsShared.Errors;
-using WebInstallers;
 
 namespace SupportToolsServerApplication.Services.Gits.List;
 
-public class GitsListService : IScopedService
+public class GitsListService : IScopedServiceSupportToolsServerApplication
 {
     private readonly IGitsQueriesRepository _repo;
 

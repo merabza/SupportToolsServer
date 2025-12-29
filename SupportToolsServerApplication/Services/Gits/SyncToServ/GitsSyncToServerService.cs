@@ -6,12 +6,11 @@ using OneOf;
 using SupportToolsServerApplication.Repositories.Gits;
 using SupportToolsServerApplication.Services.Gits.Models;
 using SystemToolsShared.Errors;
-using WebInstallers;
 
 namespace SupportToolsServerApplication.Services.Gits.SyncToServ;
 
 // ReSharper disable once UnusedType.Global
-public class GitsSyncToServerService : IScopedService
+public class GitsSyncToServerService : IScopedServiceSupportToolsServerApplication
 {
     private readonly IGitsCommandsRepository _gitsCommandsRepo;
 
@@ -28,3 +27,5 @@ public class GitsSyncToServerService : IScopedService
         return Unit.Value;
     }
 }
+
+
