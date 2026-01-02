@@ -7,10 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Application\SupportToolsServer.Application.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Domain\SupportToolsServer.Domain.csproj" />
-    <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
   </ItemGroup>
 
 </Project>

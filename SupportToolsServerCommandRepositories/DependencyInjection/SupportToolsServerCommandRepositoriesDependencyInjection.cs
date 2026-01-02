@@ -3,10 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Repositories.Gits;
 
-namespace SupportToolsServerCommandRepositories.Installers;
+namespace SupportToolsServerCommandRepositories.DependencyInjection;
 
 // ReSharper disable once UnusedType.Global
-public static class RepositoriesInstaller
+public static class SupportToolsServerCommandRepositoriesDependencyInjection
 {
     public static IServiceCollection AddSupportToolsServerCommandRepositories(this IServiceCollection services,
         bool debugMode)

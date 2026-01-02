@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SystemTools\DatabaseToolsShared\DatabaseToolsShared.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Application\SupportToolsServer.Application.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Domain\SupportToolsServer.Domain.csproj" />
   </ItemGroup>

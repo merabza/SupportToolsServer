@@ -8,7 +8,6 @@ using OneOf;
 using RepositoriesDom;
 using SupportToolsServer.Domain.GitIgnoreFileTypes;
 using SupportToolsServer.Persistence;
-using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
 using SystemToolsShared.Errors;

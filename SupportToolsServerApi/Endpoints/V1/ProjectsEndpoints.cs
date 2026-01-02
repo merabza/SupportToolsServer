@@ -1,11 +1,10 @@
 ﻿//using Microsoft.AspNetCore.Builder;
 //using SupportToolsServerApiContracts.V1.Routes;
 //using SupportToolsServerContracts.V1.Routes;
-//using WebInstallers;
 
 //namespace SupportToolsServerApi.Endpoints.V1;
 
-//public sealed class ProjectsEndpoints : IInstaller
+//public sealed class ProjectsEndpoints
 
 //{
 //    public int InstallPriority => 50;

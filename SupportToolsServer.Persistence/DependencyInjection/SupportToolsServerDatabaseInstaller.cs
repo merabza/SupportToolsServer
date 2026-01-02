@@ -1,22 +1,19 @@
-////Created by DatabaseInstallerClassCreator at 2/4/2025 7:31:10 PM
-
 //using Microsoft.AspNetCore.Builder;
 //using Microsoft.EntityFrameworkCore;
 //using Microsoft.Extensions.DependencyInjection;
 //using SupportToolsServer.Application.Data;
 //using System;
 //using System.Collections.Generic;
-//using WebInstallers;
 
-//namespace SupportToolsServer.Persistence.Installers;
+//namespace SupportToolsServer.Persistence.DependencyInjection;
 
 //// ReSharper disable once UnusedType.Global
-//public sealed class SupportToolsServerDatabaseInstaller : IInstaller
+//public sealed class SupportToolsServerDatabaseDependencyInjection
 //{
 //    public int InstallPriority => 30;
 //    public int ServiceUsePriority => 30;
 
-//    public bool InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args,
+//    public bool AddSupportToolsServer_Persistence(WebApplicationBuilder builder, bool debugMode, string[] args,
 //        Dictionary<string, string> parameters)
 //    {
 //        if (debugMode) Console.WriteLine($"{GetType().Name}.{nameof(InstallServices)} Started");
@@ -25,7 +22,7 @@
 
 //        if (string.IsNullOrWhiteSpace(connectionString) && !debugMode)
 //        {
-//            Console.WriteLine("SupportToolsServerDatabaseInstaller.InstallServices connectionString is empty");
+//            Console.WriteLine("AddSupportToolsServer_Persistence connectionString is empty");
 //            return false;
 //        }
 

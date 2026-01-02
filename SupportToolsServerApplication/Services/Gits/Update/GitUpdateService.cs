@@ -1,6 +1,4 @@
-﻿//using WebInstallers;
-
-namespace SupportToolsServerApplication.Services.Gits.Update;
+﻿namespace SupportToolsServerApplication.Services.Gits.Update;
 
 public class GitUpdateService : IScopedServiceSupportToolsServerApplication
 {

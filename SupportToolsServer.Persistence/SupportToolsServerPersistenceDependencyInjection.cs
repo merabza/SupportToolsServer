@@ -13,11 +13,12 @@ public static class SupportToolsServerPersistenceDependencyInjection
     {
         if (debugMode) Console.WriteLine($"{nameof(AddSupportToolsServerPersistence)} Started");
 
-        var connectionString = configuration["Data:SupportToolsServerDatabase:ConnectionString"];
+        const string connectionStringConfigurationKey = "Data:SupportToolsServerDatabase:ConnectionString";
+        var connectionString = configuration[connectionStringConfigurationKey];
 
         if (string.IsNullOrWhiteSpace(connectionString) && !debugMode)
         {
-            Console.WriteLine("SupportToolsServerDatabaseInstaller.InstallServices connectionString is empty");
+            Console.WriteLine($"Parameter {connectionStringConfigurationKey} is empty");
             throw new InvalidOperationException("Connection string is empty");
         }
 

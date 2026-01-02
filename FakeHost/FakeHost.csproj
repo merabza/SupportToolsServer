@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SupportToolsServer.DbMigration\SupportToolsServer.DbMigration.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Persistence\SupportToolsServer.Persistence.csproj" />
   </ItemGroup>
 

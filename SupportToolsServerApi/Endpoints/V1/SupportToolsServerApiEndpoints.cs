@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using SupportToolsServerApi.CommandRequests;
 using SupportToolsServerApi.Handlers.GitIgnoreFileTypes;
 using SupportToolsServerApi.Handlers.GitRepos;
@@ -18,29 +19,19 @@ using SupportToolsServerApiContracts.V1.Requests;
 using SupportToolsServerApiContracts.V1.Routes;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
-//using WebInstallers;
 
 namespace SupportToolsServerApi.Endpoints.V1;
 
 // ReSharper disable once UnusedMember.Global
 // ReSharper disable once UnusedType.Global
-public sealed class GitEndpoints// : IInstaller
+public static class SupportToolsServerApiEndpoints
 {
-    //public int InstallPriority => 50;
-    //public int ServiceUsePriority => 50;
-
-    //public bool InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args,
-    //    Dictionary<string, string> parameters)
-    //{
-    //    return true;
-    //}
-
-    public bool UseServices(WebApplication app, bool debugMode)
+    public static bool UseSupportToolsServerApiEndpoints(this IEndpointRouteBuilder endpoints, bool debugMode)
     {
         if (debugMode)
-            Console.WriteLine($"{GetType().Name}.{nameof(UseServices)} Started");
+            Console.WriteLine($"{nameof(UseSupportToolsServerApiEndpoints)} Started");
 
-        var group = app.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase)
+        var group = endpoints.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase)
             .RequireAuthorization();
 
         //git repos
@@ -56,7 +47,7 @@ public sealed class GitEndpoints// : IInstaller
         group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitIgnoreFileType, DeleteGitIgnoreFileType);
 
         if (debugMode)
-            Console.WriteLine($"{GetType().Name}.{nameof(UseServices)} Finished");
+            Console.WriteLine($"{nameof(UseSupportToolsServerApiEndpoints)} Finished");
 
         return true;
     }

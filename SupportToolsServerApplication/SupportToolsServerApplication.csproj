@@ -14,7 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SystemTools\RepositoriesDom\RepositoriesDom.csproj" />
     <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
   </ItemGroup>
 
 </Project>

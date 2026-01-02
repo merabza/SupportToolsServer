@@ -10,7 +10,6 @@
     <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
     <ProjectReference Include="..\..\SystemTools\MediatRMessagingAbstractions\MediatRMessagingAbstractions.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\ApiKeyIdentity\ApiKeyIdentity.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
     <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
     <ProjectReference Include="..\SupportToolsServerMappers\SupportToolsServerMappers.csproj" />
   </ItemGroup>

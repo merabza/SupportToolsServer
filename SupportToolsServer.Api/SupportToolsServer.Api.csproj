@@ -7,16 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Endpoints\V1\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MediatR" Version="14.0.0" />
   </ItemGroup>
-
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
-    <ProjectReference Include="..\..\WebSystemTools\WebInstallers\WebInstallers.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Application\SupportToolsServer.Application.csproj" />
   </ItemGroup>
 

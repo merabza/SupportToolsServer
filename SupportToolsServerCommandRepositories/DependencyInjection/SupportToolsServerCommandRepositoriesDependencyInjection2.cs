@@ -2,26 +2,27 @@ using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SupportToolsServerCommandRepositories.Installers;
+namespace SupportToolsServerCommandRepositories.DependencyInjection;
 
 // ReSharper disable once UnusedType.Global
-public static class SupportToolsServerForCommandsDatabaseInstaller
+public static class SupportToolsServerCommandRepositoriesDependencyInjection2
 {
     public static IServiceCollection AddSupportToolsServerForCommandsDatabase(this IServiceCollection services,
         IConfiguration configuration, bool debugMode)
     {
         if (debugMode) Console.WriteLine($"{nameof(AddSupportToolsServerForCommandsDatabase)} Started");
 
-        var connectionString = configuration["Data:SupportToolsServerDatabase:ConnectionString"];
+        const string connectionStringConfigurationKey = "Data:SupportToolsServerDatabase:ConnectionString";
+        var connectionString = configuration[connectionStringConfigurationKey];
 
         if (string.IsNullOrWhiteSpace(connectionString) && !debugMode)
         {
-            Console.WriteLine("SupportToolsServerDatabaseInstaller.InstallServices connectionString is empty");
+            Console.WriteLine($"Parameter {connectionStringConfigurationKey} is empty");
             return services;
         }
 
         services.AddSingleton<IDbConnectionFactory>(_ =>
-            new SqlDbConnectionFactory(configuration["Data:SupportToolsServerDatabase:ConnectionString"]!));
+            new SqlDbConnectionFactory(configuration[connectionStringConfigurationKey]!));
 
         if (debugMode) Console.WriteLine($"{nameof(AddSupportToolsServerForCommandsDatabase)} Finished");
 

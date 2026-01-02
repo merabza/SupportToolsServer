@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using SupportToolsServer.Application.GitIgnoreFileTypes.SyncUp;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Routes;
@@ -16,7 +17,7 @@ using SystemToolsShared.Errors;
 namespace SupportToolsServer.Api.Endpoints.V1;
 
 // ReSharper disable once UnusedType.Global
-public static class GitIgnoreFileTypes
+public static class GitIgnoreFileTypesEndpoints
 {
     //public int InstallPriority => 50;
     //public int ServiceUsePriority => 50;
@@ -27,12 +28,12 @@ public static class GitIgnoreFileTypes
     //    return true;
     //}
 
-    public static bool UseGitIgnoreFileTypesEndpoints(this WebApplication app, bool debugMode)
+    public static bool UseGitIgnoreFileTypesEndpoints(this IEndpointRouteBuilder endpoints, bool debugMode)
     {
         if (debugMode)
             Console.WriteLine($"{nameof(UseGitIgnoreFileTypesEndpoints)} Started");
 
-        var group = app.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase);
+        var group = endpoints.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase);
         //.RequireAuthorization();
 
         group.MapPost(SupportToolsServerApiRoutes.Git.SyncUpGitIgnoreFileTypes, SyncUpGitIgnoreFileTypes);

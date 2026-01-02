@@ -1,21 +1,14 @@
-//Created by CarcassRepositoriesInstallerClassCreator at 8/1/2022 9:35:56 PM
-
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using SupportToolsServerApiKeyIdentity;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Repositories.Gits;
 
-//using WebInstallers;
-
-namespace SupportToolsServerQueryRepositories.Installers;
+namespace SupportToolsServerQueryRepositories.DependencyInjection;
 
 // ReSharper disable once UnusedType.Global
-public static class RepositoriesInstaller // : IInstaller
+public static class SupportToolsServerQueryRepositoriesDependencyInjection
 {
-    //public int InstallPriority => 30;
-    //public int ServiceUsePriority => 30;
-
     public static IServiceCollection AddSupportToolsServerQueryRepositories(this IServiceCollection services, bool debugMode)
     {
         if (debugMode)
@@ -30,9 +23,4 @@ public static class RepositoriesInstaller // : IInstaller
 
         return services;
     }
-
-    //public bool UseServices(WebApplication app, bool debugMode)
-    //{
-    //    return true;
-    //}
 }

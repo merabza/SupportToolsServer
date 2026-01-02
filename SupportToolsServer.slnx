@@ -1,0 +1,67 @@
+<Solution>
+  <Folder Name="/AppCliTools/">
+    <Project Path="../AppCliTools/CliMenu/CliMenu.csproj" />
+    <Project Path="../AppCliTools/CliParameters/CliParameters.csproj" />
+    <Project Path="../AppCliTools/LibDataInput/LibDataInput.csproj" />
+    <Project Path="../AppCliTools/LibMenuInput/LibMenuInput.csproj" />
+  </Folder>
+  <Folder Name="/DatabaseTools/">
+    <Project Path="../DatabaseTools/DbTools/DbTools.csproj" />
+    <Project Path="../DatabaseTools/SqlServerDbTools/SqlServerDbTools.csproj" />
+  </Folder>
+  <Folder Name="/ParametersManagement/">
+    <Project Path="../ParametersManagement/LibApiClientParameters/LibApiClientParameters.csproj" />
+    <Project Path="../ParametersManagement/LibDatabaseParameters/LibDatabaseParameters.csproj" />
+    <Project Path="../ParametersManagement/LibParameters/LibParameters.csproj" />
+  </Folder>
+  <Folder Name="/SupportToolsServerDbPart/">
+    <Project Path="../SupportToolsServerDbPart/SeedSupportToolsServerDb/SeedSupportToolsServerDb.csproj" />
+    <Project Path="../SupportToolsServerDbPart/SupportToolsServerDb/SupportToolsServerDb.csproj" />
+    <Project Path="../SupportToolsServerDbPart/SupportToolsServerDbDataSeeding/SupportToolsServerDbDataSeeding.csproj" />
+    <Project Path="../SupportToolsServerDbPart/SupportToolsServerDbNewDataSeeding/SupportToolsServerDbNewDataSeeding.csproj" />
+  </Folder>
+  <Folder Name="/SupportToolsServerShared/">
+    <Project Path="../SupportToolsServerShared/SupportToolsServerApiContracts/SupportToolsServerApiContracts.csproj" />
+  </Folder>
+  <Folder Name="/SystemTools/">
+    <Project Path="../SystemTools/ApiContracts/ApiContracts.csproj" />
+    <Project Path="../SystemTools/ApiKeysManagement/ApiKeysManagement.csproj" />
+    <Project Path="../SystemTools/DatabaseToolsShared/DatabaseToolsShared.csproj" />
+    <Project Path="../SystemTools/MediatRMessagingAbstractions/MediatRMessagingAbstractions.csproj" />
+    <Project Path="../SystemTools/RepositoriesDom/RepositoriesDom.csproj" />
+    <Project Path="../SystemTools/Share.Application/Share.Application.csproj" />
+    <Project Path="../SystemTools/StringMessagesApiContracts/StringMessagesApiContracts.csproj" />
+    <Project Path="../SystemTools/SystemToolsShared/SystemToolsShared.csproj" />
+    <Project Path="../SystemTools/TestApiContracts/TestApiContracts.csproj" />
+  </Folder>
+  <Folder Name="/ToolsManagement/">
+    <Project Path="../ToolsManagement/LibToolActions/LibToolActions.csproj" />
+  </Folder>
+  <Folder Name="/WebSystemTools/">
+    <Project Path="../WebSystemTools/ApiExceptionHandler/ApiExceptionHandler.csproj" />
+    <Project Path="../WebSystemTools/ApiKeyIdentity/ApiKeyIdentity.csproj" />
+    <Project Path="../WebSystemTools/ConfigurationEncrypt/ConfigurationEncrypt.csproj" />
+    <Project Path="../WebSystemTools/SerilogLogger/SerilogLogger.csproj" />
+    <Project Path="../WebSystemTools/SignalRMessages/SignalRMessages.csproj" />
+    <Project Path="../WebSystemTools/StaticFilesTools/StaticFilesTools.csproj" />
+    <Project Path="../WebSystemTools/SwaggerTools/SwaggerTools.csproj" />
+    <Project Path="../WebSystemTools/TestToolsApi/TestToolsApi.csproj" />
+    <Project Path="../WebSystemTools/TestToolsData/TestToolsData.csproj" />
+    <Project Path="../WebSystemTools/WindowsServiceTools/WindowsServiceTools.csproj" />
+  </Folder>
+  <Project Path="FakeHost/FakeHost.csproj" />
+  <Project Path="LibSupportToolsServerRepositories/LibSupportToolsServerRepositories.csproj" />
+  <Project Path="SupportToolsServer.Api/SupportToolsServer.Api.csproj" />
+  <Project Path="SupportToolsServer.Application/SupportToolsServer.Application.csproj" />
+  <Project Path="SupportToolsServer.DbMigration/SupportToolsServer.DbMigration.csproj" />
+  <Project Path="SupportToolsServer.Domain/SupportToolsServer.Domain.csproj" />
+  <Project Path="SupportToolsServer.Persistence/SupportToolsServer.Persistence.csproj" />
+  <Project Path="SupportToolsServer.Repositories/SupportToolsServer.Repositories.csproj" />
+  <Project Path="SupportToolsServer/SupportToolsServer.csproj" />
+  <Project Path="SupportToolsServerApi/SupportToolsServerApi.csproj" />
+  <Project Path="SupportToolsServerApiKeyIdentity/SupportToolsServerApiKeyIdentity.csproj" />
+  <Project Path="SupportToolsServerApplication/SupportToolsServerApplication.csproj" />
+  <Project Path="SupportToolsServerCommandRepositories/SupportToolsServerCommandRepositories.csproj" />
+  <Project Path="SupportToolsServerMappers/SupportToolsServerMappers.csproj" />
+  <Project Path="SupportToolsServerQueryRepositories/SupportToolsServerQueryRepositories.csproj" />
+</Solution>

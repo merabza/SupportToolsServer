@@ -1,13 +1,11 @@
-//Created by CarcassRepositoriesInstallerClassCreator at 8/1/2022 9:35:56 PM
-
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using SupportToolsServer.Domain.GitIgnoreFileTypes;
 
-namespace SupportToolsServer.Repositories.Installers;
+namespace SupportToolsServer.Repositories.DependencyInjection;
 
 // ReSharper disable once UnusedType.Global
-public static class RepositoriesInstaller
+public static class SupportToolsServerRepositoriesDependencyInjection
 {
     public static IServiceCollection AddSupportToolsServer_Repositories(this IServiceCollection services,
         bool debugMode)

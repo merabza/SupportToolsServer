@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
-using ApiExceptionHandler;
-using ApiKeyIdentity.Installers;
+using ApiExceptionHandler.DependencyInjection;
+using ApiKeyIdentity.DependencyInjection;
 using ConfigurationEncrypt;
 using Figgle.Fonts;
 using Microsoft.AspNetCore.Builder;
@@ -10,19 +10,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SerilogLogger;
+using SignalRMessages.DependencyInjection;
 using SignalRMessages.Endpoints.V1;
-using SignalRMessages.Installers;
-using StaticFilesTools;
-using SupportToolsServer.Api.Endpoints.V1;
+using StaticFilesTools.DependencyInjection;
+using SupportToolsServer.Api.DependencyInjection;
 using SupportToolsServer.Application.Data;
 using SupportToolsServer.Persistence;
 using SupportToolsServer.Repositories;
-using SupportToolsServer.Repositories.Installers;
-using SupportToolsServerApiKeyIdentity;
+using SupportToolsServer.Repositories.DependencyInjection;
 using SupportToolsServerApplication;
-using SupportToolsServerCommandRepositories.Installers;
-using SupportToolsServerQueryRepositories.Installers;
-using SwaggerTools;
+using SupportToolsServerCommandRepositories.DependencyInjection;
+using SupportToolsServerDb.DependencyInjection;
+using SupportToolsServerQueryRepositories.DependencyInjection;
+using SwaggerTools.DependencyInjection;
 using TestToolsApi.Endpoints.V1;
 using WindowsServiceTools;
 
@@ -52,7 +52,7 @@ try
     // @formatter:off
     builder.Services
         .AddSwagger(debugMode, true, versionCount, appName) //+
-        .AddApiKeyAuthentication(debugMode)
+        .AddApiKeyIdentity(debugMode)
         .AddSignalRMessages(debugMode)
         .AddSupportToolsServerRepositories(debugMode)
         .AddSupportToolsServerPersistence(builder.Configuration, debugMode)
@@ -61,7 +61,8 @@ try
         .AddSupportToolsServerQueryRepositories(debugMode)
         .AddSupportToolsServerCommandRepositories(debugMode)
         .AddSupportToolsServerForCommandsDatabase(builder.Configuration, debugMode)
-        .AddSupportToolsServer_Repositories(debugMode);
+        .AddSupportToolsServer_Repositories(debugMode)
+        .AddSupportToolsServerDb(builder.Configuration, debugMode);
     // @formatter:on
 
     var mediatRSettings = builder.Configuration.GetSection("MediatRLicenseKey");
@@ -80,7 +81,7 @@ try
 
     // ReSharper disable once RedundantArgumentDefaultValue
     app.UseSwaggerServices(debugMode, versionCount); //+
-    app.UseGitIgnoreFileTypesEndpoints(debugMode);
+    app.UseSupportToolsServerApi(debugMode);
     app.UseApiExceptionHandler(debugMode); //+
     app.UseApiKeysAuthorization(debugMode);
     app.UseSignalRMessagesHub(debugMode); //+
