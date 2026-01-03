@@ -4,8 +4,8 @@ using ApiExceptionHandler.DependencyInjection;
 using ApiKeyIdentity.DependencyInjection;
 using ConfigurationEncrypt;
 using Figgle.Fonts;
+using MediatorTools.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -56,6 +56,7 @@ try
         .AddSignalRMessages(debugMode)
         .AddSupportToolsServerRepositories(debugMode)
         .AddSupportToolsServerPersistence(builder.Configuration, debugMode)
+        .AddMediator(builder.Configuration, debugMode, typeof(ISupportToolsServerDbContext).Assembly)
         //.AddSupportToolsServerApiKeyIdentity(debugMode)
         .AddAllScopedServiceSupportToolsServerApplication()
         .AddSupportToolsServerQueryRepositories(debugMode)
@@ -65,18 +66,7 @@ try
         .AddSupportToolsServerDb(builder.Configuration, debugMode);
     // @formatter:on
 
-    var mediatRSettings = builder.Configuration.GetSection("MediatRLicenseKey");
-
-    var mediatRLicenseKey = mediatRSettings.Get<string>();
-
-    builder.Services.AddMediatR(cfg =>
-    {
-        cfg.LicenseKey = mediatRLicenseKey;
-        cfg.RegisterServicesFromAssembly(typeof(ISupportToolsServerDbContext).Assembly);
-    });
-
     //ReSharper disable once using
-
     using var app = builder.Build();
 
     // ReSharper disable once RedundantArgumentDefaultValue

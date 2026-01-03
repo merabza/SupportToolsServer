@@ -41,6 +41,7 @@
     <Project Path="../WebSystemTools/ApiExceptionHandler/ApiExceptionHandler.csproj" />
     <Project Path="../WebSystemTools/ApiKeyIdentity/ApiKeyIdentity.csproj" />
     <Project Path="../WebSystemTools/ConfigurationEncrypt/ConfigurationEncrypt.csproj" />
+    <Project Path="../WebSystemTools/MediatorTools/MediatorTools.csproj" />
     <Project Path="../WebSystemTools/SerilogLogger/SerilogLogger.csproj" />
     <Project Path="../WebSystemTools/SignalRMessages/SignalRMessages.csproj" />
     <Project Path="../WebSystemTools/StaticFilesTools/StaticFilesTools.csproj" />
