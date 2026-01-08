@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
-using RepositoriesDom;
+using RepositoriesAbstraction;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
 using SystemToolsShared.Errors;
 

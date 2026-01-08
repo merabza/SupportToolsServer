@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
-using RepositoriesDom;
+using RepositoriesAbstraction;
 using SupportToolsServer.Domain.GitIgnoreFileTypes;
 using SupportToolsServer.Persistence;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;

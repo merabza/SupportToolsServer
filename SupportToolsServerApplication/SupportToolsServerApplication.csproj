@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SystemTools\RepositoriesDom\RepositoriesDom.csproj" />
+    <ProjectReference Include="..\..\SystemTools\RepositoriesAbstraction\RepositoriesAbstraction.csproj" />
     <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
   </ItemGroup>
 
