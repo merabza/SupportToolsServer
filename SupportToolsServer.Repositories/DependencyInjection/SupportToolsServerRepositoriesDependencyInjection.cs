@@ -17,7 +17,7 @@ public static class SupportToolsServerRepositoriesDependencyInjection
 
         //builder.Services.AddScoped<IGitsQueriesRepository, GitsQueriesRepository>();
         //builder.Services.AddScoped<IGitIgnoreFileTypesQueriesRepository, GitIgnoreFileTypesQueriesRepository>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUnitOfWork, SupportToolsServerUnitOfWork>();
         services.AddScoped<IGitIgnoreFileTypeRepository, GitIgnoreFileTypeRepository>();
 
         if (debugMode)

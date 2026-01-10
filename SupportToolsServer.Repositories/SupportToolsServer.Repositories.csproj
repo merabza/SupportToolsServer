@@ -7,9 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\ProcessorWorkerService\SystemTools\RepositoriesShared\RepositoriesShared.csproj" />
     <ProjectReference Include="..\..\SystemTools\DomainShared\DomainShared.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Application\SupportToolsServer.Application.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Domain\SupportToolsServer.Domain.csproj" />
+    <ProjectReference Include="..\SupportToolsServer.Persistence\SupportToolsServer.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

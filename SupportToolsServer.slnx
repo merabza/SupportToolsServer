@@ -24,6 +24,7 @@
     <Project Path="../SupportToolsServerShared/SupportToolsServerApiContracts/SupportToolsServerApiContracts.csproj" />
   </Folder>
   <Folder Name="/SystemTools/">
+    <Project Path="../../ProcessorWorkerService/SystemTools/RepositoriesShared/RepositoriesShared.csproj" />
     <Project Path="../SystemTools/ApiContracts/ApiContracts.csproj" />
     <Project Path="../SystemTools/ApiKeysManagement/ApiKeysManagement.csproj" />
     <Project Path="../SystemTools/DatabaseToolsShared/DatabaseToolsShared.csproj" />
