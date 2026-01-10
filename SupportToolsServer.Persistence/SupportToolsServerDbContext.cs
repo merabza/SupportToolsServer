@@ -5,7 +5,7 @@ using SupportToolsServer.Domain.GitIgnoreFileTypes;
 
 namespace SupportToolsServer.Persistence;
 
-public sealed class SupportToolsServerDbContext : DbContext, IUnitOfWork, ISupportToolsServerDbContext
+public sealed class SupportToolsServerDbContext : DbContext, ISupportToolsServerDbContext
 {
     public SupportToolsServerDbContext(DbContextOptions<SupportToolsServerDbContext> options, bool isDesignTime) :
         base(options)

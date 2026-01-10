@@ -2,13 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
-using RepositoriesAbstraction;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
 using SystemToolsShared.Errors;
 
 namespace SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 
-public interface IGitIgnoreFileTypesQueriesRepository : IAbstractRepository
+public interface IGitIgnoreFileTypesQueriesRepository
 {
     //Task<List<GitData>> GetAllGitsFromDb(CancellationToken cancellationToken = default);
     //Task<List<GitIgnoreFileType>> GetAllGitIgnorePathsFromDb(CancellationToken cancellationToken = default);

@@ -1,4 +1,6 @@
 using System;
+using DomainShared;
+using DomainShared.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using SupportToolsServer.Domain.GitIgnoreFileTypes;
 
@@ -15,6 +17,7 @@ public static class SupportToolsServerRepositoriesDependencyInjection
 
         //builder.Services.AddScoped<IGitsQueriesRepository, GitsQueriesRepository>();
         //builder.Services.AddScoped<IGitIgnoreFileTypesQueriesRepository, GitIgnoreFileTypesQueriesRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IGitIgnoreFileTypeRepository, GitIgnoreFileTypeRepository>();
 
         if (debugMode)

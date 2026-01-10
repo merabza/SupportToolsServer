@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
-using RepositoriesAbstraction;
 using SupportToolsServer.Persistence;
 using SupportToolsServerApplication.Repositories.Gits;
 using SupportToolsServerApplication.Services.Gits.Models;
@@ -11,12 +10,12 @@ using SystemToolsShared.Errors;
 
 namespace SupportToolsServerQueryRepositories;
 
-public sealed class GitsQueriesRepository : AbstractRepository, IGitsQueriesRepository
+public sealed class GitsQueriesRepository : IGitsQueriesRepository
 {
     private readonly SupportToolsServerDbContext _dbContext;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitsQueriesRepository(SupportToolsServerDbContext dbContext) : base(dbContext)
+    public GitsQueriesRepository(SupportToolsServerDbContext dbContext)
     {
         _dbContext = dbContext;
     }

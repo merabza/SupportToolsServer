@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
-using RepositoriesAbstraction;
 using SupportToolsServer.Domain.GitIgnoreFileTypes;
 using SupportToolsServer.Persistence;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
@@ -14,12 +13,12 @@ using SystemToolsShared.Errors;
 
 namespace SupportToolsServerQueryRepositories;
 
-public sealed class GitIgnoreFileTypesQueriesRepository : AbstractRepository, IGitIgnoreFileTypesQueriesRepository
+public sealed class GitIgnoreFileTypesQueriesRepository : IGitIgnoreFileTypesQueriesRepository
 {
     private readonly SupportToolsServerDbContext _dbContext;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitIgnoreFileTypesQueriesRepository(SupportToolsServerDbContext dbContext) : base(dbContext)
+    public GitIgnoreFileTypesQueriesRepository(SupportToolsServerDbContext dbContext)
     {
         _dbContext = dbContext;
     }

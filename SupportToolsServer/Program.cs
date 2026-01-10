@@ -54,7 +54,6 @@ try
         .AddSwagger(debugMode, true, versionCount, appName) //+
         .AddApiKeyIdentity(debugMode)
         .AddSignalRMessages(debugMode)
-        .AddSupportToolsServerRepositories(debugMode)
         .AddSupportToolsServerPersistence(builder.Configuration, debugMode)
         .AddMediator(builder.Configuration, debugMode, typeof(ISupportToolsServerDbContext).Assembly)
         //.AddSupportToolsServerApiKeyIdentity(debugMode)

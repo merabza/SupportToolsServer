@@ -2,13 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
-using RepositoriesAbstraction;
 using SupportToolsServerApplication.Services.Gits.Models;
 using SystemToolsShared.Errors;
 
 namespace SupportToolsServerApplication.Repositories.Gits;
 
-public interface IGitsQueriesRepository : IAbstractRepository
+public interface IGitsQueriesRepository
 {
     //Task<List<GitData>> GetAllGitsFromDb(CancellationToken cancellationToken = default);
     //Task<List<GitIgnoreFileType>> GetAllGitIgnorePathsFromDb(CancellationToken cancellationToken = default);

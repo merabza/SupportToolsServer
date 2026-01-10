@@ -1,4 +1,5 @@
 ﻿using System;
+using DomainShared.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +27,6 @@ public static class SupportToolsServerPersistenceDependencyInjection
 
         services.AddScoped<ISupportToolsServerDbContext>(provider =>
             provider.GetRequiredService<SupportToolsServerDbContext>());
-        services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<SupportToolsServerDbContext>());
 
         if (debugMode) Console.WriteLine($"{nameof(AddSupportToolsServerPersistence)} Finished");
         return services;
