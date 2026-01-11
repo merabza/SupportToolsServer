@@ -1,5 +1,4 @@
 ﻿using System;
-using DomainShared.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

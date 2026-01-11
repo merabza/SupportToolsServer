@@ -30,7 +30,6 @@
     <Project Path="../SystemTools/DatabaseToolsShared/DatabaseToolsShared.csproj" />
     <Project Path="../SystemTools/DomainShared/DomainShared.csproj" />
     <Project Path="../SystemTools/MediatRMessagingAbstractions/MediatRMessagingAbstractions.csproj" />
-    <Project Path="../SystemTools/RepositoriesAbstraction/RepositoriesAbstraction.csproj" />
     <Project Path="../SystemTools/StringMessagesApiContracts/StringMessagesApiContracts.csproj" />
     <Project Path="../SystemTools/SystemToolsShared/SystemToolsShared.csproj" />
     <Project Path="../SystemTools/TestApiContracts/TestApiContracts.csproj" />
