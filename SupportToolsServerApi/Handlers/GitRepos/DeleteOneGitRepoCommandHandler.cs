@@ -1,12 +1,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MediatRMessagingAbstractions;
 using OneOf;
 using SupportToolsServerApi.CommandRequests;
 using SupportToolsServerApplication.Repositories.Gits;
 using SupportToolsServerApplication.Services.Gits.Delete;
-using SystemToolsShared.Errors;
+using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServerApi.Handlers.GitRepos;
 

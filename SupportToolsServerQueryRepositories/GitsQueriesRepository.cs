@@ -6,18 +6,18 @@ using OneOf;
 using SupportToolsServer.Persistence;
 using SupportToolsServerApplication.Repositories.Gits;
 using SupportToolsServerApplication.Services.Gits.Models;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServerQueryRepositories;
 
 public sealed class GitsQueriesRepository : IGitsQueriesRepository
 {
-    private readonly SupportToolsServerDbContext _dbContext;
+    //private readonly SupportToolsServerDbContext _dbContext;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitsQueriesRepository(SupportToolsServerDbContext dbContext)
     {
-        _dbContext = dbContext;
+        //dbContext = dbContext;
     }
 
     //public async Task<List<GitData>> GetAllGitsFromDb(CancellationToken cancellationToken = default)
@@ -43,7 +43,7 @@ public sealed class GitsQueriesRepository : IGitsQueriesRepository
         throw new NotImplementedException();
     }
 
-    public async Task<OneOf<GitDataDto, Err[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
+    public Task<OneOf<GitDataDto, Err[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
     {
         //var gitData = await _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation)
         //    .FirstOrDefaultAsync(x => x.GdName == gitKey, cancellationToken);

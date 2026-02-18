@@ -2,11 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MediatRMessagingAbstractions;
 using OneOf;
 using SupportToolsServer.Domain.GitIgnoreFileTypes;
 using SupportToolsServer.Domain.Sync;
-using SystemToolsShared.Errors;
+using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServer.Application.GitIgnoreFileTypes.SyncUp;
 

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using OneOf;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServerApplication.Services.GitIgnoreFileTypes.Update;
 

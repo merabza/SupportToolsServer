@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
@@ -27,7 +28,7 @@ public sealed class GitIgnoreFileTypesCommandsRepository : IGitIgnoreFileTypesCo
         CancellationToken cancellationToken = default)
     {
         // ReSharper disable once using
-        using var dbConnection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+        using IDbConnection dbConnection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
 
         return await dbConnection.QuerySingleOrDefaultAsync<int>("""
                                                                  IF NOT EXISTS (SELECT * FROM GitIgnoreFileType WHERE [Name] = @Name)

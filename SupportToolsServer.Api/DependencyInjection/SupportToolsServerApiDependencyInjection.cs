@@ -1,20 +1,18 @@
 ﻿using Microsoft.AspNetCore.Routing;
+using Serilog;
 using SupportToolsServer.Api.Endpoints.V1;
-using System;
 
 namespace SupportToolsServer.Api.DependencyInjection;
 
 public static class SupportToolsServerApiDependencyInjection
 {
-    public static bool UseSupportToolsServerApi(this IEndpointRouteBuilder endpoints, bool debugMode)
+    public static bool UseSupportToolsServerApi(this IEndpointRouteBuilder endpoints, ILogger? debugLogger)
     {
-        if (debugMode)
-            Console.WriteLine($"{nameof(UseSupportToolsServerApi)} Started");
+        debugLogger?.Information("{MethodName} Started", nameof(UseSupportToolsServerApi));
 
-        endpoints.UseGitIgnoreFileTypesEndpoints(debugMode);
+        endpoints.UseGitIgnoreFileTypesEndpoints(debugLogger);
 
-        if (debugMode)
-            Console.WriteLine($"{nameof(UseSupportToolsServerApi)} Finished");
+        debugLogger?.Information("{MethodName} Finished", nameof(UseSupportToolsServerApi));
 
         return true;
     }

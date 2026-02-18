@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,10 +8,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using OneOf;
+using Serilog;
 using SupportToolsServer.Application.GitIgnoreFileTypes.SyncUp;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Routes;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServer.Api.Endpoints.V1;
 
@@ -28,19 +29,18 @@ public static class GitIgnoreFileTypesEndpoints
     //    return true;
     //}
 
-    public static bool UseGitIgnoreFileTypesEndpoints(this IEndpointRouteBuilder endpoints, bool debugMode)
+    public static bool UseGitIgnoreFileTypesEndpoints(this IEndpointRouteBuilder endpoints, ILogger? debugLogger)
     {
-        if (debugMode)
-            Console.WriteLine($"{nameof(UseGitIgnoreFileTypesEndpoints)} Started");
+        debugLogger?.Information("{MethodName} Started", nameof(UseGitIgnoreFileTypesEndpoints));
 
-        var group = endpoints.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase);
+        RouteGroupBuilder group =
+            endpoints.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase);
         //.RequireAuthorization();
 
         group.MapPost(SupportToolsServerApiRoutes.Git.SyncUpGitIgnoreFileTypes, SyncUpGitIgnoreFileTypes);
         //group.MapPost(SupportToolsServerApiRoutes.Git.MergeUpGitIgnoreFileTypes, MergeUpGitIgnoreFileTypes);
 
-        if (debugMode)
-            Console.WriteLine($"{nameof(UseGitIgnoreFileTypesEndpoints)} Finished");
+        debugLogger?.Information("{MethodName} Finished", nameof(UseGitIgnoreFileTypesEndpoints));
 
         return true;
     }
@@ -54,7 +54,7 @@ public static class GitIgnoreFileTypesEndpoints
             $"Call {nameof(SyncUpGitIgnoreFileTypesCommandHandler)} from {nameof(SyncUpGitIgnoreFileTypes)}");
 
         var command = new SyncUpGitIgnoreFileTypesCommand(merge ?? false, uploadGitIgnoreFileTypes);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));

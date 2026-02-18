@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatRMessagingAbstractions;
 using OneOf;
 using SupportToolsServerApi.QueryRequests;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApplication.Services.Gits.List;
 using SupportToolsServerMappers;
-using SystemToolsShared.Errors;
+using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServerApi.Handlers.GitRepos;
 
@@ -24,7 +24,7 @@ public sealed class GetGitReposQueryHandler : IQueryHandler<GetGitReposRequestQu
     }
 
     public async Task<OneOf<List<StsGitDataModel>, Err[]>> Handle(GetGitReposRequestQuery request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         return (await _gitsListService.GetGits(cancellationToken)).Match<OneOf<List<StsGitDataModel>, Err[]>>(
             f0 => f0.Select(x => x.ToContractModel()).ToList(), f1 => f1);

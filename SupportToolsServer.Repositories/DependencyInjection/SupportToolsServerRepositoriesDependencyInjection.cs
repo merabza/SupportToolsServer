@@ -1,8 +1,7 @@
-using System;
-using DomainShared;
-using DomainShared.Repositories;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using SupportToolsServer.Domain.GitIgnoreFileTypes;
+using SystemTools.DomainShared.Repositories;
 
 namespace SupportToolsServer.Repositories.DependencyInjection;
 
@@ -10,18 +9,16 @@ namespace SupportToolsServer.Repositories.DependencyInjection;
 public static class SupportToolsServerRepositoriesDependencyInjection
 {
     public static IServiceCollection AddSupportToolsServer_Repositories(this IServiceCollection services,
-        bool debugMode)
+        ILogger? debugLogger)
     {
-        if (debugMode)
-            Console.WriteLine($"{nameof(AddSupportToolsServer_Repositories)} Started");
+        debugLogger?.Information("{MethodName} Started", nameof(AddSupportToolsServer_Repositories));
 
         //builder.Services.AddScoped<IGitsQueriesRepository, GitsQueriesRepository>();
         //builder.Services.AddScoped<IGitIgnoreFileTypesQueriesRepository, GitIgnoreFileTypesQueriesRepository>();
         services.AddScoped<IUnitOfWork, SupportToolsServerUnitOfWork>();
         services.AddScoped<IGitIgnoreFileTypeRepository, GitIgnoreFileTypeRepository>();
 
-        if (debugMode)
-            Console.WriteLine($"{nameof(AddSupportToolsServer_Repositories)} Finished");
+        debugLogger?.Information("{MethodName} Finished", nameof(AddSupportToolsServer_Repositories));
 
         return services;
     }

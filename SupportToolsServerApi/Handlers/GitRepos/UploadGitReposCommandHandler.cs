@@ -2,13 +2,13 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MediatRMessagingAbstractions;
 using OneOf;
 using SupportToolsServerApi.CommandRequests;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.SyncToServ;
 using SupportToolsServerApplication.Services.Gits.SyncToServ;
 using SupportToolsServerMappers;
-using SystemToolsShared.Errors;
+using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServerApi.Handlers.GitRepos;
 
@@ -28,11 +28,14 @@ public sealed class UploadGitReposCommandHandler : ICommandHandler<UploadGitRepo
     public async Task<OneOf<Unit, Err[]>> Handle(UploadGitReposRequestCommand request,
         CancellationToken cancellationToken)
     {
-        var syncGitIgnoreFilesToServerResult =
+        OneOf<Unit, Err[]> syncGitIgnoreFilesToServerResult =
             await _gitIgnoreFilesSyncToServerService.SyncGitIgnoreFilesToServer(
                 request.GitIgnoreFiles.Select(s => s.AdaptTo()), cancellationToken);
         if (syncGitIgnoreFilesToServerResult.IsT1)
+        {
             return syncGitIgnoreFilesToServerResult.AsT1;
+        }
+
         return await _gitsSyncToServerService.SyncGitsToServer(request.Gits.Select(s => s.AdaptTo()),
             cancellationToken);
     }

@@ -6,7 +6,6 @@ using ConfigurationEncrypt;
 using Figgle.Fonts;
 using MediatorTools.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SerilogLogger;
@@ -16,7 +15,6 @@ using StaticFilesTools.DependencyInjection;
 using SupportToolsServer.Api.DependencyInjection;
 using SupportToolsServer.Application.Data;
 using SupportToolsServer.Persistence;
-using SupportToolsServer.Repositories;
 using SupportToolsServer.Repositories.DependencyInjection;
 using SupportToolsServerApplication;
 using SupportToolsServerCommandRepositories.DependencyInjection;
@@ -31,53 +29,56 @@ try
     Console.WriteLine("Loading...");
 
     const string appName = "Support Tools Server";
+    const string appKey = "3081adaf7a5d472a88cd5149671a1922";
     const int versionCount = 1;
 
-    var header = $"{appName} {Assembly.GetEntryAssembly()?.GetName().Version}";
+    string header = $"{appName} {Assembly.GetEntryAssembly()?.GetName().Version}";
     Console.WriteLine(FiggleFonts.Standard.Render(header));
 
-    var builder =
+    WebApplicationBuilder builder =
         WebApplication.CreateBuilder(new WebApplicationOptions
         {
             ContentRootPath = AppContext.BaseDirectory, Args = args
         });
 
-    var debugMode = builder.Environment.IsDevelopment();
+    bool debugMode = builder.Environment.IsDevelopment();
 
-    builder.Host.UseSerilogLogger(builder.Configuration, debugMode); //+
-    builder.Host.UseWindowsServiceOnWindows(debugMode, args); //+
+    ILogger logger = builder.Host.UseSerilogLogger(debugMode, builder.Configuration);
+    ILogger? debugLogger = debugMode ? logger : null;
 
-    builder.Configuration.AddConfigurationEncryption(debugMode, "3081adaf7a5d472a88cd5149671a1922"); //+
+    builder.Host.UseWindowsServiceOnWindows(debugLogger, args);
+
+    builder.Configuration.AddConfigurationEncryption(debugLogger, appKey);
 
     // @formatter:off
     builder.Services
-        .AddSwagger(debugMode, true, versionCount, appName) //+
-        .AddApiKeyIdentity(debugMode)
-        .AddSignalRMessages(debugMode)
-        .AddSupportToolsServerPersistence(builder.Configuration, debugMode)
-        .AddMediator(builder.Configuration, debugMode, typeof(ISupportToolsServerDbContext).Assembly)
+        .AddSwagger(debugLogger, true, versionCount, appName) //+
+        .AddApiKeyIdentity(debugLogger)
+        .AddSignalRMessages(debugLogger)
+        .AddSupportToolsServerPersistence(debugLogger, builder.Configuration)
+        .AddMediator(debugLogger, builder.Configuration, typeof(ISupportToolsServerDbContext).Assembly)
         //.AddSupportToolsServerApiKeyIdentity(debugMode)
         .AddAllScopedServiceSupportToolsServerApplication()
-        .AddSupportToolsServerQueryRepositories(debugMode)
-        .AddSupportToolsServerCommandRepositories(debugMode)
-        .AddSupportToolsServerForCommandsDatabase(builder.Configuration, debugMode)
-        .AddSupportToolsServer_Repositories(debugMode)
-        .AddSupportToolsServerDb(builder.Configuration, debugMode);
+        .AddSupportToolsServerQueryRepositories(debugLogger)
+        .AddSupportToolsServerCommandRepositories(debugLogger)
+        .AddSupportToolsServerForCommandsDatabase(debugLogger, builder.Configuration)
+        .AddSupportToolsServer_Repositories(debugLogger)
+        .AddSupportToolsServerDb(debugLogger, builder.Configuration);
     // @formatter:on
 
     //ReSharper disable once using
-    using var app = builder.Build();
+    await using WebApplication app = builder.Build();
 
     // ReSharper disable once RedundantArgumentDefaultValue
-    app.UseSwaggerServices(debugMode, versionCount); //+
-    app.UseSupportToolsServerApi(debugMode);
-    app.UseApiExceptionHandler(debugMode); //+
-    app.UseApiKeysAuthorization(debugMode);
-    app.UseSignalRMessagesHub(debugMode); //+
-    app.UseTestEndpoints(debugMode); //+
-    app.UseDefaultAndStaticFiles(debugMode); //+
+    app.UseSwaggerServices(debugLogger, versionCount); //+
+    app.UseSupportToolsServerApi(debugLogger);
+    app.UseApiExceptionHandler(debugLogger); //+
+    app.UseApiKeysAuthorization(debugLogger);
+    app.UseSignalRMessagesHub(debugLogger); //+
+    app.UseTestEndpoints(debugLogger); //+
+    app.UseDefaultAndStaticFiles(debugLogger); //+
 
-    app.Run();
+    await app.RunAsync();
     return 0;
 }
 catch (Exception e)
@@ -87,5 +88,5 @@ catch (Exception e)
 }
 finally
 {
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }

@@ -1,4 +1,4 @@
-﻿using MediatRMessagingAbstractions;
+﻿using SystemTools.MediatRMessagingAbstractions;
 
 namespace SupportToolsServerApi.CommandRequests;
 

@@ -5,7 +5,7 @@ using MediatR;
 using OneOf;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServerApplication.Services.GitIgnoreFileTypes.SyncToServ;
 
@@ -22,8 +22,10 @@ public class GitIgnoreFilesSyncToServerService : IScopedServiceSupportToolsServe
     public async Task<OneOf<Unit, Err[]>> SyncGitIgnoreFilesToServer(
         IEnumerable<GitIgnoreFileTypeForSave> requestGitIgnoreFiles, CancellationToken cancellationToken = default)
     {
-        foreach (var gitIgnoreFile in requestGitIgnoreFiles)
+        foreach (GitIgnoreFileTypeForSave gitIgnoreFile in requestGitIgnoreFiles)
+        {
             await _gitIgnoreFileTypesCommandsRepo.UpdateGitIgnoreFileType(gitIgnoreFile, cancellationToken);
+        }
 
         return new Unit();
     }

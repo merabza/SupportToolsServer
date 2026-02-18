@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using OneOf;
@@ -6,7 +7,7 @@ using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Repositories.Gits;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
 using SupportToolsServerApplication.Services.Gits.Models;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServerCommandRepositories;
 
@@ -28,13 +29,14 @@ public sealed class GitsCommandsRepository : IGitsCommandsRepository
     //    await _dbContext.GitData.AddAsync(gitData, cancellationToken);
     //}
 
-    public async Task<OneOf<int, Err[]>> UpdateGitRepo(GitDataForSave gitDataDto, CancellationToken cancellationToken)
+    public async Task<OneOf<int, Err[]>> UpdateGitRepo(GitDataForSave requestNewRecord,
+        CancellationToken cancellationToken)
     {
-        var giftId = await _gitIgnoreFileTypesCommandsRepo.UpdateGitIgnoreFileType(
-            new GitIgnoreFileTypeForSave { Name = gitDataDto.GitIgnorePathName }, cancellationToken);
+        int giftId = await _gitIgnoreFileTypesCommandsRepo.UpdateGitIgnoreFileType(
+            new GitIgnoreFileTypeForSave { Name = requestNewRecord.GitIgnorePathName }, cancellationToken);
 
         // ReSharper disable once using
-        using var dbConnection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+        using IDbConnection dbConnection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
 
         return await dbConnection.QuerySingleOrDefaultAsync<int>("""
                                                                  IF NOT EXISTS (SELECT * FROM GitData WHERE [GdName] = @GitProjectName)
@@ -64,9 +66,9 @@ public sealed class GitsCommandsRepository : IGitsCommandsRepository
                                                                  """,
             new
             {
-                gitDataDto.GitProjectName,
-                gitDataDto.GitProjectAddress,
-                gitDataDto.GitProjectFolderName,
+                requestNewRecord.GitProjectName,
+                requestNewRecord.GitProjectAddress,
+                requestNewRecord.GitProjectFolderName,
                 GitIgnoreFileTypeId = giftId
             });
     }
@@ -74,7 +76,7 @@ public sealed class GitsCommandsRepository : IGitsCommandsRepository
     public async Task DeleteGitRepo(string gitKey, CancellationToken cancellationToken)
     {
         // ReSharper disable once using
-        using var dbConnection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+        using IDbConnection dbConnection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
         await dbConnection.ExecuteAsync("DELETE FROM GitData WHERE GdName = @gitKey", new { gitKey });
     }
 }

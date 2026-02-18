@@ -9,7 +9,7 @@ using SupportToolsServer.Domain.GitIgnoreFileTypes;
 using SupportToolsServer.Persistence;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServerQueryRepositories;
 
@@ -23,8 +23,7 @@ public sealed class GitIgnoreFileTypesQueriesRepository : IGitIgnoreFileTypesQue
         _dbContext = dbContext;
     }
 
-    public async Task<OneOf<List<GitIgnoreFileTypeDto>, Err[]>> GetGitIgnoreFileTypes(
-        CancellationToken cancellationToken)
+    public Task<OneOf<List<GitIgnoreFileTypeDto>, Err[]>> GetGitIgnoreFileTypes(CancellationToken cancellationToken)
     {
         //return await _dbContext.GitIgnoreFileTypes.Select(s =>
         //    new GitIgnoreFileTypeDto

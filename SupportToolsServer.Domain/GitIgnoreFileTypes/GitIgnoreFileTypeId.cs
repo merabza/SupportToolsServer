@@ -6,12 +6,12 @@ namespace SupportToolsServer.Domain.GitIgnoreFileTypes;
 
 public class GitIgnoreFileTypeId : ValueObject
 {
-    public Guid Value { get; }
-
     public GitIgnoreFileTypeId(Guid value)
     {
         Value = value;
     }
+
+    public Guid Value { get; }
 
     public static GitIgnoreFileTypeId CreateUnique()
     {

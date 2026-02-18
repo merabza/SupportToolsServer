@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using SupportToolsServer.Application.Data;
 
 namespace SupportToolsServer.Persistence;
@@ -9,16 +10,17 @@ namespace SupportToolsServer.Persistence;
 public static class SupportToolsServerPersistenceDependencyInjection
 {
     public static IServiceCollection AddSupportToolsServerPersistence(this IServiceCollection services,
-        IConfiguration configuration, bool debugMode)
+        ILogger? debugLogger, IConfiguration configuration)
     {
-        if (debugMode) Console.WriteLine($"{nameof(AddSupportToolsServerPersistence)} Started");
+        debugLogger?.Information("{MethodName} Started", nameof(AddSupportToolsServerPersistence));
 
         const string connectionStringConfigurationKey = "Data:SupportToolsServerDatabase:ConnectionString";
-        var connectionString = configuration[connectionStringConfigurationKey];
+        string? connectionString = configuration[connectionStringConfigurationKey];
 
-        if (string.IsNullOrWhiteSpace(connectionString) && !debugMode)
+        if (string.IsNullOrWhiteSpace(connectionString) && debugLogger is not null)
         {
-            Console.WriteLine($"Parameter {connectionStringConfigurationKey} is empty");
+            debugLogger.Error("Parameter {ConnectionStringConfigurationKey} is empty",
+                connectionStringConfigurationKey);
             throw new InvalidOperationException("Connection string is empty");
         }
 
@@ -27,7 +29,8 @@ public static class SupportToolsServerPersistenceDependencyInjection
         services.AddScoped<ISupportToolsServerDbContext>(provider =>
             provider.GetRequiredService<SupportToolsServerDbContext>());
 
-        if (debugMode) Console.WriteLine($"{nameof(AddSupportToolsServerPersistence)} Finished");
+        debugLogger?.Information("{MethodName} Finished", nameof(AddSupportToolsServerPersistence));
+
         return services;
     }
 }

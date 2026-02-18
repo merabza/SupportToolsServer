@@ -1,6 +1,6 @@
-using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace SupportToolsServerCommandRepositories.DependencyInjection;
 
@@ -8,23 +8,24 @@ namespace SupportToolsServerCommandRepositories.DependencyInjection;
 public static class SupportToolsServerCommandRepositoriesDependencyInjection2
 {
     public static IServiceCollection AddSupportToolsServerForCommandsDatabase(this IServiceCollection services,
-        IConfiguration configuration, bool debugMode)
+        ILogger? debugLogger, IConfiguration configuration)
     {
-        if (debugMode) Console.WriteLine($"{nameof(AddSupportToolsServerForCommandsDatabase)} Started");
+        debugLogger?.Information("{MethodName} Started", nameof(AddSupportToolsServerForCommandsDatabase));
 
         const string connectionStringConfigurationKey = "Data:SupportToolsServerDatabase:ConnectionString";
-        var connectionString = configuration[connectionStringConfigurationKey];
+        string? connectionString = configuration[connectionStringConfigurationKey];
 
-        if (string.IsNullOrWhiteSpace(connectionString) && !debugMode)
+        if (string.IsNullOrWhiteSpace(connectionString) && debugLogger is not null)
         {
-            Console.WriteLine($"Parameter {connectionStringConfigurationKey} is empty");
+            debugLogger.Error("Parameter {ConnectionStringConfigurationKey} is empty",
+                connectionStringConfigurationKey);
             return services;
         }
 
         services.AddSingleton<IDbConnectionFactory>(_ =>
             new SqlDbConnectionFactory(configuration[connectionStringConfigurationKey]!));
 
-        if (debugMode) Console.WriteLine($"{nameof(AddSupportToolsServerForCommandsDatabase)} Finished");
+        debugLogger?.Information("{MethodName} Finished", nameof(AddSupportToolsServerForCommandsDatabase));
 
         return services;
     }

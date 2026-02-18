@@ -9,9 +9,7 @@ public static class GitIgnoreFileTypeMapper
     {
         return new StsGitIgnoreFileTypeDataModel
         {
-            Id = gitIgnoreFileType.RowId,
-            Name = gitIgnoreFileType.Name,
-            Content = gitIgnoreFileType.Content
+            Id = gitIgnoreFileType.RowId, Name = gitIgnoreFileType.Name, Content = gitIgnoreFileType.Content
         };
     }
 
@@ -19,8 +17,7 @@ public static class GitIgnoreFileTypeMapper
     {
         return new GitIgnoreFileTypeForSave
         {
-            Name = gitIgnoreFileTypeModel.Name,
-            Content = gitIgnoreFileTypeModel.Content
+            Name = gitIgnoreFileTypeModel.Name, Content = gitIgnoreFileTypeModel.Content
         };
     }
 }

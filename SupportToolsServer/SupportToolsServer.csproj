@@ -23,8 +23,8 @@
         <ProjectReference Include="..\SupportToolsServerQueryRepositories\SupportToolsServerQueryRepositories.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Figgle.Fonts" Version="0.6.5" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
+        <PackageReference Include="Figgle.Fonts" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" >
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>

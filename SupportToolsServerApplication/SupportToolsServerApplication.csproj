@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="14.0.0" />
-    <PackageReference Include="OneOf" Version="3.0.271" />
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="OneOf" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
+    <ProjectReference Include="..\..\SystemTools\SystemTools.SystemToolsShared\SystemTools.SystemToolsShared.csproj" />
   </ItemGroup>
 
 </Project>

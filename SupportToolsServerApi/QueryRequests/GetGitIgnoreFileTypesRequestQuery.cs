@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using MediatRMessagingAbstractions;
 using SupportToolsServerApiContracts.Models;
+using SystemTools.MediatRMessagingAbstractions;
 
 namespace SupportToolsServerApi.QueryRequests;
 

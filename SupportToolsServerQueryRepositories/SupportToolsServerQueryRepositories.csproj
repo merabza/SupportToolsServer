@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SystemTools\ApiKeysManagement\ApiKeysManagement.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Persistence\SupportToolsServer.Persistence.csproj" />
     <ProjectReference Include="..\SupportToolsServerApiKeyIdentity\SupportToolsServerApiKeyIdentity.csproj" />
     <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />

@@ -1,41 +1,33 @@
-﻿using System;
+﻿#nullable disable
+
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
+namespace SupportToolsServer.DbMigration.Migrations;
 
-namespace SupportToolsServer.DbMigration.Migrations
+/// <inheritdoc />
+public partial class Initial : Migration
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.CreateTable(
-                name: "GitIgnoreFileTypes",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", maxLength: 16384, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GitIgnoreFileTypes", x => x.Id);
-                });
+        migrationBuilder.CreateTable("GitIgnoreFileTypes",
+            table => new
+            {
+                Id = table.Column<Guid>("uniqueidentifier", nullable: false),
+                Name = table.Column<string>("nvarchar(50)", maxLength: 50, nullable: false),
+                Content = table.Column<string>("nvarchar(max)", maxLength: 16384, nullable: false)
+            }, constraints: table =>
+            {
+                table.PrimaryKey("PK_GitIgnoreFileTypes", x => x.Id);
+            });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_GitIgnoreFileTypes_Name",
-                table: "GitIgnoreFileTypes",
-                column: "Name",
-                unique: true);
-        }
+        migrationBuilder.CreateIndex("IX_GitIgnoreFileTypes_Name", "GitIgnoreFileTypes", "Name", unique: true);
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "GitIgnoreFileTypes");
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropTable("GitIgnoreFileTypes");
     }
 }

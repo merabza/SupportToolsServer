@@ -1,4 +1,3 @@
-
 //using System.Reflection;
 
 //namespace SupportToolsServer.Persistence;
@@ -7,3 +6,5 @@
 //{
 //    public static readonly Assembly Assembly = typeof(AssemblyReference).Assembly;
 //}
+
+

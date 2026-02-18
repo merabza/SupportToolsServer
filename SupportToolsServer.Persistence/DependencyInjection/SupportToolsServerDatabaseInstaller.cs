@@ -31,9 +31,6 @@
 //        builder.Services.AddScoped<ISupportToolsServerDbContext>(provider => provider.GetRequiredService<SupportToolsServerDbContext>());
 //        builder.Services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<SupportToolsServerDbContext>());
 
-
-
-
 //        if (debugMode) Console.WriteLine($"{GetType().Name}.{nameof(InstallServices)} Finished");
 
 //        return true;
@@ -44,3 +41,5 @@
 //        return true;
 //    }
 //}
+
+

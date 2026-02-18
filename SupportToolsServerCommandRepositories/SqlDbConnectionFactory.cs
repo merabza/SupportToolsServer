@@ -1,7 +1,8 @@
 ﻿using System.Data;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
-using SqlServerDbTools;
+using DatabaseTools.SqlServerDbTools;
 
 namespace SupportToolsServerCommandRepositories;
 
@@ -18,7 +19,7 @@ public class SqlDbConnectionFactory : IDbConnectionFactory
     {
         var sqlKit = new SqlKit();
         // ReSharper disable once using
-        var connection = sqlKit.GetConnection();
+        DbConnection connection = sqlKit.GetConnection();
         connection.ConnectionString = _connectionString;
         await connection.OpenAsync(token);
         return connection;

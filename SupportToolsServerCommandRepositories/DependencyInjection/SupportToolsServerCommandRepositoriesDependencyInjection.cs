@@ -1,5 +1,5 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Repositories.Gits;
 
@@ -9,16 +9,14 @@ namespace SupportToolsServerCommandRepositories.DependencyInjection;
 public static class SupportToolsServerCommandRepositoriesDependencyInjection
 {
     public static IServiceCollection AddSupportToolsServerCommandRepositories(this IServiceCollection services,
-        bool debugMode)
+        ILogger? debugLogger)
     {
-        if (debugMode)
-            Console.WriteLine($"{nameof(AddSupportToolsServerCommandRepositories)} Started");
+        debugLogger?.Information("{MethodName} Started", nameof(AddSupportToolsServerCommandRepositories));
 
         services.AddScoped<IGitsCommandsRepository, GitsCommandsRepository>();
         services.AddScoped<IGitIgnoreFileTypesCommandsRepository, GitIgnoreFileTypesCommandsRepository>();
 
-        if (debugMode)
-            Console.WriteLine($"{nameof(AddSupportToolsServerCommandRepositories)} Finished");
+        debugLogger?.Information("{MethodName} Finished", nameof(AddSupportToolsServerCommandRepositories));
 
         return services;
     }

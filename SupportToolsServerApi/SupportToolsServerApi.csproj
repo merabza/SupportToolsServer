@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
-    <ProjectReference Include="..\..\SystemTools\MediatRMessagingAbstractions\MediatRMessagingAbstractions.csproj" />
+    <ProjectReference Include="..\..\SystemTools\SystemTools.MediatRMessagingAbstractions\SystemTools.MediatRMessagingAbstractions.csproj" />
     <ProjectReference Include="..\..\WebSystemTools\ApiKeyIdentity\ApiKeyIdentity.csproj" />
     <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
     <ProjectReference Include="..\SupportToolsServerMappers\SupportToolsServerMappers.csproj" />

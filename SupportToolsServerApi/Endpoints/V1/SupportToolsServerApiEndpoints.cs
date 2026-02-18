@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +9,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using OneOf;
+using Serilog;
 using SupportToolsServerApi.CommandRequests;
 using SupportToolsServerApi.Handlers.GitIgnoreFileTypes;
 using SupportToolsServerApi.Handlers.GitRepos;
@@ -17,8 +18,8 @@ using SupportToolsServerApi.QueryRequests;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Requests;
 using SupportToolsServerApiContracts.V1.Routes;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServerApi.Endpoints.V1;
 
@@ -26,12 +27,12 @@ namespace SupportToolsServerApi.Endpoints.V1;
 // ReSharper disable once UnusedType.Global
 public static class SupportToolsServerApiEndpoints
 {
-    public static bool UseSupportToolsServerApiEndpoints(this IEndpointRouteBuilder endpoints, bool debugMode)
+    public static bool UseSupportToolsServerApiEndpoints(this IEndpointRouteBuilder endpoints, ILogger? debugLogger)
     {
-        if (debugMode)
-            Console.WriteLine($"{nameof(UseSupportToolsServerApiEndpoints)} Started");
+        debugLogger?.Information("{MethodName} Started", nameof(UseSupportToolsServerApiEndpoints));
 
-        var group = endpoints.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase)
+        RouteGroupBuilder group = endpoints
+            .MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase)
             .RequireAuthorization();
 
         //git repos
@@ -46,8 +47,7 @@ public static class SupportToolsServerApiEndpoints
         group.MapPost(SupportToolsServerApiRoutes.Git.UpdateGitIgnoreFileType, UpdateGitIgnoreFileType);
         group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitIgnoreFileType, DeleteGitIgnoreFileType);
 
-        if (debugMode)
-            Console.WriteLine($"{nameof(UseSupportToolsServerApiEndpoints)} Finished");
+        debugLogger?.Information("{MethodName} Finished", nameof(UseSupportToolsServerApiEndpoints));
 
         return true;
     }
@@ -57,13 +57,13 @@ public static class SupportToolsServerApiEndpoints
         ICurrentUserByApiKey currentUserByApiKey, IMediator mediator, IMessagesDataManager messagesDataManager,
         CancellationToken cancellationToken = default)
     {
-        var userName = currentUserByApiKey.Name;
+        string userName = currentUserByApiKey.Name;
         await messagesDataManager.SendMessage(userName, $"{nameof(UploadGitRepos)} started", cancellationToken);
         Debug.WriteLine($"Call {nameof(UploadGitReposCommandHandler)} from {nameof(UploadGitRepos)}");
 
         var command =
             new UploadGitReposRequestCommand { Gits = syncGitData.Gits, GitIgnoreFiles = syncGitData.GitIgnoreFiles };
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         await messagesDataManager.SendMessage(userName, $"{nameof(UploadGitRepos)} finished", cancellationToken);
 
@@ -78,7 +78,7 @@ public static class SupportToolsServerApiEndpoints
         Debug.WriteLine($"Call {nameof(GetGitReposQueryHandler)} from {nameof(GetGitRepos)}");
 
         var command = new GetGitReposRequestQuery();
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<List<StsGitDataModel>, Err[]> result = await mediator.Send(command, cancellationToken);
 
         return result.Match<Results<Ok<List<StsGitDataModel>>, BadRequest<Err[]>>>(res => TypedResults.Ok(res),
             errors => TypedResults.BadRequest(errors));
@@ -91,7 +91,7 @@ public static class SupportToolsServerApiEndpoints
         Debug.WriteLine($"Call {nameof(GetOneGitRepoQueryHandler)} from {nameof(GetOneGitRepo)}");
 
         var command = new GetOneGitRepoRequestQuery(key);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<StsGitDataModel, Err[]> result = await mediator.Send(command, cancellationToken);
 
         return result.Match<Results<Ok<StsGitDataModel>, BadRequest<Err[]>>>(res => TypedResults.Ok(res),
             errors => TypedResults.BadRequest(errors));
@@ -105,7 +105,7 @@ public static class SupportToolsServerApiEndpoints
             $"Call {nameof(UpdateOneGitRepoCommandHandler)} for key {newRecord.GitProjectName} from {nameof(UpdateOneGitRepo)}");
 
         var command = new UpdateOneGitRepoRequestCommand(newRecord);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));
@@ -118,7 +118,7 @@ public static class SupportToolsServerApiEndpoints
         Debug.WriteLine($"Call {nameof(DeleteOneGitRepoCommandHandler)} for key {key} from {nameof(DeleteOneGitRepo)}");
 
         var command = new DeleteOneGitRepoRequestCommand(key);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));
@@ -132,7 +132,7 @@ public static class SupportToolsServerApiEndpoints
         Debug.WriteLine($"Call {nameof(GetGitIgnoreFileTypesQueryHandler)} from {nameof(GetGitIgnoreFileTypesList)}");
 
         var command = new GetGitIgnoreFileTypesRequestQuery();
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<List<StsGitIgnoreFileTypeDataModel>, Err[]> result = await mediator.Send(command, cancellationToken);
 
         return result.Match<Results<Ok<List<StsGitIgnoreFileTypeDataModel>>, BadRequest<Err[]>>>(
             res => TypedResults.Ok(res), errors => TypedResults.BadRequest(errors));
@@ -147,7 +147,7 @@ public static class SupportToolsServerApiEndpoints
             $"Call {nameof(UpdateGitIgnoreFileTypeCommandHandler)} for {newRecord.Name} from {nameof(UpdateGitIgnoreFileType)}");
 
         var command = new UpdateGitIgnoreFileTypeRequestCommand(newRecord);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));
@@ -161,7 +161,7 @@ public static class SupportToolsServerApiEndpoints
             $"Call {nameof(DeleteGitIgnoreFileTypeCommandHandler)} for key {key} from {nameof(DeleteGitIgnoreFileType)}");
 
         var command = new DeleteGitIgnoreFileTypeRequestCommand(key);
-        var result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
 
         return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));

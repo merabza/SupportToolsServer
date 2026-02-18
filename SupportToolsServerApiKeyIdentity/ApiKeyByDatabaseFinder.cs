@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using ApiKeysManagement;
-using ApiKeysManagement.Domain;
+using SystemTools.ApiKeysManagement;
+using SystemTools.ApiKeysManagement.Domain;
 
 namespace SupportToolsServerApiKeyIdentity;
 

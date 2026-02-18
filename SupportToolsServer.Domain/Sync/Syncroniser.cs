@@ -20,23 +20,23 @@ public class Syncroniser<T, TId> where T : Entity<TId> where TId : notnull
     public async Task<bool> DoSyncUp(bool merge = true, CancellationToken cancellationToken = default)
     {
         //ჩავტვირთოთ ბაზაში არსებული ყველა ჩანაწერი
-        var existingEntities = await _crudRepository.GetAll(cancellationToken);
+        List<T> existingEntities = await _crudRepository.GetAll(cancellationToken);
 
         if (!merge) //თუ არ გვინდა მერჯი, მაშინ წავშალოთ ყველა ჩანაწერი, რომელიც ბაზაშია, მაგრამ მოწოდებულ სიაში არაა
         {
             //ვიპოვით ბაზაში ყველა ისეთი ჩანაწერი, რომელიც არ გვაქვს მოწოდებულ სიაში
-            var entitiesToDelete = existingEntities.Where(e => _entities.All(r => r != e)).ToList();
+            List<T> entitiesToDelete = existingEntities.Where(e => _entities.All(r => r != e)).ToList();
             //წავშალოთ ისინი
             entitiesToDelete.ForEach(e => _crudRepository.Delete(e));
         }
 
         //ვიპოვით ყველა ჩანაწერი, რომელიც მოწოდებულ სიაშია, მაგრამ ბაზაში არ არსებობს
-        var entitiesToAdd = _entities.Where(r => existingEntities.All(e => e != r)).ToList();
+        List<T> entitiesToAdd = _entities.Where(r => existingEntities.All(e => e != r)).ToList();
         //დავამატოთ ისინი
         entitiesToAdd.ForEach(r => _crudRepository.Add(r));
 
         //ვიპოვოთ ყველა ჩანაწერი, რომელიც ორივე სიაშია და შევადაროთ მათი შინაარსი
-        var entitiesToUpdate = _entities.Where(r => existingEntities.Any(e => e == r)).ToList();
+        List<T> entitiesToUpdate = _entities.Where(r => existingEntities.Any(e => e == r)).ToList();
         //განვაახლოთ ისინი
         entitiesToUpdate.ForEach(r => _crudRepository.Update(r));
 

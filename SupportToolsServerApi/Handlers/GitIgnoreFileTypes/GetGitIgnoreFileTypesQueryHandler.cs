@@ -2,13 +2,14 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatRMessagingAbstractions;
 using OneOf;
 using SupportToolsServerApi.QueryRequests;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.List;
+using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
 using SupportToolsServerMappers;
-using SystemToolsShared.Errors;
+using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServerApi.Handlers.GitIgnoreFileTypes;
 
@@ -26,11 +27,14 @@ public sealed class
     }
 
     public async Task<OneOf<List<StsGitIgnoreFileTypeDataModel>, Err[]>> Handle(
-        GetGitIgnoreFileTypesRequestQuery request, CancellationToken cancellationToken = default)
+        GetGitIgnoreFileTypesRequestQuery request, CancellationToken cancellationToken)
     {
-        var getGitIgnoreFileTypesResult = await _gitIgnoreFileTypeListService.GetGitIgnoreFileTypes(cancellationToken);
+        OneOf<List<GitIgnoreFileTypeDto>, Err[]> getGitIgnoreFileTypesResult =
+            await _gitIgnoreFileTypeListService.GetGitIgnoreFileTypes(cancellationToken);
         if (getGitIgnoreFileTypesResult.IsT1)
+        {
             return getGitIgnoreFileTypesResult.AsT1;
+        }
 
         return getGitIgnoreFileTypesResult.AsT0.Select(x => x.ToContractModel()).ToList();
     }
