@@ -1,17 +1,9 @@
 using System;
 using System.Reflection;
-using ApiExceptionHandler.DependencyInjection;
-using ApiKeyIdentity.DependencyInjection;
-using ConfigurationEncrypt;
 using Figgle.Fonts;
-using MediatorTools.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using SerilogLogger;
-using SignalRMessages.DependencyInjection;
-using SignalRMessages.Endpoints.V1;
-using StaticFilesTools.DependencyInjection;
 using SupportToolsServer.Api.DependencyInjection;
 using SupportToolsServer.Application.Data;
 using SupportToolsServer.Persistence;
@@ -20,9 +12,17 @@ using SupportToolsServerApplication;
 using SupportToolsServerCommandRepositories.DependencyInjection;
 using SupportToolsServerDb.DependencyInjection;
 using SupportToolsServerQueryRepositories.DependencyInjection;
-using SwaggerTools.DependencyInjection;
-using TestToolsApi.Endpoints.V1;
-using WindowsServiceTools;
+using WebSystemTools.ApiExceptionHandler.DependencyInjection;
+using WebSystemTools.ApiKeyIdentity.DependencyInjection;
+using WebSystemTools.ConfigurationEncrypt;
+using WebSystemTools.MediatorTools.DependencyInjection;
+using WebSystemTools.SerilogLogger;
+using WebSystemTools.SignalRMessages.DependencyInjection;
+using WebSystemTools.SignalRMessages.Endpoints.V1;
+using WebSystemTools.StaticFilesTools.DependencyInjection;
+using WebSystemTools.SwaggerTools.DependencyInjection;
+using WebSystemTools.TestToolsApi.Endpoints.V1;
+using WebSystemTools.WindowsServiceTools;
 
 try
 {
