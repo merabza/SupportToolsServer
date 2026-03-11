@@ -1,20 +1,20 @@
 <Project>
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    </PropertyGroup>
-    <!--.NET 9 packages. Most of them will work on .NET 8. If you need to, make the updates here individually.-->
-    <ItemGroup>
-        <!-- Static code analysis -->
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.3" />
-        <PackageVersion Include="Serilog" Version="4.3.1" />
-        <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.19.0.132793" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3" />
-        <PackageVersion Include="Figgle.Fonts" Version="0.6.5" />
-        <PackageVersion Include="MediatR" Version="14.0.0" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.3" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.3" />
-        <PackageVersion Include="OneOf" Version="3.0.271" />
-        <PackageVersion Include="Dapper" Version="2.1.66" />
-    </ItemGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <!--.NET 9 packages. Most of them will work on .NET 8. If you need to, make the updates here individually.-->
+  <ItemGroup>
+    <!-- Static code analysis -->
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.4" />
+    <PackageVersion Include="Serilog" Version="4.3.1" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.20.0.135146" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.4" />
+    <PackageVersion Include="Figgle.Fonts" Version="0.6.6" />
+    <PackageVersion Include="MediatR" Version="14.1.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.4" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.4" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.4" />
+    <PackageVersion Include="OneOf" Version="3.0.271" />
+    <PackageVersion Include="Dapper" Version="2.1.72" />
+  </ItemGroup>
 </Project>
