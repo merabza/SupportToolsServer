@@ -16,8 +16,8 @@ public class GitIgnoreFileTypeUpdateService : IScopedServiceSupportToolsServerAp
         _gitIgnoreFileTypesCommandsRepo = gitIgnoreFileTypesCommandsRepo;
     }
 
-    public async Task<OneOf<int, Error[]>> UpdateGitIgnoreFileType(GitIgnoreFileTypeForSave requestGitIgnoreFileTypeModel,
-        CancellationToken cancellationToken)
+    public async Task<OneOf<int, Error[]>> UpdateGitIgnoreFileType(
+        GitIgnoreFileTypeForSave requestGitIgnoreFileTypeModel, CancellationToken cancellationToken)
     {
         return await _gitIgnoreFileTypesCommandsRepo.UpdateGitIgnoreFileType(requestGitIgnoreFileTypeModel,
             cancellationToken);
