@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SupportToolsServer.Domain.GitIgnoreFileTypes;
-using SystemTools.DomainShared.Repositories;
+using SystemTools.Domain.Abstractions;
 
 namespace SupportToolsServer.Repositories.DependencyInjection;
 
