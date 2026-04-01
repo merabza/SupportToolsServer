@@ -21,11 +21,11 @@ public sealed class GetOneGitRepoQueryHandler : IQueryHandler<GetOneGitRepoReque
         _gitsListService = gitsListService;
     }
 
-    public async Task<OneOf<StsGitDataModel, Err[]>> Handle(GetOneGitRepoRequestQuery request,
+    public async Task<OneOf<StsGitDataModel, Error[]>> Handle(GetOneGitRepoRequestQuery request,
         CancellationToken cancellationToken)
     {
         // Assumes request.RecordKey exists; adjust as needed
         return (await _gitsListService.GetOneGit(request.GitKey, cancellationToken))
-            .Match<OneOf<StsGitDataModel, Err[]>>(f0 => f0.ToContractModel(), f1 => f1);
+            .Match<OneOf<StsGitDataModel, Error[]>>(f0 => f0.ToContractModel(), f1 => f1);
     }
 }

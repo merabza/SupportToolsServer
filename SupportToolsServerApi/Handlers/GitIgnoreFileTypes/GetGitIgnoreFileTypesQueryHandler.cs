@@ -26,10 +26,10 @@ public sealed class
         _gitIgnoreFileTypeListService = gitIgnoreFileTypeListService;
     }
 
-    public async Task<OneOf<List<StsGitIgnoreFileTypeDataModel>, Err[]>> Handle(
+    public async Task<OneOf<List<StsGitIgnoreFileTypeDataModel>, Error[]>> Handle(
         GetGitIgnoreFileTypesRequestQuery request, CancellationToken cancellationToken)
     {
-        OneOf<List<GitIgnoreFileTypeDto>, Err[]> getGitIgnoreFileTypesResult =
+        OneOf<List<GitIgnoreFileTypeDto>, Error[]> getGitIgnoreFileTypesResult =
             await _gitIgnoreFileTypeListService.GetGitIgnoreFileTypes(cancellationToken);
         if (getGitIgnoreFileTypesResult.IsT1)
         {

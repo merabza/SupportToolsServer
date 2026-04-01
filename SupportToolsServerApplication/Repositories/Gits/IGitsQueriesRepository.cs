@@ -12,5 +12,5 @@ public interface IGitsQueriesRepository
     //Task<List<GitData>> GetAllGitsFromDb(CancellationToken cancellationToken = default);
     //Task<List<GitIgnoreFileType>> GetAllGitIgnorePathsFromDb(CancellationToken cancellationToken = default);
     Task<List<GitDataDto>> GetGitRepos(CancellationToken cancellationToken = default);
-    Task<OneOf<GitDataDto, Err[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken);
+    Task<OneOf<GitDataDto, Error[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken);
 }

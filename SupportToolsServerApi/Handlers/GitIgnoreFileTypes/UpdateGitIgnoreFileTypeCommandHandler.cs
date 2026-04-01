@@ -21,7 +21,7 @@ public sealed class UpdateGitIgnoreFileTypeCommandHandler : ICommandHandler<Upda
         _updateService = updateService;
     }
 
-    public async Task<OneOf<Unit, Err[]>> Handle(UpdateGitIgnoreFileTypeRequestCommand request,
+    public async Task<OneOf<Unit, Error[]>> Handle(UpdateGitIgnoreFileTypeRequestCommand request,
         CancellationToken cancellationToken)
     {
         // Assumes request.RecordKey exists; adjust as needed

@@ -19,7 +19,7 @@ public class GitsSyncToServerService : IScopedServiceSupportToolsServerApplicati
         _gitsCommandsRepo = gitsCommandsRepo;
     }
 
-    public async Task<OneOf<Unit, Err[]>> SyncGitsToServer(IEnumerable<GitDataForSave> requestGits,
+    public async Task<OneOf<Unit, Error[]>> SyncGitsToServer(IEnumerable<GitDataForSave> requestGits,
         CancellationToken cancellationToken = default)
     {
         foreach (GitDataForSave git in requestGits)

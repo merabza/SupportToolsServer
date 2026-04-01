@@ -9,7 +9,7 @@ namespace SupportToolsServerApplication.Services.GitIgnoreFileTypes.Delete;
 
 public class GitIgnoreFileTypeDeleteService : IScopedServiceSupportToolsServerApplication
 {
-    public Task<OneOf<Unit, Err[]>> DeleteGitIgnoreFileType(string requestRecordKey,
+    public Task<OneOf<Unit, Error[]>> DeleteGitIgnoreFileType(string requestRecordKey,
         CancellationToken cancellationToken)
     {
         throw new NotImplementedException();

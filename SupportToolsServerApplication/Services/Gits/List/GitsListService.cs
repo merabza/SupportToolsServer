@@ -17,12 +17,12 @@ public class GitsListService : IScopedServiceSupportToolsServerApplication
         _repo = repo;
     }
 
-    public async Task<OneOf<List<GitDataDto>, Err[]>> GetGits(CancellationToken cancellationToken)
+    public async Task<OneOf<List<GitDataDto>, Error[]>> GetGits(CancellationToken cancellationToken)
     {
         return await _repo.GetGitRepos(cancellationToken);
     }
 
-    public async Task<OneOf<GitDataDto, Err[]>> GetOneGit(string requestGitKey, CancellationToken cancellationToken)
+    public async Task<OneOf<GitDataDto, Error[]>> GetOneGit(string requestGitKey, CancellationToken cancellationToken)
     {
         return await _repo.GetGitRepoByKey(requestGitKey, cancellationToken);
     }

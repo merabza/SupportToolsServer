@@ -9,7 +9,7 @@ namespace SupportToolsServerApplication.Repositories.Gits;
 public interface IGitsCommandsRepository
 {
     //Task AddGit(GitData gitData, CancellationToken cancellationToken = default);
-    Task<OneOf<int, Err[]>> UpdateGitRepo(GitDataForSave requestNewRecord, CancellationToken cancellationToken);
+    Task<OneOf<int, Error[]>> UpdateGitRepo(GitDataForSave requestNewRecord, CancellationToken cancellationToken);
 
     Task DeleteGitRepo(string gitKey, CancellationToken cancellationToken);
 }

@@ -19,7 +19,7 @@ public class GitIgnoreFilesSyncToServerService : IScopedServiceSupportToolsServe
         _gitIgnoreFileTypesCommandsRepo = gitIgnoreFileTypesCommandsRepo;
     }
 
-    public async Task<OneOf<Unit, Err[]>> SyncGitIgnoreFilesToServer(
+    public async Task<OneOf<Unit, Error[]>> SyncGitIgnoreFilesToServer(
         IEnumerable<GitIgnoreFileTypeForSave> requestGitIgnoreFiles, CancellationToken cancellationToken = default)
     {
         foreach (GitIgnoreFileTypeForSave gitIgnoreFile in requestGitIgnoreFiles)

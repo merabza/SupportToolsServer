@@ -20,7 +20,7 @@ public sealed class DeleteGitIgnoreFileTypeCommandHandler : ICommandHandler<Dele
         _gitIgnoreFileTypeDeleteService = gitIgnoreFileTypeDeleteService;
     }
 
-    public Task<OneOf<Unit, Err[]>> Handle(DeleteGitIgnoreFileTypeRequestCommand request,
+    public Task<OneOf<Unit, Error[]>> Handle(DeleteGitIgnoreFileTypeRequestCommand request,
         CancellationToken cancellationToken)
     {
         // Assumes request.RecordKey exists; adjust as needed

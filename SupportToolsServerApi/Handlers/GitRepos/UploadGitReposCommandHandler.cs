@@ -25,10 +25,10 @@ public sealed class UploadGitReposCommandHandler : ICommandHandler<UploadGitRepo
         _gitsSyncToServerService = gitsSyncToServerService;
     }
 
-    public async Task<OneOf<Unit, Err[]>> Handle(UploadGitReposRequestCommand request,
+    public async Task<OneOf<Unit, Error[]>> Handle(UploadGitReposRequestCommand request,
         CancellationToken cancellationToken)
     {
-        OneOf<Unit, Err[]> syncGitIgnoreFilesToServerResult =
+        OneOf<Unit, Error[]> syncGitIgnoreFilesToServerResult =
             await _gitIgnoreFilesSyncToServerService.SyncGitIgnoreFilesToServer(
                 request.GitIgnoreFiles.Select(s => s.AdaptTo()), cancellationToken);
         if (syncGitIgnoreFilesToServerResult.IsT1)

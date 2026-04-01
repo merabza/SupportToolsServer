@@ -46,7 +46,7 @@ public static class GitIgnoreFileTypesEndpoints
     }
 
     // POST api/v1/git/syncupgitignorefiletypes/{merge?}
-    public static async Task<Results<Ok, BadRequest<Err[]>>> SyncUpGitIgnoreFileTypes([FromRoute] bool? merge,
+    public static async Task<Results<Ok, BadRequest<Error[]>>> SyncUpGitIgnoreFileTypes([FromRoute] bool? merge,
         [FromBody] List<StsGitIgnoreFileTypeDataModel> uploadGitIgnoreFileTypes, IMediator mediator,
         CancellationToken cancellationToken = default)
     {
@@ -54,9 +54,9 @@ public static class GitIgnoreFileTypesEndpoints
             $"Call {nameof(SyncUpGitIgnoreFileTypesCommandHandler)} from {nameof(SyncUpGitIgnoreFileTypes)}");
 
         var command = new SyncUpGitIgnoreFileTypesCommand(merge ?? false, uploadGitIgnoreFileTypes);
-        OneOf<Unit, Err[]> result = await mediator.Send(command, cancellationToken);
+        OneOf<Unit, Error[]> result = await mediator.Send(command, cancellationToken);
 
-        return result.Match<Results<Ok, BadRequest<Err[]>>>(_ => TypedResults.Ok(),
+        return result.Match<Results<Ok, BadRequest<Error[]>>>(_ => TypedResults.Ok(),
             errors => TypedResults.BadRequest(errors));
     }
 }

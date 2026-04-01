@@ -23,10 +23,10 @@ public sealed class GetGitReposQueryHandler : IQueryHandler<GetGitReposRequestQu
         _gitsListService = gitsListService;
     }
 
-    public async Task<OneOf<List<StsGitDataModel>, Err[]>> Handle(GetGitReposRequestQuery request,
+    public async Task<OneOf<List<StsGitDataModel>, Error[]>> Handle(GetGitReposRequestQuery request,
         CancellationToken cancellationToken)
     {
-        return (await _gitsListService.GetGits(cancellationToken)).Match<OneOf<List<StsGitDataModel>, Err[]>>(
+        return (await _gitsListService.GetGits(cancellationToken)).Match<OneOf<List<StsGitDataModel>, Error[]>>(
             f0 => f0.Select(x => x.ToContractModel()).ToList(), f1 => f1);
     }
 }

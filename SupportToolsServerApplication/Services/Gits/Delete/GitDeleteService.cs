@@ -9,7 +9,7 @@ namespace SupportToolsServerApplication.Services.Gits.Delete;
 
 public class GitDeleteService : IScopedServiceSupportToolsServerApplication
 {
-    public Task<OneOf<Unit, Err[]>> DeleteGitRepo(string requestRecordKey, CancellationToken cancellationToken)
+    public Task<OneOf<Unit, Error[]>> DeleteGitRepo(string requestRecordKey, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

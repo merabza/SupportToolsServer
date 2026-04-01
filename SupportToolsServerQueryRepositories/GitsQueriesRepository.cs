@@ -43,13 +43,13 @@ public sealed class GitsQueriesRepository : IGitsQueriesRepository
         throw new NotImplementedException();
     }
 
-    public Task<OneOf<GitDataDto, Err[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
+    public Task<OneOf<GitDataDto, Error[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
     {
         //var gitData = await _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation)
         //    .FirstOrDefaultAsync(x => x.GdName == gitKey, cancellationToken);
 
         //if (gitData is null)
-        //    return new Err[]
+        //    return new Error[]
         //    {
         //        new()
         //        {

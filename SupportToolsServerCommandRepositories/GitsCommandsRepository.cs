@@ -29,7 +29,7 @@ public sealed class GitsCommandsRepository : IGitsCommandsRepository
     //    await _dbContext.GitData.AddAsync(gitData, cancellationToken);
     //}
 
-    public async Task<OneOf<int, Err[]>> UpdateGitRepo(GitDataForSave requestNewRecord,
+    public async Task<OneOf<int, Error[]>> UpdateGitRepo(GitDataForSave requestNewRecord,
         CancellationToken cancellationToken)
     {
         int giftId = await _gitIgnoreFileTypesCommandsRepo.UpdateGitIgnoreFileType(
