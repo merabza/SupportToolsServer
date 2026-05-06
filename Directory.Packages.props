@@ -2,9 +2,7 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-  <!--.NET 9 packages. Most of them will work on .NET 8. If you need to, make the updates here individually.-->
   <ItemGroup>
-    <!-- Static code analysis -->
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.7" />
     <PackageVersion Include="Serilog" Version="4.3.1" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.25.0.139117" />
