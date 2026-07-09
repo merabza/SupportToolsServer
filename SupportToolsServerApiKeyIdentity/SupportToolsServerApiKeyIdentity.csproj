@@ -1,7 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <ItemGroup>
-    <ProjectReference Include="..\..\SystemTools\SystemTools.ApiKeysManagement\SystemTools.ApiKeysManagement.csproj" />
+  <ItemGroup>
+    <PackageReference Include="SystemTools.ApiKeysManagement" />
   </ItemGroup>
-
 </Project>

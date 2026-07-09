@@ -14,5 +14,9 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.5" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="Dapper" Version="2.1.72" />
+    <PackageVersion Include="SystemTools.ApiKeysManagement" Version="1.0.9686.26889" />
+    <PackageVersion Include="SystemTools.DatabaseToolsShared" Version="1.0.9686.26889" />
+    <PackageVersion Include="SystemTools.MediatRMessagingAbstractions" Version="1.0.9686.26889" />
+    <PackageVersion Include="SystemTools.RepositoriesShared" Version="1.0.9686.26889" />
   </ItemGroup>
 </Project>

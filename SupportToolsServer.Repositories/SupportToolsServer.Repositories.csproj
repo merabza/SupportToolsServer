@@ -1,10 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-    <ProjectReference Include="..\..\SystemTools\SystemTools.RepositoriesShared\SystemTools.RepositoriesShared.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Application\SupportToolsServer.Application.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Domain\SupportToolsServer.Domain.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Persistence\SupportToolsServer.Persistence.csproj" />
   </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SystemTools.RepositoriesShared" />
+    </ItemGroup>
 
 </Project>
