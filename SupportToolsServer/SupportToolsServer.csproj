@@ -4,31 +4,12 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\SupportToolsServerDbPart\SupportToolsServerDb\SupportToolsServerDb.csproj" />
-        <ProjectReference
-            Include="..\..\WebSystemTools\WebSystemTools.ApiExceptionHandler\WebSystemTools.ApiExceptionHandler.csproj" />
-        <ProjectReference
-            Include="..\..\WebSystemTools\WebSystemTools.ApiKeyIdentity\WebSystemTools.ApiKeyIdentity.csproj" />
-        <ProjectReference
-            Include="..\..\WebSystemTools\WebSystemTools.MediatorTools\WebSystemTools.MediatorTools.csproj" />
-        <ProjectReference
-            Include="..\..\WebSystemTools\WebSystemTools.SignalRMessages\WebSystemTools.SignalRMessages.csproj" />
-        <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.TestToolsApi\WebSystemTools.TestToolsApi.csproj" />
-        <ProjectReference
-            Include="..\..\WebSystemTools\WebSystemTools.StaticFilesTools\WebSystemTools.StaticFilesTools.csproj" />
-        <ProjectReference
-            Include="..\..\WebSystemTools\WebSystemTools.ConfigurationEncrypt\WebSystemTools.ConfigurationEncrypt.csproj" />
-        <ProjectReference
-            Include="..\..\WebSystemTools\WebSystemTools.SerilogLogger\WebSystemTools.SerilogLogger.csproj" />
-        <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.SwaggerTools\WebSystemTools.SwaggerTools.csproj" />
-        <ProjectReference
-            Include="..\..\WebSystemTools\WebSystemTools.WindowsServiceTools\WebSystemTools.WindowsServiceTools.csproj" />
         <ProjectReference Include="..\SupportToolsServer.Api\SupportToolsServer.Api.csproj" />
         <ProjectReference Include="..\SupportToolsServer.Application\SupportToolsServer.Application.csproj" />
         <ProjectReference Include="..\SupportToolsServer.Persistence\SupportToolsServer.Persistence.csproj" />
         <ProjectReference Include="..\SupportToolsServer.Repositories\SupportToolsServer.Repositories.csproj" />
         <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
-        <ProjectReference
-            Include="..\SupportToolsServerCommandRepositories\SupportToolsServerCommandRepositories.csproj" />
+        <ProjectReference Include="..\SupportToolsServerCommandRepositories\SupportToolsServerCommandRepositories.csproj" />
         <ProjectReference Include="..\SupportToolsServerQueryRepositories\SupportToolsServerQueryRepositories.csproj" />
     </ItemGroup>
     <ItemGroup>
@@ -37,6 +18,16 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="WebSystemTools.ApiExceptionHandler" />
+        <PackageReference Include="WebSystemTools.ApiKeyIdentity" />
+        <PackageReference Include="WebSystemTools.ConfigurationEncrypt" />
+        <PackageReference Include="WebSystemTools.MediatorTools" />
+        <PackageReference Include="WebSystemTools.SerilogLogger" />
+        <PackageReference Include="WebSystemTools.SignalRMessages" />
+        <PackageReference Include="WebSystemTools.StaticFilesTools" />
+        <PackageReference Include="WebSystemTools.SwaggerTools" />
+        <PackageReference Include="WebSystemTools.TestToolsApi" />
+        <PackageReference Include="WebSystemTools.WindowsServiceTools" />
     </ItemGroup>
     <PropertyGroup>
         <UserSecretsId>59a38512-8e22-46ed-8e75-4f01c82668c1</UserSecretsId>

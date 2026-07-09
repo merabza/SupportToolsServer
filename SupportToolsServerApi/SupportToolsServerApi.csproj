@@ -2,13 +2,13 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
-        <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.ApiKeyIdentity\WebSystemTools.ApiKeyIdentity.csproj" />
         <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
         <ProjectReference Include="..\SupportToolsServerMappers\SupportToolsServerMappers.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="SystemTools.MediatRMessagingAbstractions" />
+      <PackageReference Include="WebSystemTools.ApiKeyIdentity" />
     </ItemGroup>
 
 </Project>

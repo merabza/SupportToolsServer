@@ -1,8 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="DatabaseTools.SqlServerDbTools" Version="1.0.9686.33837" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.7" />
     <PackageVersion Include="Serilog" Version="4.3.1" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.25.0.139117" />
@@ -14,9 +16,19 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.5" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="Dapper" Version="2.1.72" />
-    <PackageVersion Include="SystemTools.ApiKeysManagement" Version="1.0.9686.26889" />
-    <PackageVersion Include="SystemTools.DatabaseToolsShared" Version="1.0.9686.26889" />
-    <PackageVersion Include="SystemTools.MediatRMessagingAbstractions" Version="1.0.9686.26889" />
-    <PackageVersion Include="SystemTools.RepositoriesShared" Version="1.0.9686.26889" />
+    <PackageVersion Include="SystemTools.ApiKeysManagement" Version="1.0.9686.33588" />
+    <PackageVersion Include="SystemTools.DatabaseToolsShared" Version="1.0.9686.33588" />
+    <PackageVersion Include="SystemTools.MediatRMessagingAbstractions" Version="1.0.9686.33588" />
+    <PackageVersion Include="SystemTools.RepositoriesShared" Version="1.0.9686.33588" />
+    <PackageVersion Include="WebSystemTools.ApiExceptionHandler" Version="1.0.9686.34761" />
+    <PackageVersion Include="WebSystemTools.ApiKeyIdentity" Version="1.0.9686.34761" />
+    <PackageVersion Include="WebSystemTools.ConfigurationEncrypt" Version="1.0.9686.34761" />
+    <PackageVersion Include="WebSystemTools.MediatorTools" Version="1.0.9686.34761" />
+    <PackageVersion Include="WebSystemTools.SerilogLogger" Version="1.0.9686.34761" />
+    <PackageVersion Include="WebSystemTools.SignalRMessages" Version="1.0.9686.34761" />
+    <PackageVersion Include="WebSystemTools.StaticFilesTools" Version="1.0.9686.34761" />
+    <PackageVersion Include="WebSystemTools.SwaggerTools" Version="1.0.9686.34761" />
+    <PackageVersion Include="WebSystemTools.TestToolsApi" Version="1.0.9686.34761" />
+    <PackageVersion Include="WebSystemTools.WindowsServiceTools" Version="1.0.9686.34761" />
   </ItemGroup>
 </Project>
