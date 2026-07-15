@@ -16,19 +16,19 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.5" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="Dapper" Version="2.1.72" />
-    <PackageVersion Include="SystemTools.ApiKeysManagement" Version="1.0.9689.2043" />
-    <PackageVersion Include="SystemTools.DatabaseToolsShared" Version="1.0.9689.2043" />
-    <PackageVersion Include="SystemTools.MediatRMessagingAbstractions" Version="1.0.9689.2043" />
-    <PackageVersion Include="SystemTools.RepositoriesShared" Version="1.0.9689.2043" />
-    <PackageVersion Include="WebSystemTools.ApiExceptionHandler" Version="1.0.9686.34761" />
-    <PackageVersion Include="WebSystemTools.ApiKeyIdentity" Version="1.0.9686.34761" />
-    <PackageVersion Include="WebSystemTools.ConfigurationEncrypt" Version="1.0.9686.34761" />
-    <PackageVersion Include="WebSystemTools.MediatorTools" Version="1.0.9686.34761" />
-    <PackageVersion Include="WebSystemTools.SerilogLogger" Version="1.0.9686.34761" />
-    <PackageVersion Include="WebSystemTools.SignalRMessages" Version="1.0.9686.34761" />
-    <PackageVersion Include="WebSystemTools.StaticFilesTools" Version="1.0.9686.34761" />
-    <PackageVersion Include="WebSystemTools.SwaggerTools" Version="1.0.9686.34761" />
-    <PackageVersion Include="WebSystemTools.TestToolsApi" Version="1.0.9686.34761" />
-    <PackageVersion Include="WebSystemTools.WindowsServiceTools" Version="1.0.9686.34761" />
+    <PackageVersion Include="SystemTools.ApiKeysManagement" Version="1.0.9691.25951" />
+    <PackageVersion Include="SystemTools.DatabaseToolsShared" Version="1.0.9691.25951" />
+    <PackageVersion Include="SystemTools.MediatRMessagingAbstractions" Version="1.0.9691.25951" />
+    <PackageVersion Include="SystemTools.RepositoriesShared" Version="1.0.9691.25951" />
+    <PackageVersion Include="WebSystemTools.ApiExceptionHandler" Version="1.0.9691.25983" />
+    <PackageVersion Include="WebSystemTools.ApiKeyIdentity" Version="1.0.9691.25983" />
+    <PackageVersion Include="WebSystemTools.ConfigurationEncrypt" Version="1.0.9691.25983" />
+    <PackageVersion Include="WebSystemTools.MediatorTools" Version="1.0.9691.25983" />
+    <PackageVersion Include="WebSystemTools.SerilogLogger" Version="1.0.9691.25983" />
+    <PackageVersion Include="WebSystemTools.SignalRMessages" Version="1.0.9691.25983" />
+    <PackageVersion Include="WebSystemTools.StaticFilesTools" Version="1.0.9691.25983" />
+    <PackageVersion Include="WebSystemTools.SwaggerTools" Version="1.0.9691.25983" />
+    <PackageVersion Include="WebSystemTools.TestToolsApi" Version="1.0.9691.25983" />
+    <PackageVersion Include="WebSystemTools.WindowsServiceTools" Version="1.0.9691.25983" />
   </ItemGroup>
 </Project>
