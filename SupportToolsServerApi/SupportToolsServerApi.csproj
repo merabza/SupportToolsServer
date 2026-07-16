@@ -4,11 +4,8 @@
         <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
         <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
         <ProjectReference Include="..\SupportToolsServerMappers\SupportToolsServerMappers.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="SystemTools.MediatRMessagingAbstractions" />
-      <PackageReference Include="WebSystemTools.ApiKeyIdentity" />
+        <ProjectReference Include="..\..\SystemTools\SystemTools.MediatRMessagingAbstractions\SystemTools.MediatRMessagingAbstractions.csproj" />
+        <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.ApiKeyIdentity\WebSystemTools.ApiKeyIdentity.csproj" />
     </ItemGroup>
 
 </Project>

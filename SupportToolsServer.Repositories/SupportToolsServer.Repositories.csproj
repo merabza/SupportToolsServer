@@ -4,10 +4,7 @@
     <ProjectReference Include="..\SupportToolsServer.Application\SupportToolsServer.Application.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Domain\SupportToolsServer.Domain.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Persistence\SupportToolsServer.Persistence.csproj" />
+    <ProjectReference Include="..\..\SystemTools\SystemTools.RepositoriesShared\SystemTools.RepositoriesShared.csproj" />
   </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="SystemTools.RepositoriesShared" />
-    </ItemGroup>
 
 </Project>

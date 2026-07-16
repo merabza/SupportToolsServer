@@ -2,13 +2,13 @@
 
     <ItemGroup>
     <PackageReference Include="Dapper" />
-    <PackageReference Include="DatabaseTools.SqlServerDbTools" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Serilog" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
+    <ProjectReference Include="..\..\DatabaseTools\DatabaseTools.SqlServerDbTools\DatabaseTools.SqlServerDbTools.csproj" />
   </ItemGroup>
 
 </Project>

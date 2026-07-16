@@ -2,12 +2,12 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore" />
-        <PackageReference Include="SystemTools.MediatRMessagingAbstractions" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
         <ProjectReference Include="..\SupportToolsServer.Domain\SupportToolsServer.Domain.csproj" />
+        <ProjectReference Include="..\..\SystemTools\SystemTools.MediatRMessagingAbstractions\SystemTools.MediatRMessagingAbstractions.csproj" />
     </ItemGroup>
 
 </Project>
