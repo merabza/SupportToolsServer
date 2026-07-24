@@ -1,24 +1,7 @@
 <Solution>
-  <Folder Name="/AppCliTools/">
-    <Project Path="../AppCliTools/AppCliTools.CliMenu/AppCliTools.CliMenu.csproj" />
-    <Project Path="../AppCliTools/AppCliTools.CliParameters/AppCliTools.CliParameters.csproj" />
-    <Project Path="../AppCliTools/AppCliTools.LibDataInput/AppCliTools.LibDataInput.csproj" />
-    <Project Path="../AppCliTools/AppCliTools.LibMenuInput/AppCliTools.LibMenuInput.csproj" />
-  </Folder>
   <Folder Name="/DatabaseTools/">
     <Project Path="../DatabaseTools/DatabaseTools.DbTools/DatabaseTools.DbTools.csproj" />
     <Project Path="../DatabaseTools/DatabaseTools.SqlServerDbTools/DatabaseTools.SqlServerDbTools.csproj" />
-  </Folder>
-  <Folder Name="/ParametersManagement/">
-    <Project Path="../ParametersManagement/ParametersManagement.LibApiClientParameters/ParametersManagement.LibApiClientParameters.csproj" />
-    <Project Path="../ParametersManagement/ParametersManagement.LibDatabaseParameters/ParametersManagement.LibDatabaseParameters.csproj" />
-    <Project Path="../ParametersManagement/ParametersManagement.LibParameters/ParametersManagement.LibParameters.csproj" />
-  </Folder>
-  <Folder Name="/SupportToolsServerDbPart/">
-    <Project Path="../SupportToolsServerDbPart/SeedSupportToolsServerDb/SeedSupportToolsServerDb.csproj" />
-    <Project Path="../SupportToolsServerDbPart/SupportToolsServerDb/SupportToolsServerDb.csproj" />
-    <Project Path="../SupportToolsServerDbPart/SupportToolsServerDbDataSeeding/SupportToolsServerDbDataSeeding.csproj" />
-    <Project Path="../SupportToolsServerDbPart/SupportToolsServerDbNewDataSeeding/SupportToolsServerDbNewDataSeeding.csproj" />
   </Folder>
   <Folder Name="/SupportToolsServerShared/">
     <Project Path="../SupportToolsServerShared/SupportToolsServerApiContracts/SupportToolsServerApiContracts.csproj" />
@@ -31,10 +14,8 @@
   <Folder Name="/SystemTools/">
     <Project Path="../SystemTools/SystemTools.ApiContracts/SystemTools.ApiContracts.csproj" />
     <Project Path="../SystemTools/SystemTools.ApiKeysManagement/SystemTools.ApiKeysManagement.csproj" />
-    <Project Path="../SystemTools/SystemTools.BackgroundTasks/SystemTools.BackgroundTasks.csproj" />
     <Project Path="../SystemTools/SystemTools.DatabaseToolsShared/SystemTools.DatabaseToolsShared.csproj" />
     <Project Path="../SystemTools/SystemTools.Domain.Abstractions/SystemTools.Domain.Abstractions.csproj" />
-    <Project Path="../SystemTools/SystemTools.DomainShared/SystemTools.DomainShared.csproj" />
     <Project Path="../SystemTools/SystemTools.MediatRMessagingAbstractions/SystemTools.MediatRMessagingAbstractions.csproj" />
     <Project Path="../SystemTools/SystemTools.RepositoriesShared/SystemTools.RepositoriesShared.csproj" />
     <Project Path="../SystemTools/SystemTools.StringMessagesApiContracts/SystemTools.StringMessagesApiContracts.csproj" />
@@ -55,7 +36,6 @@
     <Project Path="../WebSystemTools/WebSystemTools.WindowsServiceTools/WebSystemTools.WindowsServiceTools.csproj" />
   </Folder>
   <Project Path="FakeHost/FakeHost.csproj" />
-  <Project Path="LibSupportToolsServerRepositories/LibSupportToolsServerRepositories.csproj" />
   <Project Path="SupportToolsServer.Api/SupportToolsServer.Api.csproj" />
   <Project Path="SupportToolsServer.Application/SupportToolsServer.Application.csproj" />
   <Project Path="SupportToolsServer.DbMigration/SupportToolsServer.DbMigration.csproj" />
@@ -63,10 +43,8 @@
   <Project Path="SupportToolsServer.Persistence/SupportToolsServer.Persistence.csproj" />
   <Project Path="SupportToolsServer.Repositories/SupportToolsServer.Repositories.csproj" />
   <Project Path="SupportToolsServer/SupportToolsServer.csproj" />
-  <Project Path="SupportToolsServerApi/SupportToolsServerApi.csproj" />
   <Project Path="SupportToolsServerApiKeyIdentity/SupportToolsServerApiKeyIdentity.csproj" />
   <Project Path="SupportToolsServerApplication/SupportToolsServerApplication.csproj" />
   <Project Path="SupportToolsServerCommandRepositories/SupportToolsServerCommandRepositories.csproj" />
-  <Project Path="SupportToolsServerMappers/SupportToolsServerMappers.csproj" />
   <Project Path="SupportToolsServerQueryRepositories/SupportToolsServerQueryRepositories.csproj" />
 </Solution>

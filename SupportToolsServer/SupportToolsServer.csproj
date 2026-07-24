@@ -1,9 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
     <ItemGroup>
-        <None Include="MediatorTools.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\..\SupportToolsServerDbPart\SupportToolsServerDb\SupportToolsServerDb.csproj" />
         <ProjectReference Include="..\SupportToolsServer.Api\SupportToolsServer.Api.csproj" />
         <ProjectReference Include="..\SupportToolsServer.Application\SupportToolsServer.Application.csproj" />
         <ProjectReference Include="..\SupportToolsServer.Persistence\SupportToolsServer.Persistence.csproj" />
