@@ -22,9 +22,10 @@ public class SyncUpGitIgnoreFileTypesCommandHandler : ICommandHandler<SyncUpGitI
     public async Task<OneOf<Unit, Error[]>> Handle(SyncUpGitIgnoreFileTypesCommand request,
         CancellationToken cancellationToken)
     {
-        var syncer = new Syncroniser<GitIgnoreFileType, GitIgnoreFileTypeId>(_gitIgnoreFileTypeRepository,
-            request.UploadGitIgnoreFileTypes
-                .Select(s => new GitIgnoreFileType(new GitIgnoreFileTypeId(s.Id), s.Name, s.Content)).ToList());
+        var syncer = new Syncroniser<GitIgnoreFileType, GitIgnoreFileTypeId>(_gitIgnoreFileTypeRepository, [
+            .. request.UploadGitIgnoreFileTypes.Select(s =>
+                new GitIgnoreFileType(new GitIgnoreFileTypeId(s.Id), s.Name, s.Content))
+        ]);
         await syncer.DoSyncUp(request.Merge, cancellationToken);
         return Unit.Value;
     }
