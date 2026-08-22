@@ -23,7 +23,7 @@ public sealed class GitIgnoreFileTypesQueriesRepository : IGitIgnoreFileTypesQue
         _dbContext = dbContext;
     }
 
-    public Task<OneOf<List<GitIgnoreFileTypeDto>, Error[]>> GetGitIgnoreFileTypes(CancellationToken cancellationToken)
+    public Task<OneOf<List<GitIgnoreFileTypeDto>, ErrorOmd[]>> GetGitIgnoreFileTypes(CancellationToken cancellationToken)
     {
         //return await _dbContext.GitIgnoreFileTypes.Select(s =>
         //    new GitIgnoreFileTypeDto
@@ -35,7 +35,7 @@ public sealed class GitIgnoreFileTypesQueriesRepository : IGitIgnoreFileTypesQue
         throw new NotImplementedException();
     }
 
-    public async Task<OneOf<List<string>, Error[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
+    public async Task<OneOf<List<string>, ErrorOmd[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
     {
         return await _dbContext.GitIgnoreFileTypes.Select(s => s.Name).ToListAsync(cancellationToken);
     }
@@ -73,13 +73,13 @@ public sealed class GitIgnoreFileTypesQueriesRepository : IGitIgnoreFileTypesQue
     //        }).ToListAsync(cancellationToken);
     //}
 
-    //public async Task<OneOf<StsGitDataModel, Error[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
+    //public async Task<OneOf<StsGitDataModel, ErrorOmd[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
     //{
     //    var gitData = await _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation)
     //        .FirstOrDefaultAsync(x => x.GdName == gitKey, cancellationToken);
 
     //    if (gitData is null)
-    //        return new Error[]
+    //        return new ErrorOmd[]
     //        {
     //            new()
     //            {

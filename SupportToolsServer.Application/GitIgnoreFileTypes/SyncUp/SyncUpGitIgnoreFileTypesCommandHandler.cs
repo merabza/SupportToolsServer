@@ -19,7 +19,7 @@ public class SyncUpGitIgnoreFileTypesCommandHandler : ICommandHandler<SyncUpGitI
         _gitIgnoreFileTypeRepository = gitIgnoreFileTypeRepository;
     }
 
-    public async Task<OneOf<Unit, Error[]>> Handle(SyncUpGitIgnoreFileTypesCommand request,
+    public async Task<OneOf<Unit, ErrorOmd[]>> Handle(SyncUpGitIgnoreFileTypesCommand request,
         CancellationToken cancellationToken)
     {
         var syncer = new Syncroniser<GitIgnoreFileType, GitIgnoreFileTypeId>(_gitIgnoreFileTypeRepository, [

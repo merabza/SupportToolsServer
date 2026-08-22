@@ -17,17 +17,17 @@ public class GitIgnoreFileTypeListService : IScopedServiceSupportToolsServerAppl
         _gitsRepo = gitsRepo;
     }
 
-    public async Task<OneOf<List<GitIgnoreFileTypeDto>, Error[]>> GetGitIgnoreFileTypes(
+    public async Task<OneOf<List<GitIgnoreFileTypeDto>, ErrorOmd[]>> GetGitIgnoreFileTypes(
         CancellationToken cancellationToken)
     {
-        OneOf<List<GitIgnoreFileTypeDto>, Error[]> gitIgnoreFileTypes =
+        OneOf<List<GitIgnoreFileTypeDto>, ErrorOmd[]> gitIgnoreFileTypes =
             await _gitsRepo.GetGitIgnoreFileTypes(cancellationToken);
         return gitIgnoreFileTypes;
     }
 
-    public async Task<OneOf<List<string>, Error[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
+    public async Task<OneOf<List<string>, ErrorOmd[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
     {
-        OneOf<List<string>, Error[]> gitIgnoreFileTypeNames =
+        OneOf<List<string>, ErrorOmd[]> gitIgnoreFileTypeNames =
             await _gitsRepo.GetGitIgnoreFileTypeNames(cancellationToken);
         return gitIgnoreFileTypeNames;
     }

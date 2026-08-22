@@ -12,7 +12,7 @@ public interface IGitIgnoreFileTypesQueriesRepository
     //Task<List<GitData>> GetAllGitsFromDb(CancellationToken cancellationToken = default);
     //Task<List<GitIgnoreFileType>> GetAllGitIgnorePathsFromDb(CancellationToken cancellationToken = default);
     //Task<List<GitDataDto>> GetGitRepos(CancellationToken cancellationToken = default);
-    //Task<OneOf<GitDataDto, Error[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken);
-    Task<OneOf<List<GitIgnoreFileTypeDto>, Error[]>> GetGitIgnoreFileTypes(CancellationToken cancellationToken);
-    Task<OneOf<List<string>, Error[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken);
+    //Task<OneOf<GitDataDto, ErrorOmd[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken);
+    Task<OneOf<List<GitIgnoreFileTypeDto>, ErrorOmd[]>> GetGitIgnoreFileTypes(CancellationToken cancellationToken);
+    Task<OneOf<List<string>, ErrorOmd[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken);
 }
