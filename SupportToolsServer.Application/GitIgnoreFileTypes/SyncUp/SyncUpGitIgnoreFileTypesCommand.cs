@@ -4,7 +4,7 @@ using SystemTools.MediatRMessagingAbstractions;
 
 namespace SupportToolsServer.Application.GitIgnoreFileTypes.SyncUp;
 
-public class SyncUpGitIgnoreFileTypesCommand : ICommand
+public class SyncUpGitIgnoreFileTypesCommand : ICommandOmd
 {
     public SyncUpGitIgnoreFileTypesCommand(bool merge, List<StsGitIgnoreFileTypeDataModel> uploadGitIgnoreFileTypes)
     {

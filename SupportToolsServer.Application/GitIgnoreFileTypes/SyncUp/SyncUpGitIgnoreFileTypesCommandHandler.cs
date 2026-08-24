@@ -10,7 +10,7 @@ using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportToolsServer.Application.GitIgnoreFileTypes.SyncUp;
 
-public class SyncUpGitIgnoreFileTypesCommandHandler : ICommandHandler<SyncUpGitIgnoreFileTypesCommand>
+public class SyncUpGitIgnoreFileTypesCommandHandler : ICommandHandlerOmd<SyncUpGitIgnoreFileTypesCommand>
 {
     private readonly IGitIgnoreFileTypeRepository _gitIgnoreFileTypeRepository;
 
