@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using SupportToolsServerApiContracts.Models;
-using SystemTools.MediatRMessagingAbstractions;
+using SystemTools.Application.Abstractions.Messaging;
 
 namespace SupportToolsServer.Application.GitIgnoreFileTypes.SyncUp;
 
-public class SyncUpGitIgnoreFileTypesCommand : ICommandOmd
+public class SyncUpGitIgnoreFileTypesCommand : ICommand
 {
     public SyncUpGitIgnoreFileTypesCommand(bool merge, List<StsGitIgnoreFileTypeDataModel> uploadGitIgnoreFileTypes)
     {

@@ -1,15 +1,14 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using OneOf;
 using SupportToolsServerApplication.Services.Gits.Models;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 
 namespace SupportToolsServerApplication.Repositories.Gits;
 
 public interface IGitsCommandsRepository
 {
     //Task AddGit(GitData gitData, CancellationToken cancellationToken = default);
-    Task<OneOf<int, ErrorOmd[]>> UpdateGitRepo(GitDataForSave requestNewRecord, CancellationToken cancellationToken);
+    Task<Result<int>> UpdateGitRepo(GitDataForSave requestNewRecord, CancellationToken cancellationToken);
 
     Task DeleteGitRepo(string gitKey, CancellationToken cancellationToken);
 }

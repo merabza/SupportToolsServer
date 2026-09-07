@@ -2,12 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
-using OneOf;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Repositories.Gits;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
 using SupportToolsServerApplication.Services.Gits.Models;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 
 namespace SupportToolsServerCommandRepositories;
 
@@ -29,7 +28,7 @@ public sealed class GitsCommandsRepository : IGitsCommandsRepository
     //    await _dbContext.GitData.AddAsync(gitData, cancellationToken);
     //}
 
-    public async Task<OneOf<int, ErrorOmd[]>> UpdateGitRepo(GitDataForSave requestNewRecord,
+    public async Task<Result<int>> UpdateGitRepo(GitDataForSave requestNewRecord,
         CancellationToken cancellationToken)
     {
         int giftId = await _gitIgnoreFileTypesCommandsRepo.UpdateGitIgnoreFileType(

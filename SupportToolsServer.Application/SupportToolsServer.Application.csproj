@@ -7,7 +7,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
         <ProjectReference Include="..\SupportToolsServer.Domain\SupportToolsServer.Domain.csproj" />
-        <ProjectReference Include="..\..\SystemTools\SystemTools.MediatRMessagingAbstractions\SystemTools.MediatRMessagingAbstractions.csproj" />
+        <ProjectReference Include="..\..\SystemTools\SystemTools.Application.Abstractions\SystemTools.Application.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

@@ -10,7 +10,6 @@
         <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.ApiExceptionHandler\WebSystemTools.ApiExceptionHandler.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.ApiKeyIdentity\WebSystemTools.ApiKeyIdentity.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.ConfigurationEncrypt\WebSystemTools.ConfigurationEncrypt.csproj" />
-        <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.MediatorTools\WebSystemTools.MediatorTools.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.SerilogLogger\WebSystemTools.SerilogLogger.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.SignalRMessages\WebSystemTools.SignalRMessages.csproj" />
         <ProjectReference Include="..\..\WebSystemTools\WebSystemTools.StaticFilesTools\WebSystemTools.StaticFilesTools.csproj" />

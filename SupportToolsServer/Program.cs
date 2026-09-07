@@ -12,10 +12,10 @@ using SupportToolsServer.Repositories.DependencyInjection;
 using SupportToolsServerApplication;
 using SupportToolsServerCommandRepositories.DependencyInjection;
 using SupportToolsServerQueryRepositories.DependencyInjection;
+using SystemTools.Application.Abstractions;
 using WebSystemTools.ApiExceptionHandler.DependencyInjection;
 using WebSystemTools.ApiKeyIdentity.DependencyInjection;
 using WebSystemTools.ConfigurationEncrypt;
-using WebSystemTools.MediatorTools.DependencyInjection;
 using WebSystemTools.SerilogLogger;
 using WebSystemTools.SignalRMessages.DependencyInjection;
 using WebSystemTools.SignalRMessages.Endpoints.V1;
@@ -56,7 +56,7 @@ try
         .AddApiKeyIdentity(debugLogger)
         .AddSignalRMessages(debugLogger)
         .AddSupportToolsServerPersistence(debugLogger, builder.Configuration)
-        .AddMediator(debugLogger, builder.Configuration, typeof(ISupportToolsServerDbContext).Assembly)
+        .AddApplication(debugLogger, typeof(ISupportToolsServerDbContext))
         //.AddSupportToolsServerApiKeyIdentity(debugMode)
         .AddAllScopedServiceSupportToolsServerApplication()
         .AddSupportToolsServerQueryRepositories(debugLogger)

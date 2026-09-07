@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using OneOf;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 
 namespace SupportToolsServerApplication.Services.GitIgnoreFileTypes.List;
 
@@ -17,18 +16,16 @@ public class GitIgnoreFileTypeListService : IScopedServiceSupportToolsServerAppl
         _gitsRepo = gitsRepo;
     }
 
-    public async Task<OneOf<List<GitIgnoreFileTypeDto>, ErrorOmd[]>> GetGitIgnoreFileTypes(
-        CancellationToken cancellationToken)
+    public async Task<Result<List<GitIgnoreFileTypeDto>>> GetGitIgnoreFileTypes(CancellationToken cancellationToken)
     {
-        OneOf<List<GitIgnoreFileTypeDto>, ErrorOmd[]> gitIgnoreFileTypes =
+        Result<List<GitIgnoreFileTypeDto>> gitIgnoreFileTypes =
             await _gitsRepo.GetGitIgnoreFileTypes(cancellationToken);
         return gitIgnoreFileTypes;
     }
 
-    public async Task<OneOf<List<string>, ErrorOmd[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
+    public async Task<Result<List<string>>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
     {
-        OneOf<List<string>, ErrorOmd[]> gitIgnoreFileTypeNames =
-            await _gitsRepo.GetGitIgnoreFileTypeNames(cancellationToken);
+        Result<List<string>> gitIgnoreFileTypeNames = await _gitsRepo.GetGitIgnoreFileTypeNames(cancellationToken);
         return gitIgnoreFileTypeNames;
     }
 }

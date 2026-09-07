@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using OneOf;
 using SupportToolsServer.Domain.GitIgnoreFileTypes;
 using SupportToolsServer.Persistence;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 
 namespace SupportToolsServerQueryRepositories;
 
@@ -23,7 +22,7 @@ public sealed class GitIgnoreFileTypesQueriesRepository : IGitIgnoreFileTypesQue
         _dbContext = dbContext;
     }
 
-    public Task<OneOf<List<GitIgnoreFileTypeDto>, ErrorOmd[]>> GetGitIgnoreFileTypes(CancellationToken cancellationToken)
+    public Task<Result<List<GitIgnoreFileTypeDto>>> GetGitIgnoreFileTypes(CancellationToken cancellationToken)
     {
         //return await _dbContext.GitIgnoreFileTypes.Select(s =>
         //    new GitIgnoreFileTypeDto
@@ -35,7 +34,7 @@ public sealed class GitIgnoreFileTypesQueriesRepository : IGitIgnoreFileTypesQue
         throw new NotImplementedException();
     }
 
-    public async Task<OneOf<List<string>, ErrorOmd[]>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
+    public async Task<Result<List<string>>> GetGitIgnoreFileTypeNames(CancellationToken cancellationToken)
     {
         return await _dbContext.GitIgnoreFileTypes.Select(s => s.Name).ToListAsync(cancellationToken);
     }

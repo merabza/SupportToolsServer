@@ -1,9 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using OneOf;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 
 namespace SupportToolsServerApplication.Services.GitIgnoreFileTypes.Update;
 
@@ -16,8 +15,8 @@ public class GitIgnoreFileTypeUpdateService : IScopedServiceSupportToolsServerAp
         _gitIgnoreFileTypesCommandsRepo = gitIgnoreFileTypesCommandsRepo;
     }
 
-    public async Task<OneOf<int, ErrorOmd[]>> UpdateGitIgnoreFileType(
-        GitIgnoreFileTypeForSave requestGitIgnoreFileTypeModel, CancellationToken cancellationToken)
+    public async Task<Result<int>> UpdateGitIgnoreFileType(GitIgnoreFileTypeForSave requestGitIgnoreFileTypeModel,
+        CancellationToken cancellationToken)
     {
         return await _gitIgnoreFileTypesCommandsRepo.UpdateGitIgnoreFileType(requestGitIgnoreFileTypeModel,
             cancellationToken);

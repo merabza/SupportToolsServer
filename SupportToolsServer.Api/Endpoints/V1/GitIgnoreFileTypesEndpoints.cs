@@ -2,18 +2,18 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using OneOf;
 using Serilog;
 using SupportToolsServer.Application.GitIgnoreFileTypes.SyncUp;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Routes;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.Application.Abstractions.Messaging;
+using SystemTools.SharedKernel;
+using WebSystemTools.WebApi.Abstractions.Infrastructure;
 
 namespace SupportToolsServer.Api.Endpoints.V1;
 
@@ -46,17 +46,17 @@ public static class GitIgnoreFileTypesEndpoints
     }
 
     // POST api/v1/git/syncupgitignorefiletypes/{merge?}
-    public static async Task<Results<Ok, BadRequest<ErrorOmd[]>>> SyncUpGitIgnoreFileTypes([FromRoute] bool? merge,
-        [FromBody] List<StsGitIgnoreFileTypeDataModel> uploadGitIgnoreFileTypes, IMediator mediator,
-        CancellationToken cancellationToken = default)
+    public static async Task<Results<Ok, ProblemHttpResult>> SyncUpGitIgnoreFileTypes([FromRoute] bool? merge,
+        [FromBody] List<StsGitIgnoreFileTypeDataModel> uploadGitIgnoreFileTypes,
+        ICommandHandler<SyncUpGitIgnoreFileTypesCommand> handler, CancellationToken cancellationToken = default)
     {
         Debug.WriteLine(
             $"Call {nameof(SyncUpGitIgnoreFileTypesCommandHandler)} from {nameof(SyncUpGitIgnoreFileTypes)}");
 
         var command = new SyncUpGitIgnoreFileTypesCommand(merge ?? false, uploadGitIgnoreFileTypes);
-        OneOf<Unit, ErrorOmd[]> result = await mediator.Send(command, cancellationToken);
+        Result result = await handler.Handle(command, cancellationToken);
 
-        return result.Match<Results<Ok, BadRequest<ErrorOmd[]>>>(_ => TypedResults.Ok(),
-            errors => TypedResults.BadRequest(errors));
+        return result.Match<Results<Ok, ProblemHttpResult>>(() => TypedResults.Ok(),
+            errors => (ProblemHttpResult)CustomResults.Problem(errors));
     }
 }

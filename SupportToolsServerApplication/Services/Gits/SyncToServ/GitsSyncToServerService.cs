@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
-using OneOf;
 using SupportToolsServerApplication.Repositories.Gits;
 using SupportToolsServerApplication.Services.Gits.Models;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 
 namespace SupportToolsServerApplication.Services.Gits.SyncToServ;
 
@@ -19,7 +17,7 @@ public class GitsSyncToServerService : IScopedServiceSupportToolsServerApplicati
         _gitsCommandsRepo = gitsCommandsRepo;
     }
 
-    public async Task<OneOf<Unit, ErrorOmd[]>> SyncGitsToServer(IEnumerable<GitDataForSave> requestGits,
+    public async Task<Result> SyncGitsToServer(IEnumerable<GitDataForSave> requestGits,
         CancellationToken cancellationToken = default)
     {
         foreach (GitDataForSave git in requestGits)
@@ -27,6 +25,6 @@ public class GitsSyncToServerService : IScopedServiceSupportToolsServerApplicati
             await _gitsCommandsRepo.UpdateGitRepo(git, cancellationToken);
         }
 
-        return Unit.Value;
+        return Result.Success();
     }
 }

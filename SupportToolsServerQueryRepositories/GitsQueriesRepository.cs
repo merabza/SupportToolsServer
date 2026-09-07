@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using OneOf;
 using SupportToolsServer.Persistence;
 using SupportToolsServerApplication.Repositories.Gits;
 using SupportToolsServerApplication.Services.Gits.Models;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 
 namespace SupportToolsServerQueryRepositories;
 
@@ -43,7 +42,7 @@ public sealed class GitsQueriesRepository : IGitsQueriesRepository
         throw new NotImplementedException();
     }
 
-    public Task<OneOf<GitDataDto, ErrorOmd[]>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
+    public Task<Result<GitDataDto>> GetGitRepoByKey(string gitKey, CancellationToken cancellationToken)
     {
         //var gitData = await _dbContext.GitData.Include(i => i.GitIgnoreFileTypeNavigation)
         //    .FirstOrDefaultAsync(x => x.GdName == gitKey, cancellationToken);

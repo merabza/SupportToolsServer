@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
-using OneOf;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 
 namespace SupportToolsServerApplication.Services.Gits.Delete;
 
 public class GitDeleteService : IScopedServiceSupportToolsServerApplication
 {
-    public Task<OneOf<Unit, ErrorOmd[]>> DeleteGitRepo(string requestRecordKey, CancellationToken cancellationToken)
+    public Task<Result> DeleteGitRepo(string requestRecordKey, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
