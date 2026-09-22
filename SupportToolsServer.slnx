@@ -3,6 +3,9 @@
     <Project Path="../DatabaseTools/DatabaseTools.DbTools/DatabaseTools.DbTools.csproj" />
     <Project Path="../DatabaseTools/DatabaseTools.SqlServerDbTools/DatabaseTools.SqlServerDbTools.csproj" />
   </Folder>
+  <Folder Name="/SupportToolsServerDbPart/">
+    <Project Path="../SupportToolsServerDbPart/SupportToolsServerDbPart.Db/SupportToolsServerDbPart.Db.csproj" />
+  </Folder>
   <Folder Name="/SupportToolsServerShared/">
     <Project Path="../SupportToolsServerShared/SupportToolsServerApiContracts/SupportToolsServerApiContracts.csproj" />
   </Folder>
@@ -36,10 +39,8 @@
     <Project Path="../WebSystemTools/WebSystemTools.WebApi.Abstractions/WebSystemTools.WebApi.Abstractions.csproj" />
     <Project Path="../WebSystemTools/WebSystemTools.WindowsServiceTools/WebSystemTools.WindowsServiceTools.csproj" />
   </Folder>
-  <Project Path="FakeHost/FakeHost.csproj" />
   <Project Path="SupportToolsServer.Api/SupportToolsServer.Api.csproj" />
   <Project Path="SupportToolsServer.Application/SupportToolsServer.Application.csproj" />
-  <Project Path="SupportToolsServer.DbMigration/SupportToolsServer.DbMigration.csproj" />
   <Project Path="SupportToolsServer.Domain/SupportToolsServer.Domain.csproj" />
   <Project Path="SupportToolsServer.Persistence/SupportToolsServer.Persistence.csproj" />
   <Project Path="SupportToolsServer.Repositories/SupportToolsServer.Repositories.csproj" />

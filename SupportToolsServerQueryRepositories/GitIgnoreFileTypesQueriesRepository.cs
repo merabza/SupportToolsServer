@@ -5,9 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SupportToolsServer.Domain.GitIgnoreFileTypes;
-using SupportToolsServer.Persistence;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
+using SupportToolsServerDbPart.Db;
 using SystemTools.SharedKernel;
 
 namespace SupportToolsServerQueryRepositories;

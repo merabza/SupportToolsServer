@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using SupportToolsServer.Persistence;
 using SupportToolsServerApiKeyIdentity;
+using SupportToolsServerDbPart.Db;
 using SystemTools.ApiKeysManagement.Domain;
 
 namespace SupportToolsServerQueryRepositories;

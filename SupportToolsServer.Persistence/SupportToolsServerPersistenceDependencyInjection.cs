@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SupportToolsServer.Application.Data;
+using SupportToolsServerDbPart.Db;
 
 namespace SupportToolsServer.Persistence;
 

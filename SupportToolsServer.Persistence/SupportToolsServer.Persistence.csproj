@@ -8,7 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SupportToolsServer.Application\SupportToolsServer.Application.csproj" />
     <ProjectReference Include="..\SupportToolsServer.Domain\SupportToolsServer.Domain.csproj" />
-    <ProjectReference Include="..\..\SystemTools\SystemTools.DatabaseToolsShared\SystemTools.DatabaseToolsShared.csproj" />
+    <ProjectReference Include="..\..\SupportToolsServerDbPart\SupportToolsServerDbPart.Db\SupportToolsServerDbPart.Db.csproj" />
   </ItemGroup>
 
 </Project>

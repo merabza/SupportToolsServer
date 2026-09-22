@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using SupportToolsServer.Persistence;
 using SupportToolsServerApplication.Repositories.Gits;
 using SupportToolsServerApplication.Services.Gits.Models;
+using SupportToolsServerDbPart.Db;
 using SystemTools.SharedKernel;
 
 namespace SupportToolsServerQueryRepositories;
