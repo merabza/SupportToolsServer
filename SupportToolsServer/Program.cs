@@ -29,7 +29,7 @@ try
     Console.WriteLine("Loading...");
 
     const string appName = "Support Tools Server";
-    const string appKey = "3081adaf7a5d472a88cd5149671a1922";
+    //const string appKey = "3081adaf7a5d472a88cd5149671a1922";
     const int versionCount = 1;
 
     string header = $"{appName} {Assembly.GetEntryAssembly()?.GetName().Version}";
@@ -48,7 +48,7 @@ try
 
     builder.Host.UseWindowsServiceOnWindows(debugLogger, args);
 
-    builder.Configuration.AddConfigurationEncryption(debugLogger, appKey);
+    //builder.Configuration.AddConfigurationEncryption(debugLogger, appKey);
 
     // @formatter:off
     builder.Services
