@@ -3,6 +3,10 @@
     <Project Path="../DatabaseTools/DatabaseTools.DbTools/DatabaseTools.DbTools.csproj" />
     <Project Path="../DatabaseTools/DatabaseTools.SqlServerDbTools/DatabaseTools.SqlServerDbTools.csproj" />
   </Folder>
+  <Folder Name="/SupportToolsServerCore/">
+    <Project Path="../SupportToolsServerCore/SupportToolsServerCore.Application.Abstraction/SupportToolsServerCore.Application.Abstraction.csproj" Id="b1ce8664-ffa7-428a-b65e-1b40de8d53a9" />
+    <Project Path="../SupportToolsServerCore/SupportToolsServerCore.Domain/SupportToolsServerCore.Domain.csproj" Id="2c469a2a-3d3b-41d5-830a-e4ff4f355236" />
+  </Folder>
   <Folder Name="/SupportToolsServerDbPart/">
     <Project Path="../SupportToolsServerDbPart/SupportToolsServerDbPart.Db/SupportToolsServerDbPart.Db.csproj" />
   </Folder>
@@ -39,11 +43,10 @@
     <Project Path="../WebSystemTools/WebSystemTools.WebApi.Abstractions/WebSystemTools.WebApi.Abstractions.csproj" />
     <Project Path="../WebSystemTools/WebSystemTools.WindowsServiceTools/WebSystemTools.WindowsServiceTools.csproj" />
   </Folder>
-  <Project Path="SupportToolsServer.Api/SupportToolsServer.Api.csproj" />
   <Project Path="SupportToolsServer.Application/SupportToolsServer.Application.csproj" />
-  <Project Path="SupportToolsServer.Domain/SupportToolsServer.Domain.csproj" />
   <Project Path="SupportToolsServer.Persistence/SupportToolsServer.Persistence.csproj" />
   <Project Path="SupportToolsServer.Repositories/SupportToolsServer.Repositories.csproj" />
+  <Project Path="SupportToolsServer.WebApi/SupportToolsServer.WebApi.csproj" Id="97761792-861d-4f86-b3fd-5e9cb191fe5e" />
   <Project Path="SupportToolsServer/SupportToolsServer.csproj" />
   <Project Path="SupportToolsServerApiKeyIdentity/SupportToolsServerApiKeyIdentity.csproj" />
   <Project Path="SupportToolsServerApplication/SupportToolsServerApplication.csproj" />

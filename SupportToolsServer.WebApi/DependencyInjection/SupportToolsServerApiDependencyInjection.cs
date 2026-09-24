@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Routing;
 using Serilog;
-using SupportToolsServer.Api.Endpoints.V1;
+using SupportToolsServer.WebApi.Endpoints.V1;
 
-namespace SupportToolsServer.Api.DependencyInjection;
+namespace SupportToolsServer.WebApi.DependencyInjection;
 
 public static class SupportToolsServerApiDependencyInjection
 {

@@ -15,7 +15,7 @@ using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.SharedKernel;
 using WebSystemTools.WebApi.Abstractions.Infrastructure;
 
-namespace SupportToolsServer.Api.Endpoints.V1;
+namespace SupportToolsServer.WebApi.Endpoints.V1;
 
 // ReSharper disable once UnusedType.Global
 public static class GitIgnoreFileTypesEndpoints
