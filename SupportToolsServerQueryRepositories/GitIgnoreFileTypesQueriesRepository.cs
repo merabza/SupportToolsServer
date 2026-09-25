@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using SupportToolsServer.Domain.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Repositories.GitIgnoreFileTypes;
 using SupportToolsServerApplication.Services.GitIgnoreFileTypes.Models;
+using SupportToolsServerCore.Application.Abstraction;
 using SupportToolsServerDbPart.Db;
 using SystemTools.SharedKernel;
 
@@ -14,10 +15,10 @@ namespace SupportToolsServerQueryRepositories;
 
 public sealed class GitIgnoreFileTypesQueriesRepository : IGitIgnoreFileTypesQueriesRepository
 {
-    private readonly SupportToolsServerDbContext _dbContext;
+    private readonly ISupportToolsServerDbContext _dbContext;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitIgnoreFileTypesQueriesRepository(SupportToolsServerDbContext dbContext)
+    public GitIgnoreFileTypesQueriesRepository(ISupportToolsServerDbContext dbContext)
     {
         _dbContext = dbContext;
     }

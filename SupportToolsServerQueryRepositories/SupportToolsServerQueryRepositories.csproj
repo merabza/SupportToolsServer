@@ -6,4 +6,10 @@
     <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
   </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="SupportToolsServer.Domain">
+        <HintPath>..\SupportToolsServer.Domain\bin\Debug\net10.0\SupportToolsServer.Domain.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>
