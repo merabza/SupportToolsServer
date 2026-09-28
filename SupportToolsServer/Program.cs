@@ -4,14 +4,9 @@ using Figgle.Fonts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using SupportToolsServer.Persistence;
-using SupportToolsServer.Persistence.DependencyInjection;
-using SupportToolsServer.Repositories.DependencyInjection;
+using SupportToolsServer.Infrastructure.DependencyInjection;
 using SupportToolsServer.WebApi.DependencyInjection;
-using SupportToolsServerApplication;
-using SupportToolsServerCommandRepositories.DependencyInjection;
-using SupportToolsServerCore.Application.Abstraction;
-using SupportToolsServerQueryRepositories.DependencyInjection;
+using SupportToolsServerDbPart.Db.DependencyInjection;
 using SystemTools.Application.Abstractions;
 using WebSystemTools.ApiExceptionHandler.DependencyInjection;
 using WebSystemTools.ApiKeyIdentity.DependencyInjection;
@@ -21,6 +16,7 @@ using WebSystemTools.SignalRMessages.Endpoints.V1;
 using WebSystemTools.StaticFilesTools.DependencyInjection;
 using WebSystemTools.SwaggerTools.DependencyInjection;
 using WebSystemTools.TestToolsApi.Endpoints.V1;
+using WebSystemTools.ValidationTools.DependencyInjection;
 using WebSystemTools.WindowsServiceTools;
 
 try
@@ -54,15 +50,10 @@ try
         .AddSwagger(debugLogger, true, versionCount, appName) //+
         .AddApiKeyIdentity(debugLogger)
         .AddSignalRMessages(debugLogger)
-        .AddSupportToolsServerPersistence(debugLogger, builder.Configuration)
-        .AddApplication(debugLogger, typeof(ISupportToolsServerDbContext))
-        //.AddSupportToolsServerApiKeyIdentity(debugMode)
-        .AddAllScopedServiceSupportToolsServerApplication()
-        .AddSupportToolsServerQueryRepositories(debugLogger)
-        .AddSupportToolsServerCommandRepositories(debugLogger)
-        .AddSupportToolsServerForCommandsDatabase(debugLogger, builder.Configuration)
-        .AddSupportToolsServer_Repositories(debugLogger)
-        .AddSupportToolsServerDb(debugLogger, builder.Configuration);
+        .AddSupportToolsServerDatabase(debugLogger, builder.Configuration)
+        .AddApplication(debugLogger, typeof(SupportToolsServer.Application.AssemblyReference))
+        .AddFluentValidation(debugLogger, SupportToolsServer.Application.AssemblyReference.Assembly)
+        .AddSupportToolsServerRepositories(debugLogger);
     // @formatter:on
 
     //ReSharper disable once using

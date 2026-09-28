@@ -11,6 +11,7 @@ public static class SupportToolsServerApiDependencyInjection
         debugLogger?.Information("{MethodName} Started", nameof(UseSupportToolsServerApi));
 
         endpoints.UseGitIgnoreFileTypesEndpoints(debugLogger);
+        endpoints.UseGitReposEndpoints(debugLogger);
 
         debugLogger?.Information("{MethodName} Finished", nameof(UseSupportToolsServerApi));
 

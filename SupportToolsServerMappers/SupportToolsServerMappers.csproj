@@ -1,8 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <ItemGroup>
-    <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
-    <ProjectReference Include="..\SupportToolsServerApplication\SupportToolsServerApplication.csproj" />
-  </ItemGroup>
-
-</Project>
