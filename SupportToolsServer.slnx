@@ -40,6 +40,9 @@
     <Project Path="../WebSystemTools/WebSystemTools.WebApi.Abstractions/WebSystemTools.WebApi.Abstractions.csproj" />
     <Project Path="../WebSystemTools/WebSystemTools.WindowsServiceTools/WebSystemTools.WindowsServiceTools.csproj" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="SupportToolsServer.Tests/SupportToolsServer.Tests.csproj" />
+  </Folder>
   <Project Path="SupportToolsServer.Application/SupportToolsServer.Application.csproj" />
   <Project Path="SupportToolsServer.Infrastructure/SupportToolsServer.Infrastructure.csproj" />
   <Project Path="SupportToolsServer.WebApi/SupportToolsServer.WebApi.csproj" Id="97761792-861d-4f86-b3fd-5e9cb191fe5e" />

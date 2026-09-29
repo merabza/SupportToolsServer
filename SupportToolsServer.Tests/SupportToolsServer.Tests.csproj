@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SupportToolsServer.Application\SupportToolsServer.Application.csproj" />
+    <ProjectReference Include="..\SupportToolsServer.Infrastructure\SupportToolsServer.Infrastructure.csproj" />
+    <ProjectReference Include="..\SupportToolsServer.WebApi\SupportToolsServer.WebApi.csproj" />
+    <ProjectReference Include="..\..\SupportToolsServerDbPart\SupportToolsServerDbPart.Db\SupportToolsServerDbPart.Db.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+</Project>

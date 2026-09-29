@@ -8,4 +8,8 @@
         <ProjectReference Include="..\..\SystemTools\SystemTools.Domain.Abstractions\SystemTools.Domain.Abstractions.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="SupportToolsServer.Tests" />
+    </ItemGroup>
+
 </Project>

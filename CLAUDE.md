@@ -25,7 +25,7 @@ dotnet run --project SupportToolsServer/SupportToolsServer.csproj
 
 - .NET 10, central package management (`Directory.Packages.props` — add versions there, not in csproj). Every sibling repo has its own `Directory.Packages.props`.
 - `Directory.Build.props` sets `TreatWarningsAsErrors`, `AnalysisMode=All`, `EnforceCodeStyleInBuild` and SonarAnalyzer, so any analyzer/style warning breaks the build. `ImplicitUsings` is **disabled** — write explicit `using`s.
-- No test projects exist in this solution.
+- Tests: `SupportToolsServer.Tests` (xUnit + Moq, `dotnet test SupportToolsServer.slnx`) covers Application handlers/validators with mocked repositories, the Infrastructure repositories over an in-memory SQLite database built from the real `SupportToolsServerDbContext` model (`Foreign Keys=True`), and the WebApi route mapping (a real `WebApplication` with `AddApplication`), endpoint results and `Debug.WriteLine` traces (asserted under `#if DEBUG`). Application exposes its internals to it via `InternalsVisibleTo`. The sibling repos have their own test projects: `SupportToolsServerCore.Tests`, `SupportToolsServerDbPart.Tests`, `SupportToolsServerApiContracts.Tests` (in `SupportToolsServerShared.slnx`) and `SystemTools.ApiContracts.Tests`.
 - The host listens on `http://*:5033` and needs `Data:SupportToolsServerDatabase:ConnectionString` (User Secrets; `appsettings.json` only holds a placeholder). `AddSupportToolsServerDatabase` throws at startup if it is empty or not a valid SQL Server connection string.
 
 ## Architecture
