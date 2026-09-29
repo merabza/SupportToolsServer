@@ -3,6 +3,7 @@ using Moq;
 using Serilog;
 using SupportToolsServer.Infrastructure.DependencyInjection;
 using SupportToolsServer.Infrastructure.Repositories;
+using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
 using Xunit;
@@ -24,6 +25,10 @@ public sealed class SupportToolsServerRepositoriesDependencyInjectionTests
                  d.ImplementationType == typeof(GitIgnoreFileTypeRepository) && d.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services,
             d => d.ServiceType == typeof(IGitRepoRepository) && d.ImplementationType == typeof(GitRepoRepository) &&
+                 d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IEditorConfigFileTypeRepository) &&
+                 d.ImplementationType == typeof(EditorConfigFileTypeRepository) &&
                  d.Lifetime == ServiceLifetime.Scoped);
     }
 

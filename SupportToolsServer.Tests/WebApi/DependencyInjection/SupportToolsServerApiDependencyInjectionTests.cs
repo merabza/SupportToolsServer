@@ -11,7 +11,7 @@ namespace SupportToolsServer.Tests.WebApi.DependencyInjection;
 public sealed class SupportToolsServerApiDependencyInjectionTests
 {
     [Fact]
-    public async Task UseSupportToolsServerApi_MapsBothEndpointGroups()
+    public async Task UseSupportToolsServerApi_MapsEveryEndpointGroup()
     {
         (bool mapped, List<string> routes) = await MappedRoutes.Of(app => app.UseSupportToolsServerApi(null));
 
@@ -19,6 +19,7 @@ public sealed class SupportToolsServerApiDependencyInjectionTests
         Assert.Equal([
             "DELETE api/v1/git/deletegitignorefiletype/{key}", "DELETE api/v1/git/deletegitrepo/{key}",
             "GET api/v1/git/gitignorefiletypeslist", "GET api/v1/git/gitrepo/{key}", "GET api/v1/git/gitrepos",
+            "POST api/v1/git/syncupeditorconfigfiletypes/{merge?}",
             "POST api/v1/git/syncupgitignorefiletypes/{merge?}", "POST api/v1/git/updategitignorefiletype/{key}",
             "POST api/v1/git/updategitrepo/{key}", "POST api/v1/git/uploadgitrepos"
         ], routes);
@@ -35,5 +36,6 @@ public sealed class SupportToolsServerApiDependencyInjectionTests
         logger.Verify(l => l.Information("{MethodName} Finished", "UseSupportToolsServerApi"), Times.Once);
         logger.Verify(l => l.Information("{MethodName} Started", "UseGitIgnoreFileTypesEndpoints"), Times.Once);
         logger.Verify(l => l.Information("{MethodName} Started", "UseGitReposEndpoints"), Times.Once);
+        logger.Verify(l => l.Information("{MethodName} Started", "UseEditorConfigFileTypesEndpoints"), Times.Once);
     }
 }

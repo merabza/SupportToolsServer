@@ -1,4 +1,5 @@
 using SupportToolsServerApiContracts.Models;
+using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
 
@@ -6,6 +7,16 @@ namespace SupportToolsServer.Tests.TestInfrastructure;
 
 internal static class TestData
 {
+    public static EditorConfigFileType NewEditorConfigFileType(string name, string content = "root = true")
+    {
+        return new EditorConfigFileType(EditorConfigFileTypeId.CreateUnique(), name, content);
+    }
+
+    public static StsEditorConfigFileTypeDataModel EditorConfigModel(string name, string content = "root = true")
+    {
+        return new StsEditorConfigFileTypeDataModel { Name = name, Content = content };
+    }
+
     public static GitIgnoreFileType NewGitIgnoreFileType(string name, string content = "bin/")
     {
         return new GitIgnoreFileType(GitIgnoreFileTypeId.CreateUnique(), name, content);
