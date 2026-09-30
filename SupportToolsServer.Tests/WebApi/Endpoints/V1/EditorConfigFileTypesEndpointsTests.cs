@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using Serilog;
+using SupportToolsServer.Application.EditorConfigFileTypes.GetEditorConfigFileTypes;
 using SupportToolsServer.Application.EditorConfigFileTypes.SyncUp;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServer.WebApi.Endpoints.V1;
@@ -18,13 +19,16 @@ namespace SupportToolsServer.Tests.WebApi.Endpoints.V1;
 public sealed class EditorConfigFileTypesEndpointsTests
 {
     [Fact]
-    public async Task UseEditorConfigFileTypesEndpoints_MapsTheSyncUpRoute()
+    public async Task UseEditorConfigFileTypesEndpoints_MapsTheListAndSyncUpRoutes()
     {
         (bool mapped, List<string> routes) =
             await MappedRoutes.Of(app => app.UseEditorConfigFileTypesEndpoints(null));
 
         Assert.True(mapped);
-        Assert.Equal(["POST api/v1/git/syncupeditorconfigfiletypes/{merge?}"], routes);
+        Assert.Equal(
+        [
+            "GET api/v1/git/editorconfigfiletypeslist", "POST api/v1/git/syncupeditorconfigfiletypes/{merge?}"
+        ], routes);
     }
 
     [Fact]
@@ -36,6 +40,34 @@ public sealed class EditorConfigFileTypesEndpointsTests
 
         logger.Verify(l => l.Information("{MethodName} Started", "UseEditorConfigFileTypesEndpoints"), Times.Once);
         logger.Verify(l => l.Information("{MethodName} Finished", "UseEditorConfigFileTypesEndpoints"), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetEditorConfigFileTypesList_ReturnsTheListOfTheHandler()
+    {
+        List<StsEditorConfigFileTypeDataModel> types = [TestData.EditorConfigModel("CSharp")];
+        var handler =
+            HandlerMocks.Query<GetEditorConfigFileTypesQuery, List<StsEditorConfigFileTypeDataModel>>(types);
+        using var cancellation = new CancellationTokenSource();
+
+        Results<Ok<List<StsEditorConfigFileTypeDataModel>>, ProblemHttpResult> result =
+            await EditorConfigFileTypesEndpoints.GetEditorConfigFileTypesList(handler.Object, cancellation.Token);
+
+        Assert.Same(types, Assert.IsType<Ok<List<StsEditorConfigFileTypeDataModel>>>(result.Result).Value);
+        handler.Verify(h => h.Handle(It.IsAny<GetEditorConfigFileTypesQuery>(), cancellation.Token), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetEditorConfigFileTypesList_ReturnsTheErrorAsAProblem()
+    {
+        var handler = HandlerMocks.Query<GetEditorConfigFileTypesQuery, List<StsEditorConfigFileTypeDataModel>>(
+            Result.Failure<List<StsEditorConfigFileTypeDataModel>>(Error.Failure("Db", "Database failure")));
+
+        Results<Ok<List<StsEditorConfigFileTypeDataModel>>, ProblemHttpResult> result =
+            await EditorConfigFileTypesEndpoints.GetEditorConfigFileTypesList(handler.Object);
+
+        Assert.Equal(StatusCodes.Status500InternalServerError,
+            Assert.IsType<ProblemHttpResult>(result.Result).StatusCode);
     }
 
     [Theory]

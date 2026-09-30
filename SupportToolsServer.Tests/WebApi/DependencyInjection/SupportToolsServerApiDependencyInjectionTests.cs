@@ -18,7 +18,8 @@ public sealed class SupportToolsServerApiDependencyInjectionTests
         Assert.True(mapped);
         Assert.Equal([
             "DELETE api/v1/git/deletegitignorefiletype/{key}", "DELETE api/v1/git/deletegitrepo/{key}",
-            "GET api/v1/git/gitignorefiletypeslist", "GET api/v1/git/gitrepo/{key}", "GET api/v1/git/gitrepos",
+            "GET api/v1/git/editorconfigfiletypeslist", "GET api/v1/git/gitignorefiletypeslist",
+            "GET api/v1/git/gitrepo/{key}", "GET api/v1/git/gitrepos",
             "POST api/v1/git/syncupeditorconfigfiletypes/{merge?}",
             "POST api/v1/git/syncupgitignorefiletypes/{merge?}", "POST api/v1/git/updategitignorefiletype/{key}",
             "POST api/v1/git/updategitrepo/{key}", "POST api/v1/git/uploadgitrepos"

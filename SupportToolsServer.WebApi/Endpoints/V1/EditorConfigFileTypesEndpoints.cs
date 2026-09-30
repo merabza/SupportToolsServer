@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Serilog;
+using SupportToolsServer.Application.EditorConfigFileTypes.GetEditorConfigFileTypes;
 using SupportToolsServer.Application.EditorConfigFileTypes.SyncUp;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Routes;
@@ -28,11 +29,31 @@ public static class EditorConfigFileTypesEndpoints
             endpoints.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase);
         //.RequireAuthorization();
 
+        group.MapGet(SupportToolsServerApiRoutes.Git.EditorConfigFileTypesList, GetEditorConfigFileTypesList);
         group.MapPost(SupportToolsServerApiRoutes.Git.SyncUpEditorConfigFileTypes, SyncUpEditorConfigFileTypes);
 
         debugLogger?.Information("{MethodName} Finished", nameof(UseEditorConfigFileTypesEndpoints));
 
         return true;
+    }
+
+    // GET api/v1/git/editorconfigfiletypeslist
+    public static async Task<Results<Ok<List<StsEditorConfigFileTypeDataModel>>, ProblemHttpResult>>
+        GetEditorConfigFileTypesList(
+            IQueryHandler<GetEditorConfigFileTypesQuery, List<StsEditorConfigFileTypeDataModel>> handler,
+            CancellationToken cancellationToken = default)
+    {
+        Debug.WriteLine(
+            $"Call {nameof(GetEditorConfigFileTypesQueryHandler)} from {nameof(GetEditorConfigFileTypesList)}");
+
+        Result<List<StsEditorConfigFileTypeDataModel>> result =
+            await handler.Handle(new GetEditorConfigFileTypesQuery(), cancellationToken);
+
+        return result
+            .Match<List<StsEditorConfigFileTypeDataModel>,
+                Results<Ok<List<StsEditorConfigFileTypeDataModel>>, ProblemHttpResult>>(
+                editorConfigFileTypes => TypedResults.Ok(editorConfigFileTypes),
+                errors => (ProblemHttpResult)CustomResults.Problem(errors));
     }
 
     // POST api/v1/git/syncupeditorconfigfiletypes/{merge?}
