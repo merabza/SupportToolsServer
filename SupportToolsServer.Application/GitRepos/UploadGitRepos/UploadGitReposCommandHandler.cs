@@ -110,15 +110,14 @@ public class UploadGitReposCommandHandler : ICommandHandler<UploadGitReposComman
             GitIgnoreFileTypeId gitIgnoreFileTypeId = gitIgnoreFileTypesByName[git.GitIgnorePatternName].Id;
             if (gitReposByName.TryGetValue(git.GitProjectName, out GitRepo? existing))
             {
-                var changed = new GitRepo(existing.Id, git.GitProjectName, git.GitProjectAddress,
-                    git.GitProjectFolderName, gitIgnoreFileTypeId);
-                changedGitRepos.Add(changed);
-                gitReposByName[git.GitProjectName] = changed;
+                existing.Update(git.GitProjectName, git.GitProjectAddress, git.GitProjectFolderName,
+                    gitIgnoreFileTypeId);
+                changedGitRepos.Add(existing);
             }
             else
             {
-                var added = new GitRepo(GitRepoId.CreateUnique(), git.GitProjectName, git.GitProjectAddress,
-                    git.GitProjectFolderName, gitIgnoreFileTypeId);
+                var added = GitRepo.Create(git.GitProjectName, git.GitProjectAddress, git.GitProjectFolderName,
+                    gitIgnoreFileTypeId);
                 newGitRepos.Add(added);
                 gitReposByName[git.GitProjectName] = added;
             }

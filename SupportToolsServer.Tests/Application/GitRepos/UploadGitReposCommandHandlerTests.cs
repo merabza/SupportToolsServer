@@ -107,6 +107,22 @@ public sealed class UploadGitReposCommandHandlerTests
     }
 
     [Fact]
+    public async Task Handle_RaisesAddedEventsForNewGitsAndUpdatedEventsForStoredOnes()
+    {
+        GitRepo stored = TestData.NewGitRepo("RepoB", _cSharp);
+        GivenGitRepos(stored);
+
+        await Handle([TestData.GitModel("RepoA", "CSharp"), TestData.GitModel("RepoB", "CSharp")], []);
+
+        GitRepo added = Assert.Single(_addedGitRepos);
+        Assert.Equal(new GitRepoAddedDomainEvent(added.Id, "RepoA", TestData.AddressOf("RepoA"), "RepoA"),
+            Assert.Single(added.DomainEvents));
+        Assert.Same(stored, Assert.Single(_updatedGitRepos));
+        Assert.Equal(new GitRepoUpdatedDomainEvent(stored.Id, "RepoB", TestData.AddressOf("RepoB"), "RepoB"),
+            Assert.Single(stored.DomainEvents));
+    }
+
+    [Fact]
     public async Task Handle_NeverDeletes()
     {
         GivenGitRepos(TestData.NewGitRepo("RepoB", _cSharp));

@@ -51,15 +51,17 @@ public class UpdateGitRepoCommandHandler : ICommandHandler<UpdateGitRepoCommand>
             return SupportToolsServerApiClientErrors.GitAddressIsInUse(model.GitProjectAddress, addressOwner.Name);
         }
 
-        var gitRepo = new GitRepo(existingGitRepo?.Id ?? GitRepoId.CreateUnique(), model.GitProjectName,
-            model.GitProjectAddress, model.GitProjectFolderName, gitIgnoreFileType.Id);
+        //დამატება და რედაქტირება დომენის მოვლენებს აგენერირებს, რომლებიც შენახვის შემდეგ იგზავნება
         if (existingGitRepo is null)
         {
-            _gitRepoRepository.Add(gitRepo);
+            _gitRepoRepository.Add(GitRepo.Create(model.GitProjectName, model.GitProjectAddress,
+                model.GitProjectFolderName, gitIgnoreFileType.Id));
         }
         else
         {
-            _gitRepoRepository.Update(gitRepo);
+            existingGitRepo.Update(model.GitProjectName, model.GitProjectAddress, model.GitProjectFolderName,
+                gitIgnoreFileType.Id);
+            _gitRepoRepository.Update(existingGitRepo);
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);

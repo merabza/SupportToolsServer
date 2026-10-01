@@ -54,7 +54,8 @@ try
         .AddSupportToolsServerDatabase(debugLogger, builder.Configuration)
         .AddApplication(debugLogger, typeof(AssemblyReference))
         .AddFluentValidation(debugLogger, AssemblyReference.Assembly)
-        .AddSupportToolsServerRepositories(debugLogger);
+        .AddSupportToolsServerRepositories(debugLogger)
+        .AddSupportToolsServerGitProjects(debugLogger, builder.Configuration);
     // @formatter:on
 
     //ReSharper disable once using

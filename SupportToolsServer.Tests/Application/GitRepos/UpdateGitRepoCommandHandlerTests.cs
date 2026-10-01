@@ -87,6 +87,34 @@ public sealed class UpdateGitRepoCommandHandlerTests
     }
 
     [Fact]
+    public async Task Handle_RaisesGitRepoAddedDomainEvent_ForANewGit()
+    {
+        GivenGitRepos();
+        GitRepo? added = null;
+        _gitRepos.Setup(r => r.Add(It.IsAny<GitRepo>())).Callback<GitRepo>(g => added = g);
+
+        await Handle("RepoA", "CSharp");
+
+        Assert.NotNull(added);
+        var domainEvent = Assert.IsType<GitRepoAddedDomainEvent>(Assert.Single(added.DomainEvents));
+        Assert.Equal(new GitRepoAddedDomainEvent(added.Id, "RepoA", TestData.AddressOf("RepoA"), "RepoA"), domainEvent);
+    }
+
+    [Fact]
+    public async Task Handle_ChangesTheStoredInstanceAndRaisesGitRepoUpdatedDomainEvent()
+    {
+        GitRepo stored = TestData.NewGitRepo("repoa", _cSharp, "git@github.com:test/old.git");
+        GivenGitRepos(stored);
+
+        await Handle("RepoA", "CSharp");
+
+        _gitRepos.Verify(r => r.Update(stored), Times.Once);
+        var domainEvent = Assert.IsType<GitRepoUpdatedDomainEvent>(Assert.Single(stored.DomainEvents));
+        Assert.Equal(new GitRepoUpdatedDomainEvent(stored.Id, "RepoA", TestData.AddressOf("RepoA"), "RepoA"),
+            domainEvent);
+    }
+
+    [Fact]
     public async Task Handle_KeepsTheAddressOfTheGitItself()
     {
         GivenGitRepos(TestData.NewGitRepo("RepoA", _cSharp));

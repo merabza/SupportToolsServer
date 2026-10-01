@@ -2,7 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using SupportToolsServerDbPart.Db;
+using SystemTools.SharedKernel;
 
 namespace SupportToolsServer.Tests.TestInfrastructure;
 
@@ -37,6 +39,8 @@ internal sealed class SupportToolsServerSqliteDatabase : IAsyncDisposable
 
     public SupportToolsServerDbContext NewContext()
     {
-        return new SupportToolsServerDbContext(_options);
+        //A dispatcher without registered handlers: domain events raised by the tests go nowhere
+        return new SupportToolsServerDbContext(_options,
+            new DomainEventsDispatcher(new ServiceCollection().BuildServiceProvider()));
     }
 }
