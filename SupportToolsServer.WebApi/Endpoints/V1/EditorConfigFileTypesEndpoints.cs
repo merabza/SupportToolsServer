@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Serilog;
+using SupportToolsServer.Application.EditorConfigFileTypes.DeleteEditorConfigFileType;
 using SupportToolsServer.Application.EditorConfigFileTypes.GetEditorConfigFileTypes;
 using SupportToolsServer.Application.EditorConfigFileTypes.SyncUp;
 using SupportToolsServerApiContracts.Models;
@@ -31,6 +32,7 @@ public static class EditorConfigFileTypesEndpoints
 
         group.MapGet(SupportToolsServerApiRoutes.Git.EditorConfigFileTypesList, GetEditorConfigFileTypesList);
         group.MapPost(SupportToolsServerApiRoutes.Git.SyncUpEditorConfigFileTypes, SyncUpEditorConfigFileTypes);
+        group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteEditorConfigFileType, DeleteEditorConfigFileType);
 
         debugLogger?.Information("{MethodName} Finished", nameof(UseEditorConfigFileTypesEndpoints));
 
@@ -66,6 +68,19 @@ public static class EditorConfigFileTypesEndpoints
 
         var command = new SyncUpEditorConfigFileTypesCommand(merge ?? false, uploadEditorConfigFileTypes);
         Result result = await handler.Handle(command, cancellationToken);
+
+        return result.Match<Results<Ok, ProblemHttpResult>>(() => TypedResults.Ok(),
+            errors => (ProblemHttpResult)CustomResults.Problem(errors));
+    }
+
+    // DELETE api/v1/git/deleteeditorconfigfiletype/{key}
+    public static async Task<Results<Ok, ProblemHttpResult>> DeleteEditorConfigFileType([FromRoute] string key,
+        ICommandHandler<DeleteEditorConfigFileTypeCommand> handler, CancellationToken cancellationToken = default)
+    {
+        Debug.WriteLine(
+            $"Call {nameof(DeleteEditorConfigFileTypeCommandHandler)} for {key} from {nameof(DeleteEditorConfigFileType)}");
+
+        Result result = await handler.Handle(new DeleteEditorConfigFileTypeCommand(key), cancellationToken);
 
         return result.Match<Results<Ok, ProblemHttpResult>>(() => TypedResults.Ok(),
             errors => (ProblemHttpResult)CustomResults.Problem(errors));

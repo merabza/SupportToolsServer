@@ -10,8 +10,8 @@ using SystemTools.SharedKernel;
 
 namespace SupportToolsServer.Application.GitIgnoreFileTypes.GetGitIgnoreFileTypes;
 
-public class GetGitIgnoreFileTypesQueryHandler
-    : IQueryHandler<GetGitIgnoreFileTypesQuery, List<StsGitIgnoreFileTypeDataModel>>
+public class
+    GetGitIgnoreFileTypesQueryHandler : IQueryHandler<GetGitIgnoreFileTypesQuery, List<StsGitIgnoreFileTypeDataModel>>
 {
     private readonly IGitIgnoreFileTypeRepository _gitIgnoreFileTypeRepository;
 

@@ -34,9 +34,8 @@ public class SyncUpEditorConfigFileTypesCommandHandler : ICommandHandler<SyncUpE
 
         var syncer = new Syncroniser<EditorConfigFileType, EditorConfigFileTypeId>(_editorConfigFileTypeRepository, [
             .. request.UploadEditorConfigFileTypes.Select(s =>
-                new EditorConfigFileType(
-                    existingIds.GetValueOrDefault(s.Name) ?? EditorConfigFileTypeId.CreateUnique(), s.Name,
-                    s.Content))
+                new EditorConfigFileType(existingIds.GetValueOrDefault(s.Name) ?? EditorConfigFileTypeId.CreateUnique(),
+                    s.Name, s.Content))
         ]);
         await syncer.DoSyncUp(request.Merge, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

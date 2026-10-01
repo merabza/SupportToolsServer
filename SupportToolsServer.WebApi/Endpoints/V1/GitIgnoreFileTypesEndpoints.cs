@@ -53,7 +53,8 @@ public static class GitIgnoreFileTypesEndpoints
 
     // GET api/v1/git/gitignorefiletypeslist
     public static async Task<Results<Ok<List<StsGitIgnoreFileTypeDataModel>>, ProblemHttpResult>>
-        GetGitIgnoreFileTypesList(IQueryHandler<GetGitIgnoreFileTypesQuery, List<StsGitIgnoreFileTypeDataModel>> handler,
+        GetGitIgnoreFileTypesList(
+            IQueryHandler<GetGitIgnoreFileTypesQuery, List<StsGitIgnoreFileTypeDataModel>> handler,
             CancellationToken cancellationToken = default)
     {
         Debug.WriteLine($"Call {nameof(GetGitIgnoreFileTypesQueryHandler)} from {nameof(GetGitIgnoreFileTypesList)}");

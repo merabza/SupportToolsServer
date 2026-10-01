@@ -57,7 +57,7 @@ public sealed class SyncUpEditorConfigFileTypesCommandHandlerTests
     [Fact]
     public async Task Handle_AddsANewNameWithANewServerId()
     {
-        Result result = await Handle(true, TestData.EditorConfigModel("React", "root = true"));
+        Result result = await Handle(true, TestData.EditorConfigModel("React"));
 
         Assert.True(result.IsSuccess);
         EditorConfigFileType added = Assert.Single(_added);

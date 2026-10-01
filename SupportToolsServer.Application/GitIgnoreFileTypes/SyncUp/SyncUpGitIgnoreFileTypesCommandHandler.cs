@@ -38,8 +38,8 @@ public class SyncUpGitIgnoreFileTypesCommandHandler : ICommandHandler<SyncUpGitI
         if (!request.Merge)
         {
             //სიაში არარსებული ჩანაწერები წაიშლება, ამიტომ არც ერთს არ უნდა იყენებდეს რეპოზიტორია
-            HashSet<string> uploadedNames =
-                new(request.UploadGitIgnoreFileTypes.Select(x => x.Name), StringComparer.OrdinalIgnoreCase);
+            HashSet<string> uploadedNames = new(request.UploadGitIgnoreFileTypes.Select(x => x.Name),
+                StringComparer.OrdinalIgnoreCase);
             Result notUsedResult = GitIgnoreFileTypeDeletion.CheckNotUsed(
                 existingGitIgnoreFileTypes.Where(x => !uploadedNames.Contains(x.Name)),
                 await _gitRepoRepository.GetAll(cancellationToken));

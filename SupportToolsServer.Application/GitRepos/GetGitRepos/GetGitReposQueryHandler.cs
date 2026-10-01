@@ -23,8 +23,7 @@ public class GetGitReposQueryHandler : IQueryHandler<GetGitReposQuery, List<StsG
         _gitIgnoreFileTypeRepository = gitIgnoreFileTypeRepository;
     }
 
-    public async Task<Result<List<StsGitDataModel>>> Handle(GetGitReposQuery query,
-        CancellationToken cancellationToken)
+    public async Task<Result<List<StsGitDataModel>>> Handle(GetGitReposQuery query, CancellationToken cancellationToken)
     {
         List<GitRepo> gitRepos = await _gitRepoRepository.GetAll(cancellationToken);
         List<GitIgnoreFileType> gitIgnoreFileTypes = await _gitIgnoreFileTypeRepository.GetAll(cancellationToken);

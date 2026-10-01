@@ -23,8 +23,7 @@ public class GetGitRepoByKeyQueryHandler : IQueryHandler<GetGitRepoByKeyQuery, S
         _gitIgnoreFileTypeRepository = gitIgnoreFileTypeRepository;
     }
 
-    public async Task<Result<StsGitDataModel>> Handle(GetGitRepoByKeyQuery query,
-        CancellationToken cancellationToken)
+    public async Task<Result<StsGitDataModel>> Handle(GetGitRepoByKeyQuery query, CancellationToken cancellationToken)
     {
         GitRepo? gitRepo = await _gitRepoRepository.GetByName(query.Key, cancellationToken);
         if (gitRepo is null)

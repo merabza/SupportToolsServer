@@ -30,8 +30,7 @@ public sealed class GitIgnoreFileTypeDeletionTests
     [Fact]
     public void CheckNotUsed_ListsEveryUsedTypeWithItsGitsInNameOrder()
     {
-        Result result = GitIgnoreFileTypeDeletion.CheckNotUsed([_cSharp, _react],
-        [
+        Result result = GitIgnoreFileTypeDeletion.CheckNotUsed([_cSharp, _react], [
             TestData.NewGitRepo("repoB", _cSharp), TestData.NewGitRepo("RepoC", _react),
             TestData.NewGitRepo("RepoA", _cSharp)
         ]);

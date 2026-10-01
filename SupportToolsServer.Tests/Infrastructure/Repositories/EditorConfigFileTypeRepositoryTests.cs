@@ -14,7 +14,7 @@ namespace SupportToolsServer.Tests.Infrastructure.Repositories;
 public sealed class EditorConfigFileTypeRepositoryTests : IAsyncLifetime
 {
     private readonly EditorConfigFileType _baGetter = TestData.NewEditorConfigFileType("BaGetter", "root = false");
-    private readonly EditorConfigFileType _default = TestData.NewEditorConfigFileType("default", "root = true");
+    private readonly EditorConfigFileType _default = TestData.NewEditorConfigFileType("default");
     private SupportToolsServerSqliteDatabase _database = null!;
 
     public async Task InitializeAsync()

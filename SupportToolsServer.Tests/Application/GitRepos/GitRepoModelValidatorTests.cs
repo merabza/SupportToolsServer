@@ -89,8 +89,7 @@ public sealed class GitRepoModelValidatorTests
         StsGitDataModel model = TestData.GitModel("RepoA", "CSharp");
         model.GitProjectFolderName = new string('f', 101);
 
-        AssertSingleError(Validate(model), "ValueTooLong",
-            "RepoA.GitProjectFolderName Is Longer Than 100 Characters");
+        AssertSingleError(Validate(model), "ValueTooLong", "RepoA.GitProjectFolderName Is Longer Than 100 Characters");
     }
 
     [Fact]

@@ -4,6 +4,7 @@ using Figgle.Fonts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using SupportToolsServer.Application;
 using SupportToolsServer.Infrastructure.DependencyInjection;
 using SupportToolsServer.WebApi.DependencyInjection;
 using SupportToolsServerDbPart.Db.DependencyInjection;
@@ -51,8 +52,8 @@ try
         .AddApiKeyIdentity(debugLogger)
         .AddSignalRMessages(debugLogger)
         .AddSupportToolsServerDatabase(debugLogger, builder.Configuration)
-        .AddApplication(debugLogger, typeof(SupportToolsServer.Application.AssemblyReference))
-        .AddFluentValidation(debugLogger, SupportToolsServer.Application.AssemblyReference.Assembly)
+        .AddApplication(debugLogger, typeof(AssemblyReference))
+        .AddFluentValidation(debugLogger, AssemblyReference.Assembly)
         .AddSupportToolsServerRepositories(debugLogger);
     // @formatter:on
 

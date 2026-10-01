@@ -81,8 +81,9 @@ public sealed class GitIgnoreFileTypesEndpointsTests
             await GitIgnoreFileTypesEndpoints.UpdateGitIgnoreFileType("Python", handler.Object);
 
         Assert.IsType<Ok>(result.Result);
-        handler.Verify(h => h.Handle(It.Is<EnsureGitIgnoreFileTypeCommand>(c => c.Name == "Python"),
-            It.IsAny<CancellationToken>()), Times.Once);
+        handler.Verify(
+            h => h.Handle(It.Is<EnsureGitIgnoreFileTypeCommand>(c => c.Name == "Python"),
+                It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -107,15 +108,16 @@ public sealed class GitIgnoreFileTypesEndpointsTests
             await GitIgnoreFileTypesEndpoints.DeleteGitIgnoreFileType("Python", handler.Object);
 
         Assert.IsType<Ok>(result.Result);
-        handler.Verify(h => h.Handle(It.Is<DeleteGitIgnoreFileTypeCommand>(c => c.Name == "Python"),
-            It.IsAny<CancellationToken>()), Times.Once);
+        handler.Verify(
+            h => h.Handle(It.Is<DeleteGitIgnoreFileTypeCommand>(c => c.Name == "Python"),
+                It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task DeleteGitIgnoreFileType_ReturnsTheErrorAsAProblem()
     {
-        var handler = HandlerMocks.Command<DeleteGitIgnoreFileTypeCommand>(
-            Error.Conflict("GitIgnoreFileTypeIsInUse", "GitIgnore File Type Is Used By Gits: CSharp (RepoA)"));
+        var handler = HandlerMocks.Command<DeleteGitIgnoreFileTypeCommand>(Error.Conflict("GitIgnoreFileTypeIsInUse",
+            "GitIgnore File Type Is Used By Gits: CSharp (RepoA)"));
 
         Results<Ok, ProblemHttpResult> result =
             await GitIgnoreFileTypesEndpoints.DeleteGitIgnoreFileType("CSharp", handler.Object);
@@ -138,17 +140,18 @@ public sealed class GitIgnoreFileTypesEndpointsTests
             await GitIgnoreFileTypesEndpoints.SyncUpGitIgnoreFileTypes(merge, uploaded, handler.Object);
 
         Assert.IsType<Ok>(result.Result);
-        handler.Verify(h => h.Handle(
-            It.Is<SyncUpGitIgnoreFileTypesCommand>(c =>
-                c.Merge == expectedMerge && c.UploadGitIgnoreFileTypes == uploaded), It.IsAny<CancellationToken>()),
+        handler.Verify(
+            h => h.Handle(
+                It.Is<SyncUpGitIgnoreFileTypesCommand>(c =>
+                    c.Merge == expectedMerge && c.UploadGitIgnoreFileTypes == uploaded), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
     [Fact]
     public async Task SyncUpGitIgnoreFileTypes_ReturnsTheErrorAsAProblem()
     {
-        var handler = HandlerMocks.Command<SyncUpGitIgnoreFileTypesCommand>(
-            Error.Conflict("GitIgnoreFileTypeIsInUse", "GitIgnore File Type Is Used By Gits: React (RepoB)"));
+        var handler = HandlerMocks.Command<SyncUpGitIgnoreFileTypesCommand>(Error.Conflict("GitIgnoreFileTypeIsInUse",
+            "GitIgnore File Type Is Used By Gits: React (RepoB)"));
 
         Results<Ok, ProblemHttpResult> result =
             await GitIgnoreFileTypesEndpoints.SyncUpGitIgnoreFileTypes(null, [], handler.Object);
@@ -156,8 +159,8 @@ public sealed class GitIgnoreFileTypesEndpointsTests
         Assert.Equal(StatusCodes.Status409Conflict, Assert.IsType<ProblemHttpResult>(result.Result).StatusCode);
     }
 
-    //Debug.WriteLine goes to the Trace listeners and Release builds leave it out. Other tests trace in parallel,
-    //so only these lines are looked for
+    //Debug.WriteLine goes to the Trace listeners and Release builds leave it out, so there the lines must be missing.
+    //Other tests trace in parallel, so only these lines are looked for
     [Fact]
     public async Task Endpoints_WriteTheHandlerTheyCallToTheDebugTrace()
     {
@@ -180,13 +183,17 @@ public sealed class GitIgnoreFileTypesEndpointsTests
             Trace.Listeners.Remove(trace);
         }
 
+        string[] expectedLines =
+        [
+            "Call GetGitIgnoreFileTypesQueryHandler from GetGitIgnoreFileTypesList",
+            "Call EnsureGitIgnoreFileTypeCommandHandler for Python from UpdateGitIgnoreFileType",
+            "Call DeleteGitIgnoreFileTypeCommandHandler for Python from DeleteGitIgnoreFileType",
+            "Call SyncUpGitIgnoreFileTypesCommandHandler from SyncUpGitIgnoreFileTypes"
+        ];
 #if DEBUG
-        Assert.Contains("Call GetGitIgnoreFileTypesQueryHandler from GetGitIgnoreFileTypesList", trace.Lines);
-        Assert.Contains("Call EnsureGitIgnoreFileTypeCommandHandler for Python from UpdateGitIgnoreFileType",
-            trace.Lines);
-        Assert.Contains("Call DeleteGitIgnoreFileTypeCommandHandler for Python from DeleteGitIgnoreFileType",
-            trace.Lines);
-        Assert.Contains("Call SyncUpGitIgnoreFileTypesCommandHandler from SyncUpGitIgnoreFileTypes", trace.Lines);
+        Assert.All(expectedLines, line => Assert.Contains(line, trace.Lines));
+#else
+        Assert.All(expectedLines, line => Assert.DoesNotContain(line, trace.Lines));
 #endif
     }
 }

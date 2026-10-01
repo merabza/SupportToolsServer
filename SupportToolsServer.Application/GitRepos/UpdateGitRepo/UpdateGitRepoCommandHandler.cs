@@ -44,8 +44,8 @@ public class UpdateGitRepoCommandHandler : ICommandHandler<UpdateGitRepoCommand>
 
         //მისამართი უნიკალურია, ამიტომ სხვა რეპოზიტორიის მისამართი ბაზის ინდექსამდე უარიყოფა
         GitRepo? addressOwner = gitRepos.FirstOrDefault(x =>
-            !string.Equals(x.Name, model.GitProjectName, StringComparison.OrdinalIgnoreCase) &&
-            string.Equals(x.Address, model.GitProjectAddress, StringComparison.OrdinalIgnoreCase));
+            !string.Equals(x.Name, model.GitProjectName, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Address,
+                model.GitProjectAddress, StringComparison.OrdinalIgnoreCase));
         if (addressOwner is not null)
         {
             return SupportToolsServerApiClientErrors.GitAddressIsInUse(model.GitProjectAddress, addressOwner.Name);

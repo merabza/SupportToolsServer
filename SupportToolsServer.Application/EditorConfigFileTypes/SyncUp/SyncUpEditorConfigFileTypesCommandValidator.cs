@@ -14,8 +14,7 @@ public sealed class SyncUpEditorConfigFileTypesCommandValidator : AbstractValida
         RuleFor(x => x.UploadEditorConfigFileTypes).NotNull()
             .WithErrorCode(nameof(SupportToolsServerApiClientErrors.ValueRequired)).WithMessage(
                 SupportToolsServerApiClientErrors
-                    .ValueRequired(nameof(SyncUpEditorConfigFileTypesCommand.UploadEditorConfigFileTypes))
-                    .Description);
+                    .ValueRequired(nameof(SyncUpEditorConfigFileTypesCommand.UploadEditorConfigFileTypes)).Description);
 
         RuleForEach(x => x.UploadEditorConfigFileTypes).SetValidator(new EditorConfigFileTypeModelValidator());
 

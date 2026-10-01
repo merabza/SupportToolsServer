@@ -39,13 +39,13 @@ public class UploadGitReposCommandHandler : ICommandHandler<UploadGitReposComman
 
         string[] unknownPatternNames =
         [
-            .. command.Gits.Select(x => x.GitIgnorePatternName)
-                .Where(x => !gitIgnoreFileTypesByName.ContainsKey(x)).Distinct(StringComparer.OrdinalIgnoreCase)
+            .. command.Gits.Select(x => x.GitIgnorePatternName).Where(x => !gitIgnoreFileTypesByName.ContainsKey(x))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
         ];
         if (unknownPatternNames.Length > 0)
         {
-            return SupportToolsServerApiClientErrors.GitIgnoreFileTypeWithNameNotFound(
-                string.Join(", ", unknownPatternNames));
+            return SupportToolsServerApiClientErrors.GitIgnoreFileTypeWithNameNotFound(string.Join(", ",
+                unknownPatternNames));
         }
 
         Dictionary<string, GitRepo> gitReposByName =
@@ -100,9 +100,8 @@ public class UploadGitReposCommandHandler : ICommandHandler<UploadGitReposComman
     }
 
     //gitReposByName შედეგში ატვირთვის შემდგომ მდგომარეობას ასახავს
-    private static (List<GitRepo> New, List<GitRepo> Changed) MergeGitRepos(
-        Dictionary<string, GitRepo> gitReposByName, Dictionary<string, GitIgnoreFileType> gitIgnoreFileTypesByName,
-        List<StsGitDataModel> gits)
+    private static (List<GitRepo> New, List<GitRepo> Changed) MergeGitRepos(Dictionary<string, GitRepo> gitReposByName,
+        Dictionary<string, GitIgnoreFileType> gitIgnoreFileTypesByName, List<StsGitDataModel> gits)
     {
         List<GitRepo> newGitRepos = [];
         List<GitRepo> changedGitRepos = [];

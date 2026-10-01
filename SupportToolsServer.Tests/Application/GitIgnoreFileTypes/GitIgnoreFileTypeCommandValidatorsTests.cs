@@ -17,8 +17,8 @@ public sealed class GitIgnoreFileTypeCommandValidatorsTests
 
     private static ValidationResult ValidateSyncUp(List<StsGitIgnoreFileTypeDataModel>? list)
     {
-        return new SyncUpGitIgnoreFileTypesCommandValidator().Validate(new SyncUpGitIgnoreFileTypesCommand(false,
-            list!));
+        return new SyncUpGitIgnoreFileTypesCommandValidator().Validate(
+            new SyncUpGitIgnoreFileTypesCommand(false, list!));
     }
 
     private static void AssertSingleError(ValidationResult result, string errorCode, string errorMessage)
@@ -63,8 +63,8 @@ public sealed class GitIgnoreFileTypeCommandValidatorsTests
     [Fact]
     public void SyncUpValidator_AppliesTheGitIgnoreFileRulesToEveryFile()
     {
-        AssertSingleError(ValidateSyncUp([TestData.GitIgnoreModel("CSharp", new string('c', 16385))]),
-            "ValueTooLong", "CSharp.Content Is Longer Than 16384 Characters");
+        AssertSingleError(ValidateSyncUp([TestData.GitIgnoreModel("CSharp", new string('c', 16385))]), "ValueTooLong",
+            "CSharp.Content Is Longer Than 16384 Characters");
     }
 
     [Fact]

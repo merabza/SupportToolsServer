@@ -19,8 +19,7 @@ public sealed class SyncUpGitIgnoreFileTypesCommandValidator : AbstractValidator
         RuleForEach(x => x.UploadGitIgnoreFileTypes).SetValidator(new GitIgnoreFileTypeModelValidator());
 
         //ჩანაწერები სერვერისას სახელით ემთხვევა, ამიტომ სახელი სიაში ერთხელ უნდა შეგვხვდეს
-        RuleFor(x => x.UploadGitIgnoreFileTypes)
-            .Must(x => x is null || UniqueValues.AreUnique(x.Select(y => y.Name)))
+        RuleFor(x => x.UploadGitIgnoreFileTypes).Must(x => x is null || UniqueValues.AreUnique(x.Select(y => y.Name)))
             .WithErrorCode(nameof(SupportToolsServerApiClientErrors.ValuesNotUnique)).WithMessage(
                 SupportToolsServerApiClientErrors.ValuesNotUnique(nameof(StsGitIgnoreFileTypeDataModel.Name))
                     .Description);

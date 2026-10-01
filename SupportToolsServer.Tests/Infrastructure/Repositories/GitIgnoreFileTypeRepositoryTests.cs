@@ -13,7 +13,7 @@ namespace SupportToolsServer.Tests.Infrastructure.Repositories;
 
 public sealed class GitIgnoreFileTypeRepositoryTests : IAsyncLifetime
 {
-    private readonly GitIgnoreFileType _cSharp = TestData.NewGitIgnoreFileType("CSharp", "bin/");
+    private readonly GitIgnoreFileType _cSharp = TestData.NewGitIgnoreFileType("CSharp");
     private SupportToolsServerSqliteDatabase _database = null!;
 
     public async Task InitializeAsync()

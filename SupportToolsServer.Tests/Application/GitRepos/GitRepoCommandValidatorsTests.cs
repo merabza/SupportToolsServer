@@ -106,8 +106,7 @@ public sealed class GitRepoCommandValidatorsTests
     [Fact]
     public void UploadValidator_RejectsARepeatedAddress()
     {
-        ValidationResult result = ValidateUpload(
-        [
+        ValidationResult result = ValidateUpload([
             TestData.GitModel("RepoA", "CSharp", "git@github.com:test/a.git"),
             TestData.GitModel("RepoB", "CSharp", "git@github.com:test/a.git")
         ], []);

@@ -61,9 +61,10 @@ public sealed class GitReposEndpointsTests
             await GitReposEndpoints.UploadGitRepos(request, handler.Object, cancellation.Token);
 
         Assert.IsType<Ok>(result.Result);
-        handler.Verify(h => h.Handle(
-            It.Is<UploadGitReposCommand>(c => c.Gits == request.Gits && c.GitIgnoreFiles == request.GitIgnoreFiles),
-            cancellation.Token), Times.Once);
+        handler.Verify(
+            h => h.Handle(
+                It.Is<UploadGitReposCommand>(c => c.Gits == request.Gits && c.GitIgnoreFiles == request.GitIgnoreFiles),
+                cancellation.Token), Times.Once);
     }
 
     [Fact]
@@ -143,9 +144,9 @@ public sealed class GitReposEndpointsTests
         Results<Ok, ProblemHttpResult> result = await GitReposEndpoints.UpdateGitRepo("RepoA", gitRepo, handler.Object);
 
         Assert.IsType<Ok>(result.Result);
-        handler.Verify(h => h.Handle(
-            It.Is<UpdateGitRepoCommand>(c => c.GitRepo == gitRepo && c.GitRepo.GitProjectName == "RepoA"),
-            It.IsAny<CancellationToken>()), Times.Once);
+        handler.Verify(
+            h => h.Handle(It.Is<UpdateGitRepoCommand>(c => c.GitRepo == gitRepo && c.GitRepo.GitProjectName == "RepoA"),
+                It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -182,8 +183,8 @@ public sealed class GitReposEndpointsTests
         Assert.Equal(StatusCodes.Status404NotFound, Assert.IsType<ProblemHttpResult>(result.Result).StatusCode);
     }
 
-    //Debug.WriteLine goes to the Trace listeners and Release builds leave it out. Other tests trace in parallel,
-    //so only these lines are looked for
+    //Debug.WriteLine goes to the Trace listeners and Release builds leave it out, so there the lines must be missing.
+    //Other tests trace in parallel, so only these lines are looked for
     [Fact]
     public async Task Endpoints_WriteTheHandlerTheyCallToTheDebugTrace()
     {
@@ -209,12 +210,17 @@ public sealed class GitReposEndpointsTests
             Trace.Listeners.Remove(trace);
         }
 
+        string[] expectedLines =
+        [
+            "Call UploadGitReposCommandHandler from UploadGitRepos", "Call GetGitReposQueryHandler from GetGitRepos",
+            "Call GetGitRepoByKeyQueryHandler for key RepoA from GetGitRepoByKey",
+            "Call UpdateGitRepoCommandHandler for key RepoA from UpdateGitRepo",
+            "Call DeleteGitRepoCommandHandler for key RepoA from DeleteGitRepo"
+        ];
 #if DEBUG
-        Assert.Contains("Call UploadGitReposCommandHandler from UploadGitRepos", trace.Lines);
-        Assert.Contains("Call GetGitReposQueryHandler from GetGitRepos", trace.Lines);
-        Assert.Contains("Call GetGitRepoByKeyQueryHandler for key RepoA from GetGitRepoByKey", trace.Lines);
-        Assert.Contains("Call UpdateGitRepoCommandHandler for key RepoA from UpdateGitRepo", trace.Lines);
-        Assert.Contains("Call DeleteGitRepoCommandHandler for key RepoA from DeleteGitRepo", trace.Lines);
+        Assert.All(expectedLines, line => Assert.Contains(line, trace.Lines));
+#else
+        Assert.All(expectedLines, line => Assert.DoesNotContain(line, trace.Lines));
 #endif
     }
 }

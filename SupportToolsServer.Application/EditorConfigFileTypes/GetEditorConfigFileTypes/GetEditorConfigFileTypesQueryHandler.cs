@@ -10,8 +10,9 @@ using SystemTools.SharedKernel;
 
 namespace SupportToolsServer.Application.EditorConfigFileTypes.GetEditorConfigFileTypes;
 
-public class GetEditorConfigFileTypesQueryHandler
-    : IQueryHandler<GetEditorConfigFileTypesQuery, List<StsEditorConfigFileTypeDataModel>>
+public class
+    GetEditorConfigFileTypesQueryHandler : IQueryHandler<GetEditorConfigFileTypesQuery,
+    List<StsEditorConfigFileTypeDataModel>>
 {
     private readonly IEditorConfigFileTypeRepository _editorConfigFileTypeRepository;
 

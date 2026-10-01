@@ -62,9 +62,10 @@ public sealed class UpdateGitRepoCommandHandlerTests
         Result result = await Handle("RepoA", "CSharp");
 
         Assert.True(result.IsSuccess);
-        _gitRepos.Verify(r => r.Add(It.Is<GitRepo>(g =>
-            g.Name == "RepoA" && g.Address == TestData.AddressOf("RepoA") && g.FolderName == "RepoA" &&
-            g.GitIgnoreFileTypeId == _cSharp.Id)), Times.Once);
+        _gitRepos.Verify(
+            r => r.Add(It.Is<GitRepo>(g =>
+                g.Name == "RepoA" && g.Address == TestData.AddressOf("RepoA") && g.FolderName == "RepoA" &&
+                g.GitIgnoreFileTypeId == _cSharp.Id)), Times.Once);
         _gitRepos.Verify(r => r.Update(It.IsAny<GitRepo>()), Times.Never);
         _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -78,8 +79,9 @@ public sealed class UpdateGitRepoCommandHandlerTests
         Result result = await Handle("RepoA", "CSharp");
 
         Assert.True(result.IsSuccess);
-        _gitRepos.Verify(r => r.Update(It.Is<GitRepo>(g =>
-            g.Id == stored.Id && g.Name == "RepoA" && g.Address == TestData.AddressOf("RepoA"))), Times.Once);
+        _gitRepos.Verify(
+            r => r.Update(It.Is<GitRepo>(g =>
+                g.Id == stored.Id && g.Name == "RepoA" && g.Address == TestData.AddressOf("RepoA"))), Times.Once);
         _gitRepos.Verify(r => r.Add(It.IsAny<GitRepo>()), Times.Never);
         _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }

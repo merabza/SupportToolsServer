@@ -15,9 +15,9 @@ namespace SupportToolsServer.Tests.Application.GitRepos;
 
 public sealed class UploadGitReposCommandHandlerTests
 {
-    private readonly GitIgnoreFileType _cSharp = TestData.NewGitIgnoreFileType("CSharp", "old");
     private readonly List<GitIgnoreFileType> _added = [];
     private readonly List<GitRepo> _addedGitRepos = [];
+    private readonly GitIgnoreFileType _cSharp = TestData.NewGitIgnoreFileType("CSharp", "old");
     private readonly Mock<IGitIgnoreFileTypeRepository> _gitIgnoreFileTypes = new();
     private readonly Mock<IGitRepoRepository> _gitRepos = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
@@ -122,8 +122,7 @@ public sealed class UploadGitReposCommandHandlerTests
     {
         GivenGitRepos();
 
-        Result result = await Handle(
-        [
+        Result result = await Handle([
             TestData.GitModel("RepoA", "Missing"), TestData.GitModel("RepoB", "missing"),
             TestData.GitModel("RepoC", "Other"), TestData.GitModel("RepoD", "CSharp")
         ], [TestData.GitIgnoreModel("React")]);
@@ -152,8 +151,7 @@ public sealed class UploadGitReposCommandHandlerTests
     {
         GivenGitRepos(TestData.NewGitRepo("RepoC", _cSharp));
 
-        Result result = await Handle(
-        [
+        Result result = await Handle([
             TestData.GitModel("RepoC", "CSharp", "git@github.com:test/moved.git"),
             TestData.GitModel("RepoH", "CSharp", TestData.AddressOf("RepoC"))
         ], []);

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using Serilog;
+using SupportToolsServer.Application.EditorConfigFileTypes.DeleteEditorConfigFileType;
 using SupportToolsServer.Application.EditorConfigFileTypes.GetEditorConfigFileTypes;
 using SupportToolsServer.Application.EditorConfigFileTypes.SyncUp;
 using SupportToolsServer.Tests.TestInfrastructure;
@@ -19,15 +20,14 @@ namespace SupportToolsServer.Tests.WebApi.Endpoints.V1;
 public sealed class EditorConfigFileTypesEndpointsTests
 {
     [Fact]
-    public async Task UseEditorConfigFileTypesEndpoints_MapsTheListAndSyncUpRoutes()
+    public async Task UseEditorConfigFileTypesEndpoints_MapsTheListSyncUpAndDeleteRoutes()
     {
-        (bool mapped, List<string> routes) =
-            await MappedRoutes.Of(app => app.UseEditorConfigFileTypesEndpoints(null));
+        (bool mapped, List<string> routes) = await MappedRoutes.Of(app => app.UseEditorConfigFileTypesEndpoints(null));
 
         Assert.True(mapped);
-        Assert.Equal(
-        [
-            "GET api/v1/git/editorconfigfiletypeslist", "POST api/v1/git/syncupeditorconfigfiletypes/{merge?}"
+        Assert.Equal([
+            "DELETE api/v1/git/deleteeditorconfigfiletype/{key}", "GET api/v1/git/editorconfigfiletypeslist",
+            "POST api/v1/git/syncupeditorconfigfiletypes/{merge?}"
         ], routes);
     }
 
@@ -46,8 +46,7 @@ public sealed class EditorConfigFileTypesEndpointsTests
     public async Task GetEditorConfigFileTypesList_ReturnsTheListOfTheHandler()
     {
         List<StsEditorConfigFileTypeDataModel> types = [TestData.EditorConfigModel("CSharp")];
-        var handler =
-            HandlerMocks.Query<GetEditorConfigFileTypesQuery, List<StsEditorConfigFileTypeDataModel>>(types);
+        var handler = HandlerMocks.Query<GetEditorConfigFileTypesQuery, List<StsEditorConfigFileTypeDataModel>>(types);
         using var cancellation = new CancellationTokenSource();
 
         Results<Ok<List<StsEditorConfigFileTypeDataModel>>, ProblemHttpResult> result =
@@ -70,6 +69,32 @@ public sealed class EditorConfigFileTypesEndpointsTests
             Assert.IsType<ProblemHttpResult>(result.Result).StatusCode);
     }
 
+    //Debug.WriteLine goes to the Trace listeners and Release builds leave it out, so there the line must be missing.
+    //Other tests trace in parallel, so only this line is looked for
+    [Fact]
+    public async Task GetEditorConfigFileTypesList_WritesTheHandlerItCallsToTheDebugTrace()
+    {
+        List<StsEditorConfigFileTypeDataModel> types = [];
+        using var trace = new CollectingTraceListener();
+        Trace.Listeners.Add(trace);
+        try
+        {
+            await EditorConfigFileTypesEndpoints.GetEditorConfigFileTypesList(HandlerMocks
+                .Query<GetEditorConfigFileTypesQuery, List<StsEditorConfigFileTypeDataModel>>(types).Object);
+        }
+        finally
+        {
+            Trace.Listeners.Remove(trace);
+        }
+
+        const string expectedLine = "Call GetEditorConfigFileTypesQueryHandler from GetEditorConfigFileTypesList";
+#if DEBUG
+        Assert.Contains(expectedLine, trace.Lines);
+#else
+        Assert.DoesNotContain(expectedLine, trace.Lines);
+#endif
+    }
+
     [Theory]
     [InlineData(null, false)]
     [InlineData(false, false)]
@@ -85,9 +110,10 @@ public sealed class EditorConfigFileTypesEndpointsTests
                 cancellation.Token);
 
         Assert.IsType<Ok>(result.Result);
-        handler.Verify(h => h.Handle(
-            It.Is<SyncUpEditorConfigFileTypesCommand>(c =>
-                c.Merge == expectedMerge && c.UploadEditorConfigFileTypes == uploaded), cancellation.Token),
+        handler.Verify(
+            h => h.Handle(
+                It.Is<SyncUpEditorConfigFileTypesCommand>(c =>
+                    c.Merge == expectedMerge && c.UploadEditorConfigFileTypes == uploaded), cancellation.Token),
             Times.Once);
     }
 
@@ -105,8 +131,8 @@ public sealed class EditorConfigFileTypesEndpointsTests
         Assert.Equal("ValuesNotUnique", problem.ProblemDetails.Title);
     }
 
-    //Debug.WriteLine goes to the Trace listeners and Release builds leave it out. Other tests trace in parallel,
-    //so only this line is looked for
+    //Debug.WriteLine goes to the Trace listeners and Release builds leave it out, so there the line must be missing.
+    //Other tests trace in parallel, so only this line is looked for
     [Fact]
     public async Task SyncUpEditorConfigFileTypes_WritesTheHandlerItCallsToTheDebugTrace()
     {
@@ -122,9 +148,66 @@ public sealed class EditorConfigFileTypesEndpointsTests
             Trace.Listeners.Remove(trace);
         }
 
+        const string expectedLine = "Call SyncUpEditorConfigFileTypesCommandHandler from SyncUpEditorConfigFileTypes";
 #if DEBUG
-        Assert.Contains("Call SyncUpEditorConfigFileTypesCommandHandler from SyncUpEditorConfigFileTypes",
-            trace.Lines);
+        Assert.Contains(expectedLine, trace.Lines);
+#else
+        Assert.DoesNotContain(expectedLine, trace.Lines);
+#endif
+    }
+
+    [Fact]
+    public async Task DeleteEditorConfigFileType_DeletesTheRouteKeyAndReturnsOk()
+    {
+        var handler = HandlerMocks.Command<DeleteEditorConfigFileTypeCommand>(Result.Success());
+        using var cancellation = new CancellationTokenSource();
+
+        Results<Ok, ProblemHttpResult> result =
+            await EditorConfigFileTypesEndpoints.DeleteEditorConfigFileType("BaGetter", handler.Object,
+                cancellation.Token);
+
+        Assert.IsType<Ok>(result.Result);
+        handler.Verify(
+            h => h.Handle(It.Is<DeleteEditorConfigFileTypeCommand>(c => c.Name == "BaGetter"), cancellation.Token),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteEditorConfigFileType_ReturnsTheErrorAsAProblem()
+    {
+        var handler = HandlerMocks.Command<DeleteEditorConfigFileTypeCommand>(Error.NotFound(
+            "EditorConfigFileTypeWithNameNotFound", "EditorConfig File Type With Name React Not Found"));
+
+        Results<Ok, ProblemHttpResult> result =
+            await EditorConfigFileTypesEndpoints.DeleteEditorConfigFileType("React", handler.Object);
+
+        var problem = Assert.IsType<ProblemHttpResult>(result.Result);
+        Assert.Equal(StatusCodes.Status404NotFound, problem.StatusCode);
+        Assert.Equal("EditorConfigFileTypeWithNameNotFound", problem.ProblemDetails.Title);
+        Assert.Equal("EditorConfig File Type With Name React Not Found", problem.ProblemDetails.Detail);
+    }
+
+    [Fact]
+    public async Task DeleteEditorConfigFileType_WritesTheHandlerItCallsToTheDebugTrace()
+    {
+        using var trace = new CollectingTraceListener();
+        Trace.Listeners.Add(trace);
+        try
+        {
+            await EditorConfigFileTypesEndpoints.DeleteEditorConfigFileType("BaGetter",
+                HandlerMocks.Command<DeleteEditorConfigFileTypeCommand>(Result.Success()).Object);
+        }
+        finally
+        {
+            Trace.Listeners.Remove(trace);
+        }
+
+        const string expectedLine =
+            "Call DeleteEditorConfigFileTypeCommandHandler for BaGetter from DeleteEditorConfigFileType";
+#if DEBUG
+        Assert.Contains(expectedLine, trace.Lines);
+#else
+        Assert.DoesNotContain(expectedLine, trace.Lines);
 #endif
     }
 }
