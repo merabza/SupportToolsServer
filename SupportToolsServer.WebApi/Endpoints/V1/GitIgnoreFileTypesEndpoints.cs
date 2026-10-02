@@ -36,9 +36,9 @@ public static class GitIgnoreFileTypesEndpoints
     {
         debugLogger?.Information("{MethodName} Started", nameof(UseGitIgnoreFileTypesEndpoints));
 
-        RouteGroupBuilder group =
-            endpoints.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase);
-        //.RequireAuthorization();
+        RouteGroupBuilder group = endpoints
+            .MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase)
+            .RequireAuthorization();
 
         group.MapGet(SupportToolsServerApiRoutes.Git.GitIgnoreFileTypesList, GetGitIgnoreFileTypesList);
         group.MapPost(SupportToolsServerApiRoutes.Git.UpdateGitIgnoreFileType, UpdateGitIgnoreFileType);

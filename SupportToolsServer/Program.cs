@@ -15,6 +15,7 @@ using WebSystemTools.SerilogLogger;
 using WebSystemTools.SignalRMessages.DependencyInjection;
 using WebSystemTools.SignalRMessages.Endpoints.V1;
 using WebSystemTools.StaticFilesTools.DependencyInjection;
+using WebSystemTools.SwaggerTools;
 using WebSystemTools.SwaggerTools.DependencyInjection;
 using WebSystemTools.TestToolsApi.Endpoints.V1;
 using WebSystemTools.ValidationTools.DependencyInjection;
@@ -48,7 +49,7 @@ try
 
     // @formatter:off
     builder.Services
-        .AddSwagger(debugLogger, true, versionCount, appName) //+
+        .AddSwagger(debugLogger, ESwaggerSecurityScheme.ApiKey, versionCount, appName) //+
         .AddApiKeyIdentity(debugLogger)
         .AddSignalRMessages(debugLogger)
         .AddSupportToolsServerDatabase(debugLogger, builder.Configuration)

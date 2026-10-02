@@ -46,6 +46,18 @@ public sealed class GitIgnoreFileTypesEndpointsTests
     }
 
     [Fact]
+    public async Task UseGitIgnoreFileTypesEndpoints_RequiresAuthorizationOnEveryRoute()
+    {
+        (_, List<string> routes) = await MappedRoutes.Of(app => app.UseGitIgnoreFileTypesEndpoints(null));
+
+        List<string> protectedRoutes =
+            await MappedRoutes.RequiringAuthorization(app => app.UseGitIgnoreFileTypesEndpoints(null));
+
+        Assert.NotEmpty(routes);
+        Assert.Equal(routes, protectedRoutes);
+    }
+
+    [Fact]
     public async Task GetGitIgnoreFileTypesList_ReturnsTheListOfTheHandler()
     {
         List<StsGitIgnoreFileTypeDataModel> types = [TestData.GitIgnoreModel("CSharp")];

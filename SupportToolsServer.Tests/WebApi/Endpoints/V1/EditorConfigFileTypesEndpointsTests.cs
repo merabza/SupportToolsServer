@@ -43,6 +43,18 @@ public sealed class EditorConfigFileTypesEndpointsTests
     }
 
     [Fact]
+    public async Task UseEditorConfigFileTypesEndpoints_RequiresAuthorizationOnEveryRoute()
+    {
+        (_, List<string> routes) = await MappedRoutes.Of(app => app.UseEditorConfigFileTypesEndpoints(null));
+
+        List<string> protectedRoutes =
+            await MappedRoutes.RequiringAuthorization(app => app.UseEditorConfigFileTypesEndpoints(null));
+
+        Assert.NotEmpty(routes);
+        Assert.Equal(routes, protectedRoutes);
+    }
+
+    [Fact]
     public async Task GetEditorConfigFileTypesList_ReturnsTheListOfTheHandler()
     {
         List<StsEditorConfigFileTypeDataModel> types = [TestData.EditorConfigModel("CSharp")];

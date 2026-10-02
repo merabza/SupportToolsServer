@@ -26,9 +26,9 @@ public static class EditorConfigFileTypesEndpoints
     {
         debugLogger?.Information("{MethodName} Started", nameof(UseEditorConfigFileTypesEndpoints));
 
-        RouteGroupBuilder group =
-            endpoints.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase);
-        //.RequireAuthorization();
+        RouteGroupBuilder group = endpoints
+            .MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase)
+            .RequireAuthorization();
 
         group.MapGet(SupportToolsServerApiRoutes.Git.EditorConfigFileTypesList, GetEditorConfigFileTypesList);
         group.MapPost(SupportToolsServerApiRoutes.Git.SyncUpEditorConfigFileTypes, SyncUpEditorConfigFileTypes);

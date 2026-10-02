@@ -29,8 +29,9 @@ public static class GitReposEndpoints
     {
         debugLogger?.Information("{MethodName} Started", nameof(UseGitReposEndpoints));
 
-        RouteGroupBuilder group =
-            endpoints.MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase);
+        RouteGroupBuilder group = endpoints
+            .MapGroup(SupportToolsServerApiRoutes.ApiBase + SupportToolsServerApiRoutes.Git.GitBase)
+            .RequireAuthorization();
 
         group.MapPost(SupportToolsServerApiRoutes.Git.UploadGitRepos, UploadGitRepos);
         group.MapGet(SupportToolsServerApiRoutes.Git.GitRepos, GetGitRepos);

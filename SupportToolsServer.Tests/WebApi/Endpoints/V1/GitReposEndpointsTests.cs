@@ -48,6 +48,17 @@ public sealed class GitReposEndpointsTests
     }
 
     [Fact]
+    public async Task UseGitReposEndpoints_RequiresAuthorizationOnEveryRoute()
+    {
+        (_, List<string> routes) = await MappedRoutes.Of(app => app.UseGitReposEndpoints(null));
+
+        List<string> protectedRoutes = await MappedRoutes.RequiringAuthorization(app => app.UseGitReposEndpoints(null));
+
+        Assert.NotEmpty(routes);
+        Assert.Equal(routes, protectedRoutes);
+    }
+
+    [Fact]
     public async Task UploadGitRepos_PassesTheUploadedListsAndReturnsOk()
     {
         var request = new SyncGitRequest

@@ -180,7 +180,7 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 |-|-|-|-|-|-|
 | [A1](tasks/A1-dbtools-fakehost-docs.md) | DbTools FakeHost-ის გასწორება და მოძველებული დოკუმენტაცია | SupportToolsServer | — | S | ✅ |
 | [A2](tasks/A2-git-input-validation.md) | git-ის მონაცემების ვალიდაცია და git-ის უსაფრთხო გამოძახება სერვერზე | SupportToolsServer | — | M | ✅ |
-| [A3](tasks/A3-api-key-auth.md) | API key ავთენტიფიკაცია ყველა endpoint-ზე | SupportToolsServer | — | M | ⬜ |
+| [A3](tasks/A3-api-key-auth.md) | API key ავთენტიფიკაცია ყველა endpoint-ზე | SupportToolsServer | — | M | ✅ |
 | [A4](tasks/A4-client-integrity-fixes.md) | კლიენტის შეცდომები, რომლებიც სინქრონიზაციას გააფუჭებს | SupportTools | — | M | ✅ |
 | [B1](tasks/B1-registry-foundation-environments.md) | რეესტრის საფუძველი (`Version`, კონვენციები) და Environments | SupportToolsServer | A1, A3 | L | ⬜ |
 | [B2](tasks/B2-lookup-collections.md) | ცნობარები: Runtimes, NpmPackages, ReactAppTemplates, DotnetTools | SupportToolsServer | B1 | M | ⬜ |
@@ -192,7 +192,7 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [B8](tasks/B8-stored-files.md) | საიდუმლო ფაილების საცავი | SupportToolsServer | B1 | M | ⬜ |
 | [B9](tasks/B9-server-git-projects.md) | (სურვილისამებრ) `GitProjects`-ის გამოთვლა სერვერზე | SupportToolsServer | B1, C5 | L | ⬜ |
 | [C1](tasks/C1-machine-profile-path-mapping.md) | კომპიუტერის პროფილი და გზების გარდაქმნა | SupportTools | A4 | M | ✅ |
-| [C2](tasks/C2-sync-engine-core.md) | სინქრონიზაციის ძრავის ბირთვი | SupportTools | A4 | L | ⬜ |
+| [C2](tasks/C2-sync-engine-core.md) | სინქრონიზაციის ძრავის ბირთვი | SupportTools | A4 | L | ✅ |
 | [C3](tasks/C3-adapters-reference-data.md) | ადაპტერები: ცნობარები, რესურსები, სერვერები, პარამეტრები, გიტები, შაბლონები | SupportTools | C1, C2, B1–B5 | L | ⬜ |
 | [C4](tasks/C4-adapter-projects.md) | ადაპტერი: Projects და ServerInfo-ები | SupportTools | C3, B6, B7 | L | ⬜ |
 | [C5](tasks/C5-sync-command-seed.md) | სინქრონიზაციის ბრძანება და საწყისი ატვირთვა (seed) | SupportTools | C4, A3 | L | ⬜ |
