@@ -178,10 +178,10 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 
 | ID | ამოცანა | სესიის საქაღალდე | დამოკიდებულია | ზომა | სტატუსი |
 |-|-|-|-|-|-|
-| [A1](tasks/A1-dbtools-fakehost-docs.md) | DbTools FakeHost-ის გასწორება და მოძველებული დოკუმენტაცია | SupportToolsServer | — | S | ⬜ |
+| [A1](tasks/A1-dbtools-fakehost-docs.md) | DbTools FakeHost-ის გასწორება და მოძველებული დოკუმენტაცია | SupportToolsServer | — | S | ✅ |
 | [A2](tasks/A2-git-input-validation.md) | git-ის მონაცემების ვალიდაცია და git-ის უსაფრთხო გამოძახება სერვერზე | SupportToolsServer | — | M | ⬜ |
 | [A3](tasks/A3-api-key-auth.md) | API key ავთენტიფიკაცია ყველა endpoint-ზე | SupportToolsServer | — | M | ⬜ |
-| [A4](tasks/A4-client-integrity-fixes.md) | კლიენტის შეცდომები, რომლებიც სინქრონიზაციას გააფუჭებს | SupportTools | — | M | ⬜ |
+| [A4](tasks/A4-client-integrity-fixes.md) | კლიენტის შეცდომები, რომლებიც სინქრონიზაციას გააფუჭებს | SupportTools | — | M | ✅ |
 | [B1](tasks/B1-registry-foundation-environments.md) | რეესტრის საფუძველი (`Version`, კონვენციები) და Environments | SupportToolsServer | A1, A3 | L | ⬜ |
 | [B2](tasks/B2-lookup-collections.md) | ცნობარები: Runtimes, NpmPackages, ReactAppTemplates, DotnetTools | SupportToolsServer | B1 | M | ⬜ |
 | [B3](tasks/B3-infrastructure-resources.md) | რესურსები: SmartSchemas, FileStorages, ApiClients, DatabaseServerConnections | SupportToolsServer | B1 | L | ⬜ |
@@ -262,7 +262,7 @@ flowchart LR
      - `Cruders\GitStsCruderTests.cs`
      - ინტერაქტიული ბრძანება შიდა კონსტრუქტორით: `SaveGitIgnoreAsNewTemplateCliMenuCommand`
      - კონსოლის დამჭერი კლასები `[Collection(ConsoleCaptureCollection.Name)]`-ით.
-   - ParametersManagement-სა და WebSystemTools-ში სატესტო პროექტი არ არის. თუ იქ ცვლი კოდს, ჰკითხე მომხმარებელს, შეიქმნას თუ არა სატესტო პროექტი.
+   - ParametersManagement-ში სატესტო პროექტია `ParametersManagement.LibParameters.Tests` (A4-დან, `ParametersManagement.slnx`-ში). WebSystemTools-ში სატესტო პროექტი არ არის. თუ იქ ცვლი კოდს, ჰკითხე მომხმარებელს, შეიქმნას თუ არა სატესტო პროექტი.
 8. **საიდუმლოებები:** user secrets-ს, connection string-ებს და API key-ებს არ კითხულობ და არ ბეჭდავ. `D:\1WorkSecurity\SupportTools\SupportTools.json`-ში მხოლოდ კონკრეტული, არასაიდუმლო გასაღებების grep შეიძლება. ტესტებში მხოლოდ გამოგონილი მნიშვნელობები გამოიყენე. ახალ კოდში საიდუმლო არ უნდა მოხვდეს კონსოლის გამონატანში, ლოგში ან Debug ტრეისში.
 9. **სერვერის კონვენციები:** SupportToolsServer-ის `CLAUDE.md` და B1-ის შემდეგ მასში ჩაწერილი რეესტრის კონვენციები. მოკლედ:
    - ნაკადი: endpoint → command/query → handler → რეპოზიტორი → `IUnitOfWork.SaveChangesAsync` → `Result`.
