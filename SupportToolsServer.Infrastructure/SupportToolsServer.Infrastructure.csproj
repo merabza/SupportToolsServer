@@ -10,4 +10,8 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="SupportToolsServer.Tests" />
+  </ItemGroup>
+
 </Project>

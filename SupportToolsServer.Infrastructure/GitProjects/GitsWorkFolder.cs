@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -42,7 +43,21 @@ public sealed class GitsWorkFolder : IGitsWorkFolder
             return GitProjectsErrors.CannotCreateFolder(gitsFolder);
         }
 
-        return Path.Combine(gitsFolder, gitProjectFolderName.Replace($"{Path.DirectorySeparatorChar}", "."));
+        //კლიენტის ქეშის წესით ორივე გამყოფი წერტილით იცვლება, ამიტომ პროექტის ფოლდერი Gits-ის პირდაპირი ქვეფოლდერია
+        string gitsFolderPath = Path.GetFullPath(gitsFolder);
+        string projectFolderPath = Path.GetFullPath(Path.Combine(gitsFolderPath,
+            gitProjectFolderName.Replace('\\', '.').Replace('/', '.')));
+
+        //დაცვის მეორე ფენა ვალიდატორის შემდეგ: ".." და ფესვიანი გზა Gits-ის გარეთ გადის, ხოლო "." და Windows-ზე
+        //ბოლო წერტილებით ან გამოტოვებებით დასრულებული სახელი ("...") თავად Gits ფოლდერს ემთხვევა
+        string gitsFolderPrefix = gitsFolderPath + Path.DirectorySeparatorChar;
+        if (projectFolderPath.Length == gitsFolderPrefix.Length ||
+            !projectFolderPath.StartsWith(gitsFolderPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            return GitProjectsErrors.FolderIsOutsideGitsFolder(gitProjectFolderName);
+        }
+
+        return projectFolderPath;
     }
 
     public bool Exists(string projectFolderPath)

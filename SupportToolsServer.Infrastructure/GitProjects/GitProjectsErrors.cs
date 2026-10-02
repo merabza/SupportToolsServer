@@ -11,4 +11,9 @@ public static class GitProjectsErrors
     {
         return Error.Problem(nameof(CannotCreateFolder), $"Folder {folderName} does not exist and cannot be created");
     }
+
+    public static Error FolderIsOutsideGitsFolder(string folderName)
+    {
+        return Error.Problem(nameof(FolderIsOutsideGitsFolder), $"Folder {folderName} is not inside the Gits folder");
+    }
 }

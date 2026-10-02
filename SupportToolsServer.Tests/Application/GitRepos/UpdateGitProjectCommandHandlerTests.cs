@@ -1,9 +1,15 @@
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SupportToolsServer.Application.GitRepos.UpdateGitProject;
+using SupportToolsServer.Infrastructure.GitProjects;
+using SupportToolsServer.Infrastructure.Options;
+using SupportToolsServer.Tests.TestInfrastructure;
 using SystemTools.SharedKernel;
 using Xunit;
+using MsOptions = Microsoft.Extensions.Options.Options;
 
 namespace SupportToolsServer.Tests.Application.GitRepos;
 
@@ -35,6 +41,47 @@ public sealed class UpdateGitProjectCommandHandlerTests
         _gitsWorkFolder.Setup(f => f.Exists(ProjectPath)).Returns(true);
         _gitClient.Setup(c => c.GetRemoteOriginUrl(ProjectPath)).Returns(Address);
         _gitClient.Setup(c => c.HasChanges(ProjectPath)).Returns(false);
+    }
+
+    //Like the client's cache, a folder relative to the SPA project is kept in the Gits folder under the git's name
+    [Fact]
+    public async Task Handle_UsesTheGitNameAsTheFolderName_WhenTheFolderIsRelativeToTheSpaProject()
+    {
+        _gitsWorkFolder.Setup(f => f.GetProjectFolderPath("RepoA")).Returns(ProjectPath);
+        _gitsWorkFolder.Setup(f => f.Exists(ProjectPath)).Returns(false);
+        _gitClient.Setup(c => c.Clone(Address, ProjectPath)).Returns(Result.Success());
+        var handler = new UpdateGitProjectCommandHandler(_gitsWorkFolder.Object, _gitClient.Object);
+
+        Result result = await handler.Handle(
+            new UpdateGitProjectCommand("RepoA", Address, @"{SpaProjectFolderRelativePath}\src\carcass"),
+            CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        _gitsWorkFolder.Verify(f => f.GetProjectFolderPath("RepoA"), Times.Once);
+    }
+
+    //The real work folder: "." is the Gits folder itself and ".." the work folder around it. The strict git client
+    //has no setups, so any git command would throw
+    [Theory]
+    [InlineData(".", "Gits")]
+    [InlineData("..", "")]
+    public async Task Handle_NeitherDeletesNorClones_WhenTheFolderIsNotInsideTheGitsFolder(string folderName,
+        string existingFolder)
+    {
+        using var temp = new TempFolder();
+        string workFolder = temp.Combine("Work");
+        string existingFile = Path.Combine(workFolder, existingFolder, "existing.txt");
+        Directory.CreateDirectory(Path.GetDirectoryName(existingFile)!);
+        await File.WriteAllTextAsync(existingFile, "existing");
+        var gitsWorkFolder = new GitsWorkFolder(MsOptions.Create(new AppOptions { WorkFolder = workFolder }),
+            NullLogger<GitsWorkFolder>.Instance);
+        var handler = new UpdateGitProjectCommandHandler(gitsWorkFolder, _gitClient.Object);
+
+        Result result = await handler.Handle(new UpdateGitProjectCommand("RepoA", Address, folderName),
+            CancellationToken.None);
+
+        Assert.Equal(GitProjectsErrors.FolderIsOutsideGitsFolder(folderName), result.Error);
+        Assert.True(File.Exists(existingFile));
     }
 
     [Fact]

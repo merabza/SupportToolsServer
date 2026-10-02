@@ -1,5 +1,7 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SupportToolsServer.Application.Validation;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.SharedKernel;
 
@@ -25,7 +27,8 @@ public sealed class UpdateGitProjectCommandHandler : ICommandHandler<UpdateGitPr
 
     private Result UpdateGitProject(UpdateGitProjectCommand command)
     {
-        Result<string> projectFolderPathResult = _gitsWorkFolder.GetProjectFolderPath(command.GitProjectFolderName);
+        //Gits ფოლდერის გარეთ გასული გზა შეცდომაა, ამიტომ ასეთი ფოლდერი არც იშლება და არც იკლონება
+        Result<string> projectFolderPathResult = _gitsWorkFolder.GetProjectFolderPath(GitsFolderName(command));
         if (projectFolderPathResult.IsFailure)
         {
             return projectFolderPathResult.Error;
@@ -79,5 +82,15 @@ public sealed class UpdateGitProjectCommandHandler : ICommandHandler<UpdateGitPr
         }
 
         return needPullResult.Value ? _gitClient.Pull(projectFolderPath) : Result.Success();
+    }
+
+    //SPA-ის წინსართიანი ფოლდერი კლიენტში SPA პროექტის ფოლდერის მიმართ ითვლება. Gits-ში, როგორც კლიენტის ქეშში
+    //(GitRepos.Create, useGitRecordNameForComplexGitProjectFolderName), ასეთი რეპოზიტორია git-ის სახელით ინახება
+    private static string GitsFolderName(UpdateGitProjectCommand command)
+    {
+        return command.GitProjectFolderName.StartsWith(GitRules.SpaProjectFolderRelativePathName,
+            StringComparison.Ordinal)
+            ? command.GitProjectName
+            : command.GitProjectFolderName;
     }
 }

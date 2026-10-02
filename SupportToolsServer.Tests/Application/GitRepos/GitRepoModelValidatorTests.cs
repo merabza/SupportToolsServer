@@ -20,6 +20,21 @@ public sealed class GitRepoModelValidatorTests
         Assert.Equal(errorMessage, failure.ErrorMessage);
     }
 
+    //A valid git@ address of exactly the given length
+    private static string AddressOfLength(int length)
+    {
+        const string prefix = "git@github.com:test/";
+        const string suffix = ".git";
+        return prefix + new string('a', length - prefix.Length - suffix.Length) + suffix;
+    }
+
+    private static StsGitDataModel GitModelWithFolderName(string folderName)
+    {
+        StsGitDataModel model = TestData.GitModel("RepoA", "CSharp");
+        model.GitProjectFolderName = folderName;
+        return model;
+    }
+
     [Fact]
     public void Validate_AcceptsAFilledModel()
     {
@@ -32,7 +47,7 @@ public sealed class GitRepoModelValidatorTests
         var model = new StsGitDataModel
         {
             GitProjectName = new string('n', 50),
-            GitProjectAddress = new string('a', 256),
+            GitProjectAddress = AddressOfLength(256),
             GitProjectFolderName = new string('f', 100),
             GitIgnorePatternName = new string('p', 50)
         };
@@ -69,7 +84,7 @@ public sealed class GitRepoModelValidatorTests
     [Fact]
     public void Validate_RejectsATooLongAddress_NamingTheGit()
     {
-        StsGitDataModel model = TestData.GitModel("RepoA", "CSharp", new string('a', 257));
+        StsGitDataModel model = TestData.GitModel("RepoA", "CSharp", AddressOfLength(257));
 
         AssertSingleError(Validate(model), "ValueTooLong", "RepoA.GitProjectAddress Is Longer Than 256 Characters");
     }
@@ -106,6 +121,34 @@ public sealed class GitRepoModelValidatorTests
         StsGitDataModel model = TestData.GitModel("RepoA", new string('p', 51));
 
         AssertSingleError(Validate(model), "ValueTooLong", "RepoA.GitIgnorePatternName Is Longer Than 50 Characters");
+    }
+
+    //The folder and address forms are covered by GitRulesTests; these tests check that the rules apply here
+
+    [Fact]
+    public void Validate_AcceptsAFolderNameRelativeToTheSpaProject()
+    {
+        Assert.True(Validate(GitModelWithFolderName(@"{SpaProjectFolderRelativePath}\src\carcass")).IsValid);
+    }
+
+    [Fact]
+    public void Validate_RejectsAFolderNameThatIsNotARelativeFolderPath_NamingTheGit()
+    {
+        AssertSingleError(Validate(GitModelWithFolderName(@"..\..\x")), "InvalidGitFolderName",
+            "RepoA.GitProjectFolderName Is Not A Valid Relative Folder Path");
+    }
+
+    [Fact]
+    public void Validate_AcceptsAnSshUrlAddress()
+    {
+        Assert.True(Validate(TestData.GitModel("RepoA", "CSharp", "ssh://nas/volume1/GitServer/RepoA")).IsValid);
+    }
+
+    [Fact]
+    public void Validate_RejectsAnAddressThatIsNotAGitAddress_NamingTheGit()
+    {
+        AssertSingleError(Validate(TestData.GitModel("RepoA", "CSharp", "--upload-pack=x")), "InvalidGitAddress",
+            "RepoA.GitProjectAddress Is Not A Valid Git Address (git@host:path, ssh:// Or https://)");
     }
 
     [Fact]

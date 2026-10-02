@@ -49,14 +49,54 @@ public sealed class GitsWorkFolderTests : IDisposable
     }
 
     [Fact]
-    public void GetProjectFolderPath_ReplacesTheDirectorySeparatorsOfTheFolderNameWithDots()
+    public void GetProjectFolderPath_ReplacesBothSeparatorsOfTheFolderNameWithDots()
     {
         string workFolder = _temp.Combine("Work");
 
-        Result<string> result = Create(workFolder)
-            .GetProjectFolderPath($"Group{Path.DirectorySeparatorChar}Sub{Path.DirectorySeparatorChar}RepoA");
+        Result<string> result = Create(workFolder).GetProjectFolderPath(@"Group\Sub/RepoA");
 
         Assert.Equal(Path.Combine(workFolder, "Gits", "Group.Sub.RepoA"), result.Value);
+    }
+
+    //Flattened, "..\../x" stays inside the Gits folder as "......x"
+    [Fact]
+    public void GetProjectFolderPath_KeepsAFlattenedParentPathInsideTheGitsFolder()
+    {
+        string workFolder = _temp.Combine("Work");
+
+        Result<string> result = Create(workFolder).GetProjectFolderPath(@"..\../x");
+
+        Assert.Equal(Path.Combine(workFolder, "Gits", "......x"), result.Value);
+    }
+
+    //"." is the Gits folder itself and ".." the work folder around it
+    [Theory]
+    [InlineData(".")]
+    [InlineData("..")]
+    public void GetProjectFolderPath_RejectsAFolderThatIsNotInsideTheGitsFolder(string folderName)
+    {
+        Result<string> result = Create(_temp.Combine("Work")).GetProjectFolderPath(folderName);
+
+        Assert.Equal(GitProjectsErrors.FolderIsOutsideGitsFolder(folderName), result.Error);
+    }
+
+    //On Windows "C:" makes a drive-relative path, "a:" a path on drive A, and the trailing dots and spaces of the
+    //last segment are trimmed, so "..." and ".. " resolve to the Gits folder itself
+    [Theory]
+    [InlineData(@"C:\Windows")]
+    [InlineData("a:b")]
+    [InlineData("...")]
+    [InlineData(".. ")]
+    public void GetProjectFolderPath_RejectsAFolderThatWindowsResolvesOutsideTheGitsFolder(string folderName)
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        Result<string> result = Create(_temp.Combine("Work")).GetProjectFolderPath(folderName);
+
+        Assert.Equal(GitProjectsErrors.FolderIsOutsideGitsFolder(folderName), result.Error);
     }
 
     [Fact]

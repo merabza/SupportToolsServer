@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using SupportToolsServer.Infrastructure.GitProjects;
 using SupportToolsServer.Tests.TestInfrastructure;
@@ -211,6 +212,93 @@ public sealed class GitClientTests : IDisposable
 
         Assert.Contains(logger.Entries,
             e => e.Message.Contains("config --get remote.origin.url", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void GitCommands_LogTheCommandLineBeforeRunningIt()
+    {
+        var logger = new CollectingLogger<GitClient>();
+
+        new GitClient(logger).GetRemoteOriginUrl(_clone);
+
+        Assert.Contains(logger.Entries,
+            e => e.Level == LogLevel.Information &&
+                 e.Message == $"Running git -C {_clone} config --get remote.origin.url");
+    }
+
+    [Fact]
+    public void GitCommands_LogTheOutputOfASuccessfulCommand()
+    {
+        var logger = new CollectingLogger<GitClient>();
+
+        new GitClient(logger).GetRemoteOriginUrl(_clone);
+
+        Assert.Contains(logger.Entries,
+            e => e.Level == LogLevel.Information && e.Message.StartsWith(
+                $"Output for 'git -C {_clone} config --get remote.origin.url' is{Environment.NewLine}{_origin}",
+                StringComparison.Ordinal));
+    }
+
+    //git config writes nothing to stderr
+    [Fact]
+    public void GitCommands_DoNotLogAnEmptyErrorOutput()
+    {
+        var logger = new CollectingLogger<GitClient>();
+
+        new GitClient(logger).GetRemoteOriginUrl(_clone);
+
+        Assert.DoesNotContain(logger.Entries, e => e.Message.StartsWith("Error output", StringComparison.Ordinal));
+    }
+
+    //git clone reports "Cloning into ..." on stderr even when it succeeds
+    [Fact]
+    public void GitCommands_LogTheErrorOutputOfASuccessfulCommand()
+    {
+        var logger = new CollectingLogger<GitClient>();
+        string folder = _temp.Combine("logged clone");
+
+        Result result = new GitClient(logger).Clone(_origin, folder);
+
+        Assert.True(result.IsSuccess);
+        Assert.Contains(logger.Entries,
+            e => e.Level == LogLevel.Information && e.Message.StartsWith(
+                $"Error output for 'git clone -- {_origin} {folder}' is{Environment.NewLine}Cloning into",
+                StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void GitCommands_DescribeAFailureWithItsTrimmedErrorOutput()
+    {
+        Result<bool> result = _sut.HasChanges(_notARepository);
+
+        Assert.StartsWith(
+            $"RunProcessError: git -C {_notARepository} status --porcelain process was finished with errors. ExitCode=128{Environment.NewLine}fatal: not a git repository",
+            result.Error.Description, StringComparison.Ordinal);
+        Assert.False(char.IsWhiteSpace(result.Error.Description[^1]));
+    }
+
+    //Outside a repository "git config --get" fails with exit code 1 and writes nothing to stderr
+    [Fact]
+    public void GitCommands_DescribeAFailureWithoutErrorOutputByItsExitCode()
+    {
+        Result<string> result = _sut.GetRemoteOriginUrl(_notARepository);
+
+        Assert.Equal(
+            $"RunProcessError: git -C {_notARepository} config --get remote.origin.url process was finished with errors. ExitCode=1",
+            result.Error.Description);
+    }
+
+    [Fact]
+    public void GitCommands_LogAFailureAsAnError()
+    {
+        var logger = new CollectingLogger<GitClient>();
+
+        new GitClient(logger).HasChanges(_notARepository);
+
+        Assert.Contains(logger.Entries,
+            e => e.Level == LogLevel.Error && e.Message.StartsWith(
+                $"git -C {_notARepository} status --porcelain process was finished with errors. ExitCode=128",
+                StringComparison.Ordinal));
     }
 
     [Fact]

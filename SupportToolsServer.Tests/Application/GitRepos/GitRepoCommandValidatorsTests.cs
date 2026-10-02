@@ -45,6 +45,29 @@ public sealed class GitRepoCommandValidatorsTests
     }
 
     [Fact]
+    public void UpdateValidator_RejectsAFolderNameOutsideItsFolder()
+    {
+        StsGitDataModel model = TestData.GitModel("RepoA", "CSharp");
+        model.GitProjectFolderName = @"..\Other";
+
+        ValidationResult result = new UpdateGitRepoCommandValidator().Validate(new UpdateGitRepoCommand(model));
+
+        AssertSingleError(result, "InvalidGitFolderName",
+            "RepoA.GitProjectFolderName Is Not A Valid Relative Folder Path");
+    }
+
+    [Fact]
+    public void UpdateValidator_RejectsAnAddressThatIsNotAGitAddress()
+    {
+        var command = new UpdateGitRepoCommand(TestData.GitModel("RepoA", "CSharp", "--upload-pack=x"));
+
+        ValidationResult result = new UpdateGitRepoCommandValidator().Validate(command);
+
+        AssertSingleError(result, "InvalidGitAddress",
+            "RepoA.GitProjectAddress Is Not A Valid Git Address (git@host:path, ssh:// Or https://)");
+    }
+
+    [Fact]
     public void UploadValidator_AcceptsValidLists()
     {
         ValidationResult result = ValidateUpload([TestData.GitModel("RepoA", "CSharp")],
@@ -80,6 +103,28 @@ public sealed class GitRepoCommandValidatorsTests
         ValidationResult result = ValidateUpload([TestData.GitModel("RepoA", "CSharp"), invalid], []);
 
         AssertSingleError(result, "ValueRequired", "RepoB.GitProjectFolderName Is Required");
+    }
+
+    [Fact]
+    public void UploadValidator_RejectsAFolderNameOutsideItsFolder()
+    {
+        StsGitDataModel invalid = TestData.GitModel("RepoB", "CSharp");
+        invalid.GitProjectFolderName = @"C:\Windows";
+
+        ValidationResult result = ValidateUpload([TestData.GitModel("RepoA", "CSharp"), invalid], []);
+
+        AssertSingleError(result, "InvalidGitFolderName",
+            "RepoB.GitProjectFolderName Is Not A Valid Relative Folder Path");
+    }
+
+    [Fact]
+    public void UploadValidator_RejectsAnAddressThatIsNotAGitAddress()
+    {
+        ValidationResult result = ValidateUpload(
+            [TestData.GitModel("RepoA", "CSharp"), TestData.GitModel("RepoB", "CSharp", "ext::sh -c x")], []);
+
+        AssertSingleError(result, "InvalidGitAddress",
+            "RepoB.GitProjectAddress Is Not A Valid Git Address (git@host:path, ssh:// Or https://)");
     }
 
     [Fact]

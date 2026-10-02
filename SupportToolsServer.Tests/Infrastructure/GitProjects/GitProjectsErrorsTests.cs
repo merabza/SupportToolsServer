@@ -25,4 +25,14 @@ public sealed class GitProjectsErrorsTests
         Assert.Equal(@"Folder C:\Work does not exist and cannot be created", error.Description);
         Assert.Equal(ErrorType.Problem, error.Type);
     }
+
+    [Fact]
+    public void FolderIsOutsideGitsFolder_IsAProblemNamingTheFolder()
+    {
+        Error error = GitProjectsErrors.FolderIsOutsideGitsFolder("..");
+
+        Assert.Equal("FolderIsOutsideGitsFolder", error.Code);
+        Assert.Equal("Folder .. is not inside the Gits folder", error.Description);
+        Assert.Equal(ErrorType.Problem, error.Type);
+    }
 }
