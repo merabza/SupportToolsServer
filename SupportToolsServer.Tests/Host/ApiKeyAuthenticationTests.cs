@@ -129,6 +129,10 @@ public sealed class ApiKeyAuthenticationTests : IClassFixture<SupportToolsServer
     [InlineData("GET", "api/v1/git/editorconfigfiletypeslist")]
     [InlineData("POST", "api/v1/git/syncupeditorconfigfiletypes/true")]
     [InlineData("DELETE", "api/v1/git/deleteeditorconfigfiletype/default")]
+    [InlineData("GET", "api/v1/environments")]
+    [InlineData("GET", "api/v1/environments/Prod")]
+    [InlineData("POST", "api/v1/environments/update/Prod")]
+    [InlineData("DELETE", "api/v1/environments/delete/Prod?version=1")]
     [InlineData("POST", NegotiateRoute)]
     public async Task EveryProtectedRoute_ReturnsUnauthorized_WithoutApiKey(string method, string route)
     {

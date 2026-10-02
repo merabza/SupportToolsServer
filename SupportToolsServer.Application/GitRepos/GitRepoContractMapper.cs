@@ -13,7 +13,8 @@ internal static class GitRepoContractMapper
             GitProjectName = gitRepo.Name,
             GitProjectAddress = gitRepo.Address,
             GitProjectFolderName = gitRepo.FolderName,
-            GitIgnorePatternName = gitIgnorePatternName
+            GitIgnorePatternName = gitIgnorePatternName,
+            Version = gitRepo.Version
         };
     }
 }

@@ -182,7 +182,7 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [A2](tasks/A2-git-input-validation.md) | git-ის მონაცემების ვალიდაცია და git-ის უსაფრთხო გამოძახება სერვერზე | SupportToolsServer | — | M | ✅ |
 | [A3](tasks/A3-api-key-auth.md) | API key ავთენტიფიკაცია ყველა endpoint-ზე | SupportToolsServer | — | M | ✅ |
 | [A4](tasks/A4-client-integrity-fixes.md) | კლიენტის შეცდომები, რომლებიც სინქრონიზაციას გააფუჭებს | SupportTools | — | M | ✅ |
-| [B1](tasks/B1-registry-foundation-environments.md) | რეესტრის საფუძველი (`Version`, კონვენციები) და Environments | SupportToolsServer | A1, A3 | L | ⬜ |
+| [B1](tasks/B1-registry-foundation-environments.md) | რეესტრის საფუძველი (`Version`, კონვენციები) და Environments | SupportToolsServer | A1, A3 | L | ✅ |
 | [B2](tasks/B2-lookup-collections.md) | ცნობარები: Runtimes, NpmPackages, ReactAppTemplates, DotnetTools | SupportToolsServer | B1 | M | ⬜ |
 | [B3](tasks/B3-infrastructure-resources.md) | რესურსები: SmartSchemas, FileStorages, ApiClients, DatabaseServerConnections | SupportToolsServer | B1 | L | ⬜ |
 | [B4](tasks/B4-servers.md) | Servers | SupportToolsServer | B2, B3 | M | ⬜ |

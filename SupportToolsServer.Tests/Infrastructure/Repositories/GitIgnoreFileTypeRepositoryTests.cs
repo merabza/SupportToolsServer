@@ -79,18 +79,36 @@ public sealed class GitIgnoreFileTypeRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Update_StoresTheValuesOfANewInstanceWithTheSameId()
+    public async Task Update_StoresTheValuesOfANewInstanceWithTheSameIdAndTheNextVersion()
     {
         await using (SupportToolsServerDbContext context = _database.NewContext())
         {
             var repository = new GitIgnoreFileTypeRepository(context);
             await repository.GetAll(CancellationToken.None);
-            repository.Update(new GitIgnoreFileType(_cSharp.Id, "CSharp", "bin/\nobj/"));
+            repository.Update(new GitIgnoreFileType(_cSharp.Id, "CSharp", "bin/\nobj/", _cSharp.Version + 1));
             await context.SaveChangesAsync();
         }
 
         await using SupportToolsServerDbContext check = _database.NewContext();
-        Assert.Equal("bin/\nobj/", (await check.GitIgnoreFileTypes.SingleAsync(x => x.Name == "CSharp")).Content);
+        GitIgnoreFileType stored = await check.GitIgnoreFileTypes.SingleAsync(x => x.Name == "CSharp");
+        Assert.Equal("bin/\nobj/", stored.Content);
+        Assert.Equal(2, stored.Version);
+    }
+
+    //The new instance carries the stored version + 1; the update is based on the version before it
+    [Fact]
+    public async Task Update_IsRefusedOnSave_WhenTheStoredVersionIsNotThePreviousOne()
+    {
+        await using SupportToolsServerDbContext context = _database.NewContext();
+        new GitIgnoreFileTypeRepository(context).Update(new GitIgnoreFileType(_cSharp.Id, "CSharp", "obj/",
+            _cSharp.Version + 2));
+
+        await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => context.SaveChangesAsync());
+
+        await using SupportToolsServerDbContext check = _database.NewContext();
+        GitIgnoreFileType stored = await check.GitIgnoreFileTypes.SingleAsync(x => x.Name == "CSharp");
+        Assert.Equal("bin/", stored.Content);
+        Assert.Equal(1, stored.Version);
     }
 
     [Fact]

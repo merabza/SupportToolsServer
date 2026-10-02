@@ -66,19 +66,42 @@ public sealed class EditorConfigFileTypeRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Update_StoresTheValuesOfANewInstanceWithTheSameId()
+    public async Task Update_StoresTheValuesOfANewInstanceWithTheSameIdAndTheNextVersion()
     {
         await using (SupportToolsServerDbContext context = _database.NewContext())
         {
             var repository = new EditorConfigFileTypeRepository(context);
             await repository.GetAll(CancellationToken.None);
-            repository.Update(new EditorConfigFileType(_default.Id, "default", "root = true\n[*.cs]"));
+            repository.Update(new EditorConfigFileType(_default.Id, "default", "root = true\n[*.cs]",
+                _default.Version + 1));
             await context.SaveChangesAsync();
         }
 
         await using SupportToolsServerDbContext check = _database.NewContext();
-        Assert.Equal("root = true\n[*.cs]",
-            (await check.EditorConfigFileTypes.SingleAsync(x => x.Name == "default")).Content);
+        EditorConfigFileType stored = await check.EditorConfigFileTypes.SingleAsync(x => x.Name == "default");
+        Assert.Equal("root = true\n[*.cs]", stored.Content);
+        Assert.Equal(2, stored.Version);
+    }
+
+    //Two sync-ups that read the same version: the second one writes nothing
+    [Fact]
+    public async Task Update_IsRefusedOnSave_WhenTheTypeChangedAfterItWasRead()
+    {
+        await using (SupportToolsServerDbContext context = _database.NewContext())
+        {
+            new EditorConfigFileTypeRepository(context).Update(new EditorConfigFileType(_default.Id, "default",
+                "first", _default.Version + 1));
+            await context.SaveChangesAsync();
+        }
+
+        await using SupportToolsServerDbContext stale = _database.NewContext();
+        new EditorConfigFileTypeRepository(stale).Update(new EditorConfigFileType(_default.Id, "default", "second",
+            _default.Version + 1));
+
+        await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => stale.SaveChangesAsync());
+
+        await using SupportToolsServerDbContext check = _database.NewContext();
+        Assert.Equal("first", (await check.EditorConfigFileTypes.SingleAsync(x => x.Name == "default")).Content);
     }
 
     [Fact]

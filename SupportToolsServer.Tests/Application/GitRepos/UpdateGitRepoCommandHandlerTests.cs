@@ -65,7 +65,7 @@ public sealed class UpdateGitRepoCommandHandlerTests
         _gitRepos.Verify(
             r => r.Add(It.Is<GitRepo>(g =>
                 g.Name == "RepoA" && g.Address == TestData.AddressOf("RepoA") && g.FolderName == "RepoA" &&
-                g.GitIgnoreFileTypeId == _cSharp.Id)), Times.Once);
+                g.GitIgnoreFileTypeId == _cSharp.Id && g.Version == 1)), Times.Once);
         _gitRepos.Verify(r => r.Update(It.IsAny<GitRepo>()), Times.Never);
         _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -84,6 +84,20 @@ public sealed class UpdateGitRepoCommandHandlerTests
                 g.Id == stored.Id && g.Name == "RepoA" && g.Address == TestData.AddressOf("RepoA"))), Times.Once);
         _gitRepos.Verify(r => r.Add(It.IsAny<GitRepo>()), Times.Never);
         _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    //The old client sends no version, so the stored git is updated whatever its version is
+    [Fact]
+    public async Task Handle_IncrementsTheVersionOfTheStoredGit()
+    {
+        GitRepo stored = TestData.NewGitRepo("RepoA", _cSharp, null, 5);
+        GivenGitRepos(stored);
+
+        Result result = await Handle("RepoA", "CSharp");
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(6, stored.Version);
+        _gitRepos.Verify(r => r.Update(stored), Times.Once);
     }
 
     [Fact]

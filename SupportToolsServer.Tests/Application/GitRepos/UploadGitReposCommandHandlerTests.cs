@@ -66,16 +66,18 @@ public sealed class UploadGitReposCommandHandlerTests
         GitIgnoreFileType react = Assert.Single(_added);
         Assert.Equal("React", react.Name);
         Assert.Equal("nm/", react.Content);
+        Assert.Equal(1, react.Version);
         GitRepo gitRepo = Assert.Single(_addedGitRepos);
         Assert.Equal("RepoA", gitRepo.Name);
         Assert.Equal(TestData.AddressOf("RepoA"), gitRepo.Address);
         Assert.Equal("RepoA", gitRepo.FolderName);
         Assert.Equal(react.Id, gitRepo.GitIgnoreFileTypeId);
+        Assert.Equal(1, gitRepo.Version);
         _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task Handle_UpdatesTheStoredTypeOfTheSameNameKeepingItsId()
+    public async Task Handle_UpdatesTheStoredTypeOfTheSameNameKeepingItsIdWithTheNextVersion()
     {
         GivenGitRepos();
 
@@ -87,12 +89,13 @@ public sealed class UploadGitReposCommandHandlerTests
         Assert.Equal(_cSharp.Id, updated.Id);
         Assert.Equal("csharp", updated.Name);
         Assert.Equal("new", updated.Content);
+        Assert.Equal(2, updated.Version);
     }
 
     [Fact]
     public async Task Handle_UpdatesTheStoredGitOfTheSameNameKeepingItsId()
     {
-        GitRepo stored = TestData.NewGitRepo("repoa", _cSharp, "git@github.com:test/old.git");
+        GitRepo stored = TestData.NewGitRepo("repoa", _cSharp, "git@github.com:test/old.git", 2);
         GivenGitRepos(stored);
 
         Result result = await Handle([TestData.GitModel("RepoA", "CSharp")], []);
@@ -104,6 +107,7 @@ public sealed class UploadGitReposCommandHandlerTests
         Assert.Equal("RepoA", updated.Name);
         Assert.Equal(TestData.AddressOf("RepoA"), updated.Address);
         Assert.Equal(_cSharp.Id, updated.GitIgnoreFileTypeId);
+        Assert.Equal(3, updated.Version);
     }
 
     [Fact]

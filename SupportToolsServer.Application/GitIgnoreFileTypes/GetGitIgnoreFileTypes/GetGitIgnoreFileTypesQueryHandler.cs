@@ -28,7 +28,10 @@ public class
         List<StsGitIgnoreFileTypeDataModel> gitIgnoreFileTypeModels =
         [
             .. gitIgnoreFileTypes.OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase).Select(x =>
-                new StsGitIgnoreFileTypeDataModel { Id = x.Id.Value, Name = x.Name, Content = x.Content })
+                new StsGitIgnoreFileTypeDataModel
+                {
+                    Id = x.Id.Value, Name = x.Name, Content = x.Content, Version = x.Version
+                })
         ];
         return gitIgnoreFileTypeModels;
     }

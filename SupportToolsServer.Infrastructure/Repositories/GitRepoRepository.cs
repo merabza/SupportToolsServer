@@ -38,8 +38,9 @@ public class GitRepoRepository : IGitRepoRepository
         _dbContext.GitRepos.Add(crudEntity);
     }
 
+    //GitRepo.Update ვერსიას ზრდის, ამიტომ concurrency token-ის ორიგინალი წინა ვერსიაა
     public void Update(GitRepo crudEntity)
     {
-        _dbContext.GitRepos.Update(crudEntity);
+        _dbContext.GitRepos.Update(crudEntity).ExpectPreviousVersion();
     }
 }

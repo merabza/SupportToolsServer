@@ -16,4 +16,13 @@ internal static class TextRules
             .MaximumLength(maxLength).WithErrorCode(nameof(SupportToolsServerApiClientErrors.ValueTooLong))
             .WithMessage(x => SupportToolsServerApiClientErrors.ValueTooLong(valueName(x), maxLength).Description);
     }
+
+    //არასავალდებულო ტექსტური ველი: null და ცარიელი მნიშვნელობა დასაშვებია, სხვა მნიშვნელობა კი ბაზის სვეტის სიგრძეს
+    //არ უნდა აღემატებოდეს
+    public static IRuleBuilderOptions<T, string?> OptionalWithMaxLength<T>(this IRuleBuilder<T, string?> ruleBuilder,
+        Func<T, string> valueName, int maxLength)
+    {
+        return ruleBuilder.MaximumLength(maxLength).WithErrorCode(nameof(SupportToolsServerApiClientErrors.ValueTooLong))
+            .WithMessage(x => SupportToolsServerApiClientErrors.ValueTooLong(valueName(x), maxLength).Description);
+    }
 }

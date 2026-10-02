@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SupportToolsServer.Infrastructure.Repositories;
+using SupportToolsServerCore.Domain.DeploymentEnvironments;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
@@ -18,6 +19,7 @@ public static class SupportToolsServerRepositoriesDependencyInjection
         services.AddScoped<IGitIgnoreFileTypeRepository, GitIgnoreFileTypeRepository>();
         services.AddScoped<IGitRepoRepository, GitRepoRepository>();
         services.AddScoped<IEditorConfigFileTypeRepository, EditorConfigFileTypeRepository>();
+        services.AddScoped<IDeploymentEnvironmentRepository, DeploymentEnvironmentRepository>();
 
         debugLogger?.Information("{MethodName} Finished", nameof(AddSupportToolsServerRepositories));
 

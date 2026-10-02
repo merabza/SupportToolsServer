@@ -16,7 +16,7 @@ public sealed class SyncUpEditorConfigFileTypesCommandHandlerTests
 {
     private readonly List<EditorConfigFileType> _added = [];
     private readonly EditorConfigFileType _baGetter = TestData.NewEditorConfigFileType("BaGetter");
-    private readonly EditorConfigFileType _default = TestData.NewEditorConfigFileType("default", "old");
+    private readonly EditorConfigFileType _default = TestData.NewEditorConfigFileType("default", "old", 6);
     private readonly List<EditorConfigFileType> _deleted = [];
     private readonly Mock<IEditorConfigFileTypeRepository> _editorConfigFileTypes = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
@@ -54,8 +54,18 @@ public sealed class SyncUpEditorConfigFileTypesCommandHandlerTests
         _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    //Every uploaded type is written again, so the version of each stored one grows by one
     [Fact]
-    public async Task Handle_AddsANewNameWithANewServerId()
+    public async Task Handle_GivesTheUpdatedTypesTheNextVersion()
+    {
+        await Handle(true, TestData.EditorConfigModel("default", "new"), TestData.EditorConfigModel("BaGetter"));
+
+        Assert.Equal(7, Assert.Single(_updated, t => t.Id == _default.Id).Version);
+        Assert.Equal(2, Assert.Single(_updated, t => t.Id == _baGetter.Id).Version);
+    }
+
+    [Fact]
+    public async Task Handle_AddsANewNameWithANewServerIdAndTheFirstVersion()
     {
         Result result = await Handle(true, TestData.EditorConfigModel("React"));
 
@@ -65,6 +75,7 @@ public sealed class SyncUpEditorConfigFileTypesCommandHandlerTests
         Assert.Equal("root = true", added.Content);
         Assert.NotEqual(_default.Id, added.Id);
         Assert.NotEqual(_baGetter.Id, added.Id);
+        Assert.Equal(1, added.Version);
     }
 
     [Fact]

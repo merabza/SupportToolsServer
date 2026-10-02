@@ -85,13 +85,14 @@ public sealed class GitRepoRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Update_StoresTheValuesOfANewInstanceWithTheSameId()
+    public async Task Update_StoresTheValuesOfANewInstanceWithTheSameIdAndTheNextVersion()
     {
         await using (SupportToolsServerDbContext context = _database.NewContext())
         {
             var repository = new GitRepoRepository(context);
             await repository.GetAll(CancellationToken.None);
-            repository.Update(new GitRepo(_repoA.Id, "RepoA", "git@github.com:test/moved.git", "Moved", _react.Id));
+            repository.Update(new GitRepo(_repoA.Id, "RepoA", "git@github.com:test/moved.git", "Moved", _react.Id,
+                _repoA.Version + 1));
             await context.SaveChangesAsync();
         }
 
@@ -100,6 +101,65 @@ public sealed class GitRepoRepositoryTests : IAsyncLifetime
         Assert.Equal("git@github.com:test/moved.git", stored.Address);
         Assert.Equal("Moved", stored.FolderName);
         Assert.Equal(_react.Id, stored.GitIgnoreFileTypeId);
+        Assert.Equal(2, stored.Version);
+    }
+
+    [Fact]
+    public async Task Update_StoresTheDomainUpdateOfTheReadGitWithItsNewVersion()
+    {
+        await using (SupportToolsServerDbContext context = _database.NewContext())
+        {
+            var repository = new GitRepoRepository(context);
+            GitRepo read = (await repository.GetByName("RepoA", CancellationToken.None))!;
+            read.Update("RepoA", read.Address, "Moved", read.GitIgnoreFileTypeId);
+            repository.Update(read);
+            await context.SaveChangesAsync();
+        }
+
+        await using SupportToolsServerDbContext check = _database.NewContext();
+        GitRepo stored = await check.GitRepos.SingleAsync(x => x.Name == "RepoA");
+        Assert.Equal("Moved", stored.FolderName);
+        Assert.Equal(2, stored.Version);
+    }
+
+    //The version is the concurrency token: an update based on a version that is no longer stored writes nothing
+    [Fact]
+    public async Task Update_IsRefusedOnSave_WhenTheGitChangedAfterItWasRead()
+    {
+        await using SupportToolsServerDbContext first = _database.NewContext();
+        await using SupportToolsServerDbContext second = _database.NewContext();
+        GitRepo readFirst = (await new GitRepoRepository(first).GetByName("RepoA", CancellationToken.None))!;
+        GitRepo readSecond = (await new GitRepoRepository(second).GetByName("RepoA", CancellationToken.None))!;
+        readFirst.Update("RepoA", readFirst.Address, "First", readFirst.GitIgnoreFileTypeId);
+        new GitRepoRepository(first).Update(readFirst);
+        await first.SaveChangesAsync();
+        readSecond.Update("RepoA", readSecond.Address, "Second", readSecond.GitIgnoreFileTypeId);
+        new GitRepoRepository(second).Update(readSecond);
+
+        await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => second.SaveChangesAsync());
+
+        await using SupportToolsServerDbContext check = _database.NewContext();
+        GitRepo stored = await check.GitRepos.SingleAsync(x => x.Name == "RepoA");
+        Assert.Equal("First", stored.FolderName);
+        Assert.Equal(2, stored.Version);
+    }
+
+    [Fact]
+    public async Task Delete_IsRefusedOnSave_WhenTheGitChangedAfterItWasRead()
+    {
+        await using SupportToolsServerDbContext first = _database.NewContext();
+        await using SupportToolsServerDbContext second = _database.NewContext();
+        GitRepo readFirst = (await new GitRepoRepository(first).GetByName("RepoA", CancellationToken.None))!;
+        GitRepo readSecond = (await new GitRepoRepository(second).GetByName("RepoA", CancellationToken.None))!;
+        readFirst.Update("RepoA", readFirst.Address, "First", readFirst.GitIgnoreFileTypeId);
+        new GitRepoRepository(first).Update(readFirst);
+        await first.SaveChangesAsync();
+        new GitRepoRepository(second).Delete(readSecond);
+
+        await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => second.SaveChangesAsync());
+
+        await using SupportToolsServerDbContext check = _database.NewContext();
+        Assert.True(await check.GitRepos.AnyAsync(x => x.Name == "RepoA"));
     }
 
     [Fact]

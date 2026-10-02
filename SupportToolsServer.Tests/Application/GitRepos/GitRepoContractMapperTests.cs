@@ -13,7 +13,8 @@ public sealed class GitRepoContractMapperTests
     public void ToContractModel_CopiesTheGitAndTheGivenPatternName()
     {
         GitIgnoreFileType cSharp = TestData.NewGitIgnoreFileType("CSharp");
-        var gitRepo = new GitRepo(GitRepoId.CreateUnique(), "RepoA", "git@github.com:test/a.git", "FolderA", cSharp.Id);
+        var gitRepo = new GitRepo(GitRepoId.CreateUnique(), "RepoA", "git@github.com:test/a.git", "FolderA", cSharp.Id,
+            3);
 
         StsGitDataModel model = gitRepo.ToContractModel("CSharp");
 
@@ -21,5 +22,6 @@ public sealed class GitRepoContractMapperTests
         Assert.Equal("git@github.com:test/a.git", model.GitProjectAddress);
         Assert.Equal("FolderA", model.GitProjectFolderName);
         Assert.Equal("CSharp", model.GitIgnorePatternName);
+        Assert.Equal(3, model.Version);
     }
 }

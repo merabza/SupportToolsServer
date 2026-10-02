@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
+using SupportToolsServerCore.Domain.Primitives;
 using SupportToolsServerCore.Domain.Sync;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
@@ -29,11 +30,12 @@ public class SyncUpGitIgnoreFileTypesCommandHandler : ICommandHandler<SyncUpGitI
     public async Task<Result> Handle(SyncUpGitIgnoreFileTypesCommand request, CancellationToken cancellationToken)
     {
         //ატვირთული ჩანაწერი არსებულს სახელით ემთხვევა და სერვერის Id-ს ინარჩუნებს, რადგან git რეპოზიტორიები
-        //gitignore ფაილის ტიპს Id-ით მიმართავენ. კლიენტის მიერ გამოგზავნილი Id არ გამოიყენება
+        //gitignore ფაილის ტიპს Id-ით მიმართავენ. კლიენტის მიერ გამოგზავნილი Id არ გამოიყენება.
+        //არსებული ჩანაწერი ყოველთვის თავიდან იწერება, ამიტომ მისი ვერსია ერთით იზრდება
         List<GitIgnoreFileType> existingGitIgnoreFileTypes =
             await _gitIgnoreFileTypeRepository.GetAll(cancellationToken);
-        Dictionary<string, GitIgnoreFileTypeId> existingIds =
-            existingGitIgnoreFileTypes.ToDictionary(x => x.Name, x => x.Id, StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, GitIgnoreFileType> existingByName =
+            existingGitIgnoreFileTypes.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
 
         if (!request.Merge)
         {
@@ -51,8 +53,10 @@ public class SyncUpGitIgnoreFileTypesCommandHandler : ICommandHandler<SyncUpGitI
 
         var syncer = new Syncroniser<GitIgnoreFileType, GitIgnoreFileTypeId>(_gitIgnoreFileTypeRepository, [
             .. request.UploadGitIgnoreFileTypes.Select(s =>
-                new GitIgnoreFileType(existingIds.GetValueOrDefault(s.Name) ?? GitIgnoreFileTypeId.CreateUnique(),
-                    s.Name, s.Content))
+                existingByName.TryGetValue(s.Name, out GitIgnoreFileType? existing)
+                    ? new GitIgnoreFileType(existing.Id, s.Name, s.Content, existing.Version + 1)
+                    : new GitIgnoreFileType(GitIgnoreFileTypeId.CreateUnique(), s.Name, s.Content,
+                        EntityVersion.Initial))
         ]);
         await syncer.DoSyncUp(request.Merge, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

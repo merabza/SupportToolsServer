@@ -30,7 +30,7 @@ public sealed class GitRepoQueryHandlersTests
     public async Task GetGitRepos_ReturnsTheGitsInNameOrderWithTheirPatternNames()
     {
         _gitRepos.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync([
-            TestData.NewGitRepo("RepoC", _react), TestData.NewGitRepo("repoB", _cSharp),
+            TestData.NewGitRepo("RepoC", _react), TestData.NewGitRepo("repoB", _cSharp, null, 7),
             TestData.NewGitRepo("RepoA", _react)
         ]);
         var handler = new GetGitReposQueryHandler(_gitRepos.Object, _gitIgnoreFileTypes.Object);
@@ -40,6 +40,7 @@ public sealed class GitRepoQueryHandlersTests
         Assert.Equal(["RepoA", "repoB", "RepoC"], result.Value.Select(x => x.GitProjectName));
         Assert.Equal(["React", "CSharp", "React"], result.Value.Select(x => x.GitIgnorePatternName));
         Assert.Equal(TestData.AddressOf("RepoA"), result.Value[0].GitProjectAddress);
+        Assert.Equal([1, 7, 1], result.Value.Select(x => x.Version));
     }
 
     [Fact]
@@ -61,7 +62,7 @@ public sealed class GitRepoQueryHandlersTests
     public async Task GetGitRepoByKey_ReturnsTheGitWithItsPatternName()
     {
         _gitRepos.Setup(r => r.GetByName("RepoA", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(TestData.NewGitRepo("RepoA", _react));
+            .ReturnsAsync(TestData.NewGitRepo("RepoA", _react, null, 2));
         var handler = new GetGitRepoByKeyQueryHandler(_gitRepos.Object, _gitIgnoreFileTypes.Object);
 
         Result<StsGitDataModel> result =
@@ -69,5 +70,6 @@ public sealed class GitRepoQueryHandlersTests
 
         Assert.Equal("RepoA", result.Value.GitProjectName);
         Assert.Equal("React", result.Value.GitIgnorePatternName);
+        Assert.Equal(2, result.Value.Version);
     }
 }

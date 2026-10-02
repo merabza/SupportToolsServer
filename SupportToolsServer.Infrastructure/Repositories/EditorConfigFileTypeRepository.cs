@@ -33,8 +33,9 @@ public class EditorConfigFileTypeRepository : IEditorConfigFileTypeRepository
         _dbContext.EditorConfigFileTypes.Add(crudEntity);
     }
 
+    //ახალი ეგზემპლარი შენახული Version + 1-ით მოდის, ამიტომ concurrency token-ის ორიგინალი წინა ვერსიაა
     public void Update(EditorConfigFileType crudEntity)
     {
-        _dbContext.EditorConfigFileTypes.Update(crudEntity);
+        _dbContext.EditorConfigFileTypes.Update(crudEntity).ExpectPreviousVersion();
     }
 }

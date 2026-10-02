@@ -30,7 +30,7 @@ public class
         List<StsEditorConfigFileTypeDataModel> editorConfigFileTypeModels =
         [
             .. editorConfigFileTypes.OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase).Select(x =>
-                new StsEditorConfigFileTypeDataModel { Name = x.Name, Content = x.Content })
+                new StsEditorConfigFileTypeDataModel { Name = x.Name, Content = x.Content, Version = x.Version })
         ];
         return editorConfigFileTypeModels;
     }

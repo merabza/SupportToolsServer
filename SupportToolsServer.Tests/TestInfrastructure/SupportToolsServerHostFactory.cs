@@ -1,13 +1,17 @@
 using System.Collections.Generic;
+using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Moq;
 using Serilog;
+using SupportToolsServer.Application.Environments.GetEnvironmentByName;
 using SupportToolsServer.Application.GitRepos.GetGitRepos;
 using SupportToolsServerApiContracts.Models;
+using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.SharedKernel;
 
 namespace SupportToolsServer.Tests.TestInfrastructure;
@@ -16,7 +20,8 @@ namespace SupportToolsServer.Tests.TestInfrastructure;
 //The environment is Production, so the User Secrets of the developer are never read.
 //Program.cs reads the connection string and the Serilog section before Build, so they come as settings,
 //which WebApplicationFactory passes as command line arguments. The rest is read later and comes from an in-memory source.
-//The connection string is valid only in format: the handler of GET gitrepos is a stub, so no database is opened
+//The connection string is valid only in format: the handlers of GET gitrepos and GET environments/{key} are stubs,
+//so no database is opened. The second one returns the name it received, which shows how the route key was decoded
 public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Program>
 {
     public const string ValidApiKey = "valid-test-key";
@@ -50,7 +55,17 @@ public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Progra
             services.AddTransient<IStartupFilter, ClientAddressStartupFilter>();
             services.AddScoped(_ => HandlerMocks
                 .Query<GetGitReposQuery, List<StsGitDataModel>>(Result.Success(new List<StsGitDataModel>())).Object);
+            services.AddScoped(_ => EnvironmentNameEchoHandler());
         });
+    }
+
+    private static IQueryHandler<GetEnvironmentByNameQuery, StsEnvironmentDataModel> EnvironmentNameEchoHandler()
+    {
+        var handler = new Mock<IQueryHandler<GetEnvironmentByNameQuery, StsEnvironmentDataModel>>();
+        handler.Setup(h => h.Handle(It.IsAny<GetEnvironmentByNameQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GetEnvironmentByNameQuery query, CancellationToken _) =>
+                Result.Success(new StsEnvironmentDataModel { Name = query.Name }));
+        return handler.Object;
     }
 
     protected override void Dispose(bool disposing)

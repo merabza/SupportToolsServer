@@ -43,6 +43,26 @@ public sealed class TextRulesTests
         Assert.Equal("Owner.Value Is Longer Than 5 Characters", failure.ErrorMessage);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("abcde")]
+    public void OptionalWithMaxLength_AcceptsAMissingValueAndAValueUpToTheMaximum(string? value)
+    {
+        Assert.True(new OptionalSampleValidator().Validate(new Sample("Owner", value)).IsValid);
+    }
+
+    [Fact]
+    public void OptionalWithMaxLength_RejectsALongerValue()
+    {
+        ValidationFailure failure =
+            Assert.Single(new OptionalSampleValidator().Validate(new Sample("Owner", "abcdef")).Errors);
+
+        Assert.Equal("ValueTooLong", failure.ErrorCode);
+        Assert.Equal("Owner.Value Is Longer Than 5 Characters", failure.ErrorMessage);
+    }
+
     private sealed record Sample(string Owner, string? Value);
 
     private sealed class SampleValidator : AbstractValidator<Sample>
@@ -50,6 +70,14 @@ public sealed class TextRulesTests
         public SampleValidator()
         {
             RuleFor(x => x.Value!).RequiredWithMaxLength(x => $"{x.Owner}.Value", MaxLength);
+        }
+    }
+
+    private sealed class OptionalSampleValidator : AbstractValidator<Sample>
+    {
+        public OptionalSampleValidator()
+        {
+            RuleFor(x => x.Value).OptionalWithMaxLength(x => $"{x.Owner}.Value", MaxLength);
         }
     }
 }

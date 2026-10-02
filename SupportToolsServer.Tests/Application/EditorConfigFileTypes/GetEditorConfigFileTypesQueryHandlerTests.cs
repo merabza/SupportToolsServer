@@ -19,7 +19,7 @@ public sealed class GetEditorConfigFileTypesQueryHandlerTests
     {
         var editorConfigFileTypes = new Mock<IEditorConfigFileTypeRepository>();
         editorConfigFileTypes.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync([
-            TestData.NewEditorConfigFileType("React", "[*.ts]"), TestData.NewEditorConfigFileType("basic"),
+            TestData.NewEditorConfigFileType("React", "[*.ts]", 4), TestData.NewEditorConfigFileType("basic"),
             TestData.NewEditorConfigFileType("CSharp")
         ]);
         var handler = new GetEditorConfigFileTypesQueryHandler(editorConfigFileTypes.Object);
@@ -29,5 +29,6 @@ public sealed class GetEditorConfigFileTypesQueryHandlerTests
 
         Assert.Equal(["basic", "CSharp", "React"], result.Value.Select(x => x.Name));
         Assert.Equal("[*.ts]", result.Value[2].Content);
+        Assert.Equal([1, 1, 4], result.Value.Select(x => x.Version));
     }
 }

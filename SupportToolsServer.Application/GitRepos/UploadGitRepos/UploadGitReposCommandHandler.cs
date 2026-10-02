@@ -7,6 +7,7 @@ using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
+using SupportToolsServerCore.Domain.Primitives;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
@@ -72,7 +73,8 @@ public class UploadGitReposCommandHandler : ICommandHandler<UploadGitReposComman
         return Result.Success();
     }
 
-    //gitIgnoreFileTypesByName შედეგშიც ახლდება, რომ რეპოზიტორიებმა ახალი ტიპებიც იპოვონ
+    //gitIgnoreFileTypesByName შედეგშიც ახლდება, რომ რეპოზიტორიებმა ახალი ტიპებიც იპოვონ.
+    //არსებული ტიპი ყოველთვის თავიდან იწერება, ამიტომ მისი ვერსია ერთით იზრდება
     private static (List<GitIgnoreFileType> New, List<GitIgnoreFileType> Changed) MergeGitIgnoreFileTypes(
         Dictionary<string, GitIgnoreFileType> gitIgnoreFileTypesByName,
         List<StsGitIgnoreFileTypeDataModel> gitIgnoreFiles)
@@ -83,14 +85,15 @@ public class UploadGitReposCommandHandler : ICommandHandler<UploadGitReposComman
         {
             if (gitIgnoreFileTypesByName.TryGetValue(gitIgnoreFile.Name, out GitIgnoreFileType? existing))
             {
-                var changed = new GitIgnoreFileType(existing.Id, gitIgnoreFile.Name, gitIgnoreFile.Content);
+                var changed = new GitIgnoreFileType(existing.Id, gitIgnoreFile.Name, gitIgnoreFile.Content,
+                    existing.Version + 1);
                 changedGitIgnoreFileTypes.Add(changed);
                 gitIgnoreFileTypesByName[gitIgnoreFile.Name] = changed;
             }
             else
             {
                 var added = new GitIgnoreFileType(GitIgnoreFileTypeId.CreateUnique(), gitIgnoreFile.Name,
-                    gitIgnoreFile.Content);
+                    gitIgnoreFile.Content, EntityVersion.Initial);
                 newGitIgnoreFileTypes.Add(added);
                 gitIgnoreFileTypesByName[gitIgnoreFile.Name] = added;
             }

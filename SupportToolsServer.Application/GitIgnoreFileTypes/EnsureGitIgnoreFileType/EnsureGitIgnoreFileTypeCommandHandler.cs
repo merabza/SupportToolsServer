@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
+using SupportToolsServerCore.Domain.Primitives;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
@@ -28,7 +29,7 @@ public class EnsureGitIgnoreFileTypeCommandHandler : ICommandHandler<EnsureGitIg
         }
 
         _gitIgnoreFileTypeRepository.Add(new GitIgnoreFileType(GitIgnoreFileTypeId.CreateUnique(), command.Name,
-            string.Empty));
+            string.Empty, EntityVersion.Initial));
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }

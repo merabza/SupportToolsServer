@@ -39,8 +39,9 @@ public class GitIgnoreFileTypeRepository : IGitIgnoreFileTypeRepository
         _dbContext.GitIgnoreFileTypes.Add(crudEntity);
     }
 
+    //ახალი ეგზემპლარი შენახული Version + 1-ით მოდის, ამიტომ concurrency token-ის ორიგინალი წინა ვერსიაა
     public void Update(GitIgnoreFileType crudEntity)
     {
-        _dbContext.GitIgnoreFileTypes.Update(crudEntity);
+        _dbContext.GitIgnoreFileTypes.Update(crudEntity).ExpectPreviousVersion();
     }
 }

@@ -17,7 +17,7 @@ namespace SupportToolsServer.Tests.Application.GitIgnoreFileTypes;
 public sealed class SyncUpGitIgnoreFileTypesCommandHandlerTests
 {
     private readonly List<GitIgnoreFileType> _added = [];
-    private readonly GitIgnoreFileType _cSharp = TestData.NewGitIgnoreFileType("CSharp", "old");
+    private readonly GitIgnoreFileType _cSharp = TestData.NewGitIgnoreFileType("CSharp", "old", 3);
     private readonly List<GitIgnoreFileType> _deleted = [];
     private readonly Mock<IGitIgnoreFileTypeRepository> _gitIgnoreFileTypes = new();
     private readonly Mock<IGitRepoRepository> _gitRepos = new();
@@ -67,8 +67,20 @@ public sealed class SyncUpGitIgnoreFileTypesCommandHandlerTests
         _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    //Every uploaded type is written again, so the version of each stored one grows by one
     [Fact]
-    public async Task Handle_AddsANewNameWithAServerId()
+    public async Task Handle_GivesTheUpdatedTypesTheNextVersion()
+    {
+        GivenGitRepos();
+
+        await Handle(true, Uploaded("CSharp", "new"), Uploaded("React", "node_modules/"));
+
+        Assert.Equal(4, Assert.Single(_updated, t => t.Id == _cSharp.Id).Version);
+        Assert.Equal(2, Assert.Single(_updated, t => t.Id == _react.Id).Version);
+    }
+
+    [Fact]
+    public async Task Handle_AddsANewNameWithAServerIdAndTheFirstVersion()
     {
         GivenGitRepos();
         StsGitIgnoreFileTypeDataModel python = Uploaded("Python", "venv/");
@@ -79,6 +91,7 @@ public sealed class SyncUpGitIgnoreFileTypesCommandHandlerTests
         GitIgnoreFileType added = Assert.Single(_added);
         Assert.Equal("Python", added.Name);
         Assert.NotEqual(python.Id, added.Id.Value);
+        Assert.Equal(1, added.Version);
     }
 
     [Fact]

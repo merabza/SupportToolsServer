@@ -27,7 +27,7 @@ public sealed class GitIgnoreFileTypeHandlersTests
     public async Task GetGitIgnoreFileTypes_ReturnsTheTypesInNameOrder()
     {
         _gitIgnoreFileTypes.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync([
-            TestData.NewGitIgnoreFileType("React", "nm/"), TestData.NewGitIgnoreFileType("basic"), _cSharp
+            TestData.NewGitIgnoreFileType("React", "nm/", 3), TestData.NewGitIgnoreFileType("basic"), _cSharp
         ]);
         var handler = new GetGitIgnoreFileTypesQueryHandler(_gitIgnoreFileTypes.Object);
 
@@ -37,6 +37,7 @@ public sealed class GitIgnoreFileTypeHandlersTests
         Assert.Equal(["basic", "CSharp", "React"], result.Value.Select(x => x.Name));
         Assert.Equal(_cSharp.Id.Value, result.Value[1].Id);
         Assert.Equal("nm/", result.Value[2].Content);
+        Assert.Equal([1, 1, 3], result.Value.Select(x => x.Version));
     }
 
     [Fact]
@@ -62,7 +63,8 @@ public sealed class GitIgnoreFileTypeHandlersTests
         Result result = await handler.Handle(new EnsureGitIgnoreFileTypeCommand("Python"), CancellationToken.None);
 
         Assert.True(result.IsSuccess);
-        _gitIgnoreFileTypes.Verify(r => r.Add(It.Is<GitIgnoreFileType>(t => t.Name == "Python" && t.Content == "")),
+        _gitIgnoreFileTypes.Verify(
+            r => r.Add(It.Is<GitIgnoreFileType>(t => t.Name == "Python" && t.Content == "" && t.Version == 1)),
             Times.Once);
         _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
