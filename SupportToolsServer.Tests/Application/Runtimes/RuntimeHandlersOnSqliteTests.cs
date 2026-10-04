@@ -16,7 +16,8 @@ using Xunit;
 namespace SupportToolsServer.Tests.Application.Runtimes;
 
 //The handlers with the real repository and unit of work on SQLite, one context per request as in the host.
-//The concurrent requests prove that the version check also holds between the read and the save of a handler
+//The concurrent requests prove that the version check also holds between the read and the save of a handler.
+//The servers that use a Runtime are in ServerHandlersOnSqliteTests
 public sealed class RuntimeHandlersOnSqliteTests : IAsyncLifetime
 {
     private SupportToolsServerSqliteDatabase _database = null!;
@@ -44,7 +45,7 @@ public sealed class RuntimeHandlersOnSqliteTests : IAsyncLifetime
     private async Task<Result> Delete(string name, int? version, Func<Task>? concurrentChange = null)
     {
         await using SupportToolsServerDbContext context = _database.NewContext();
-        var handler = new DeleteRuntimeCommandHandler(new RuntimeRepository(context),
+        var handler = new DeleteRuntimeCommandHandler(new RuntimeRepository(context), new ServerRepository(context),
             UnitOfWork(context, concurrentChange));
         return await handler.Handle(new DeleteRuntimeCommand(name, version), CancellationToken.None);
     }

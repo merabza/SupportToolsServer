@@ -185,7 +185,7 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [B1](tasks/B1-registry-foundation-environments.md) | რეესტრის საფუძველი (`Version`, კონვენციები) და Environments | SupportToolsServer | A1, A3 | L | ✅ |
 | [B2](tasks/B2-lookup-collections.md) | ცნობარები: Runtimes, NpmPackages, ReactAppTemplates, DotnetTools | SupportToolsServer | B1 | M | ✅ |
 | [B3](tasks/B3-infrastructure-resources.md) | რესურსები: SmartSchemas, FileStorages, ApiClients, DatabaseServerConnections | SupportToolsServer | B1 | L | ✅ |
-| [B4](tasks/B4-servers.md) | Servers | SupportToolsServer | B2, B3 | M | ⬜ |
+| [B4](tasks/B4-servers.md) | Servers | SupportToolsServer | B2, B3 | M | ✅ |
 | [B5](tasks/B5-settings-and-templates.md) | გლობალური პარამეტრები, პროექტის შემქმნელის პარამეტრები, შაბლონები | SupportToolsServer | B4 | M | ⬜ |
 | [B6](tasks/B6-projects.md) | Projects-ის აგრეგატი | SupportToolsServer | B2, B3 | XL | ⬜ |
 | [B7](tasks/B7-server-infos.md) | ServerInfo-ები Project-ის აგრეგატში | SupportToolsServer | B4, B6 | L | ⬜ |

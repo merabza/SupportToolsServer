@@ -178,6 +178,28 @@ public sealed class ApiClientRepositoryTests : IAsyncLifetime
         Assert.NotNull(await Stored("Pc1.WebAgent"));
     }
 
+    //Both web agent foreign keys of the servers are Restrict
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Delete_IsRefusedOnSave_WhenAServerUsesTheApiClient(bool asInstaller)
+    {
+        await using (SupportToolsServerDbContext setup = _database.NewContext())
+        {
+            setup.Servers.Add(asInstaller
+                ? TestData.NewServer("dl360", webAgentInstaller: _pc1)
+                : TestData.NewServer("dl360", _pc1));
+            await setup.SaveChangesAsync();
+        }
+
+        await using SupportToolsServerDbContext context = _database.NewContext();
+        new ApiClientRepository(context).Delete(await Read(context, "Pc1.WebAgent"));
+
+        await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
+
+        Assert.NotNull(await Stored("Pc1.WebAgent"));
+    }
+
     [Fact]
     public async Task Delete_IsRefusedOnSave_WhenTheApiClientChangedAfterItWasRead()
     {

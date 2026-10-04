@@ -70,7 +70,8 @@ public sealed class DatabaseServerConnectionHandlersOnSqliteTests : IAsyncLifeti
     {
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteApiClientCommandHandler(new ApiClientRepository(context),
-            new DatabaseServerConnectionRepository(context), new SupportToolsServerUnitOfWork(context));
+            new DatabaseServerConnectionRepository(context), new ServerRepository(context),
+            new SupportToolsServerUnitOfWork(context));
         return await handler.Handle(new DeleteApiClientCommand(name, version), CancellationToken.None);
     }
 

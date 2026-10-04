@@ -5,6 +5,7 @@ using Moq;
 using SupportToolsServer.Application.Runtimes.DeleteRuntime;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerCore.Domain.Runtimes;
+using SupportToolsServerCore.Domain.Servers;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -15,11 +16,17 @@ public sealed class DeleteRuntimeCommandHandlerTests
 {
     private readonly Runtime _runtime = TestData.NewRuntime("win-x64", "Windows x64", 3);
     private readonly Mock<IRuntimeRepository> _runtimes = new();
+    private readonly Mock<IServerRepository> _servers = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
+
+    public DeleteRuntimeCommandHandlerTests()
+    {
+        _servers.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync([]);
+    }
 
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
-        var handler = new DeleteRuntimeCommandHandler(_runtimes.Object, _unitOfWork.Object);
+        var handler = new DeleteRuntimeCommandHandler(_runtimes.Object, _servers.Object, _unitOfWork.Object);
         return handler.Handle(new DeleteRuntimeCommand(name, version), cancellationToken);
     }
 
@@ -42,17 +49,41 @@ public sealed class DeleteRuntimeCommandHandlerTests
         VerifyNothingDeleted();
     }
 
+    //A server without a runtime and one with another runtime do not use it
     [Fact]
-    public async Task Handle_DeletesTheRecord_WhenTheExpectedVersionIsStored()
+    public async Task Handle_DeletesTheRecord_WhenTheExpectedVersionIsStoredAndNoServerUsesIt()
     {
         _runtimes.Setup(r => r.GetByName("WIN-X64", It.IsAny<CancellationToken>())).ReturnsAsync(_runtime);
+        _servers.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync([
+            TestData.NewServer("PAZISI"), TestData.NewServer("dl360", runtime: TestData.NewRuntime("linux-x64"))
+        ]);
         using var cancellation = new CancellationTokenSource();
 
         Result result = await Handle("WIN-X64", 3, cancellation.Token);
 
         Assert.True(result.IsSuccess);
         _runtimes.Verify(r => r.Delete(_runtime), Times.Once);
+        _servers.Verify(r => r.GetAll(cancellation.Token), Times.Once);
         _unitOfWork.Verify(u => u.SaveChangesAsync(cancellation.Token), Times.Once);
+    }
+
+    //The users are named by their type and name, in name order
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheServersThatUseIt()
+    {
+        _runtimes.Setup(r => r.GetByName("win-x64", It.IsAny<CancellationToken>())).ReturnsAsync(_runtime);
+        _servers.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync([
+            TestData.NewServer("PAZISI", runtime: _runtime),
+            TestData.NewServer("dl360", runtime: TestData.NewRuntime("linux-x64")),
+            TestData.NewServer("bee", runtime: _runtime)
+        ]);
+
+        Result result = await Handle("win-x64", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(ErrorType.Conflict, result.Error.Type);
+        Assert.Equal("Runtime win-x64 Is Used By: Server bee, Server PAZISI", result.Error.Description);
+        VerifyNothingDeleted();
     }
 
     [Theory]

@@ -158,6 +158,25 @@ public sealed class RuntimeRepositoryTests : IAsyncLifetime
         Assert.Equal(["linux-x64"], await check.Runtimes.Select(x => x.Name).ToListAsync());
     }
 
+    //The foreign key of the servers is Restrict: the database keeps a Runtime that a server uses, even if the handler's
+    //check missed it
+    [Fact]
+    public async Task Delete_IsRefusedOnSave_WhenAServerUsesTheRuntime()
+    {
+        await using (SupportToolsServerDbContext setup = _database.NewContext())
+        {
+            setup.Servers.Add(TestData.NewServer("PAZISI", runtime: _runtime));
+            await setup.SaveChangesAsync();
+        }
+
+        await using SupportToolsServerDbContext context = _database.NewContext();
+        new RuntimeRepository(context).Delete(await Read(context, "win-x64"));
+
+        await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
+
+        Assert.NotNull(await Stored("win-x64"));
+    }
+
     [Fact]
     public async Task Delete_IsRefusedOnSave_WhenTheRuntimeChangedAfterItWasRead()
     {

@@ -13,6 +13,7 @@ using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.Primitives;
 using SupportToolsServerCore.Domain.ReactAppTemplates;
 using SupportToolsServerCore.Domain.Runtimes;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.SmartSchemas;
 
 namespace SupportToolsServer.Tests.TestInfrastructure;
@@ -124,6 +125,31 @@ internal static class TestData
                     Name = x, Backup = $@"D:\{x}\Bak", Data = $@"D:\{x}\Data", DataLog = $@"D:\{x}\Log"
                 })
             ],
+            Version = version
+        };
+    }
+
+    public static Server NewServer(string name, ApiClient? webAgent = null, ApiClient? webAgentInstaller = null,
+        Runtime? runtime = null, int version = EntityVersion.Initial)
+    {
+        return new Server(ServerId.CreateUnique(), name, webAgent?.Id, webAgentInstaller?.Id, "deployer", "deployers",
+            runtime?.Id, "/home/deployer/Download", "/opt/apps", version);
+    }
+
+    //version is the expected version of an upsert: 0 creates the record
+    public static StsServerDataModel ServerModel(string name, string? webAgentName = null,
+        string? webAgentInstallerName = null, string? runtime = null, int version = 0)
+    {
+        return new StsServerDataModel
+        {
+            Name = name,
+            WebAgentName = webAgentName,
+            WebAgentInstallerName = webAgentInstallerName,
+            FilesUserName = "deployer",
+            FilesUsersGroupName = "deployers",
+            Runtime = runtime,
+            ServerSideDownloadFolder = "/home/deployer/Download",
+            ServerSideDeployFolder = "/opt/apps",
             Version = version
         };
     }

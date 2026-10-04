@@ -17,7 +17,8 @@ namespace SupportToolsServer.Tests.Application.ApiClients;
 
 //The handlers with the real repositories and unit of work on SQLite, one context per request as in the host.
 //The concurrent requests prove that the version check also holds between the read and the save of a handler.
-//The connections that use an ApiClient are in DatabaseServerConnectionHandlersOnSqliteTests
+//The connections and the servers that use an ApiClient are in DatabaseServerConnectionHandlersOnSqliteTests and
+//ServerHandlersOnSqliteTests
 public sealed class ApiClientHandlersOnSqliteTests : IAsyncLifetime
 {
     private SupportToolsServerSqliteDatabase _database = null!;
@@ -46,7 +47,8 @@ public sealed class ApiClientHandlersOnSqliteTests : IAsyncLifetime
     {
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteApiClientCommandHandler(new ApiClientRepository(context),
-            new DatabaseServerConnectionRepository(context), UnitOfWork(context, concurrentChange));
+            new DatabaseServerConnectionRepository(context), new ServerRepository(context),
+            UnitOfWork(context, concurrentChange));
         return await handler.Handle(new DeleteApiClientCommand(name, version), CancellationToken.None);
     }
 

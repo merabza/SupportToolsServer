@@ -12,6 +12,7 @@ using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.ReactAppTemplates;
 using SupportToolsServerCore.Domain.Runtimes;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.SmartSchemas;
 
 namespace SupportToolsServer.Infrastructure.DependencyInjection;
@@ -36,6 +37,7 @@ public static class SupportToolsServerRepositoriesDependencyInjection
         services.AddScoped<IFileStorageRepository, FileStorageRepository>();
         services.AddScoped<IApiClientRepository, ApiClientRepository>();
         services.AddScoped<IDatabaseServerConnectionRepository, DatabaseServerConnectionRepository>();
+        services.AddScoped<IServerRepository, ServerRepository>();
 
         debugLogger?.Information("{MethodName} Finished", nameof(AddSupportToolsServerRepositories));
 

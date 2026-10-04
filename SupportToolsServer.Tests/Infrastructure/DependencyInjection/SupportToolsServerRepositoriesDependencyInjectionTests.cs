@@ -14,6 +14,7 @@ using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.ReactAppTemplates;
 using SupportToolsServerCore.Domain.Runtimes;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.SmartSchemas;
 using Xunit;
 
@@ -67,6 +68,9 @@ public sealed class SupportToolsServerRepositoriesDependencyInjectionTests
         Assert.Contains(services,
             d => d.ServiceType == typeof(IDatabaseServerConnectionRepository) &&
                  d.ImplementationType == typeof(DatabaseServerConnectionRepository) &&
+                 d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IServerRepository) && d.ImplementationType == typeof(ServerRepository) &&
                  d.Lifetime == ServiceLifetime.Scoped);
     }
 
