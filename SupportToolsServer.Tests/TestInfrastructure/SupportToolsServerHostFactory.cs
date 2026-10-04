@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using Serilog;
+using SupportToolsServer.Application.ApiClients.GetApiClientByName;
 using SupportToolsServer.Application.Environments.GetEnvironmentByName;
 using SupportToolsServer.Application.GitRepos.GetGitRepos;
 using SupportToolsServer.Application.NpmPackages.GetNpmPackageByName;
@@ -23,9 +24,9 @@ namespace SupportToolsServer.Tests.TestInfrastructure;
 //which WebApplicationFactory passes as command line arguments. The rest is read later and comes from an in-memory source.
 //The factory passes the parent keys of a setting as well, with empty values: Serilog takes the empty
 //Serilog:WriteTo:1 for a sink without a name and skips it, so the test hosts write no log file (only to the console).
-//The connection string is valid only in format: the handlers of GET gitrepos, GET environments/{key} and
-//GET npmpackages/{key} are stubs, so no database is opened. The last two return the name they received, which shows
-//how the route key was decoded
+//The connection string is valid only in format: the handlers of GET gitrepos, GET environments/{key},
+//GET npmpackages/{key} and GET apiclients/{key} are stubs, so no database is opened. The last three return the name
+//they received, which shows how the route key was decoded
 public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Program>
 {
     public const string ValidApiKey = "valid-test-key";
@@ -61,7 +62,17 @@ public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Progra
                 .Query<GetGitReposQuery, List<StsGitDataModel>>(Result.Success(new List<StsGitDataModel>())).Object);
             services.AddScoped(_ => EnvironmentNameEchoHandler());
             services.AddScoped(_ => NpmPackageNameEchoHandler());
+            services.AddScoped(_ => ApiClientNameEchoHandler());
         });
+    }
+
+    private static IQueryHandler<GetApiClientByNameQuery, StsApiClientDataModel> ApiClientNameEchoHandler()
+    {
+        var handler = new Mock<IQueryHandler<GetApiClientByNameQuery, StsApiClientDataModel>>();
+        handler.Setup(h => h.Handle(It.IsAny<GetApiClientByNameQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GetApiClientByNameQuery query, CancellationToken _) =>
+                Result.Success(new StsApiClientDataModel { Name = query.Name }));
+        return handler.Object;
     }
 
     private static IQueryHandler<GetEnvironmentByNameQuery, StsEnvironmentDataModel> EnvironmentNameEchoHandler()

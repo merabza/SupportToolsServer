@@ -3,14 +3,18 @@ using Moq;
 using Serilog;
 using SupportToolsServer.Infrastructure.DependencyInjection;
 using SupportToolsServer.Infrastructure.Repositories;
+using SupportToolsServerCore.Domain.ApiClients;
+using SupportToolsServerCore.Domain.DatabaseServerConnections;
 using SupportToolsServerCore.Domain.DeploymentEnvironments;
 using SupportToolsServerCore.Domain.DotnetTools;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
+using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.ReactAppTemplates;
 using SupportToolsServerCore.Domain.Runtimes;
+using SupportToolsServerCore.Domain.SmartSchemas;
 using Xunit;
 
 namespace SupportToolsServer.Tests.Infrastructure.DependencyInjection;
@@ -51,6 +55,19 @@ public sealed class SupportToolsServerRepositoriesDependencyInjectionTests
         Assert.Contains(services,
             d => d.ServiceType == typeof(IDotnetToolRepository) &&
                  d.ImplementationType == typeof(DotnetToolRepository) && d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(ISmartSchemaRepository) &&
+                 d.ImplementationType == typeof(SmartSchemaRepository) && d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IFileStorageRepository) &&
+                 d.ImplementationType == typeof(FileStorageRepository) && d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IApiClientRepository) &&
+                 d.ImplementationType == typeof(ApiClientRepository) && d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IDatabaseServerConnectionRepository) &&
+                 d.ImplementationType == typeof(DatabaseServerConnectionRepository) &&
+                 d.Lifetime == ServiceLifetime.Scoped);
     }
 
     [Fact]

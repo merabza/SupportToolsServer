@@ -18,6 +18,10 @@ public static class SupportToolsServerApiDependencyInjection
         endpoints.UseNpmPackagesEndpoints(debugLogger);
         endpoints.UseReactAppTemplatesEndpoints(debugLogger);
         endpoints.UseDotnetToolsEndpoints(debugLogger);
+        endpoints.UseSmartSchemasEndpoints(debugLogger);
+        endpoints.UseFileStoragesEndpoints(debugLogger);
+        endpoints.UseApiClientsEndpoints(debugLogger);
+        endpoints.UseDatabaseServerConnectionsEndpoints(debugLogger);
 
         debugLogger?.Information("{MethodName} Finished", nameof(UseSupportToolsServerApi));
 
