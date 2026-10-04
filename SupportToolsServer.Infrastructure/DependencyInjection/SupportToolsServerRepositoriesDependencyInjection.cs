@@ -2,9 +2,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SupportToolsServer.Infrastructure.Repositories;
 using SupportToolsServerCore.Domain.DeploymentEnvironments;
+using SupportToolsServerCore.Domain.DotnetTools;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
+using SupportToolsServerCore.Domain.NpmPackages;
+using SupportToolsServerCore.Domain.ReactAppTemplates;
+using SupportToolsServerCore.Domain.Runtimes;
 
 namespace SupportToolsServer.Infrastructure.DependencyInjection;
 
@@ -20,6 +24,10 @@ public static class SupportToolsServerRepositoriesDependencyInjection
         services.AddScoped<IGitRepoRepository, GitRepoRepository>();
         services.AddScoped<IEditorConfigFileTypeRepository, EditorConfigFileTypeRepository>();
         services.AddScoped<IDeploymentEnvironmentRepository, DeploymentEnvironmentRepository>();
+        services.AddScoped<IRuntimeRepository, RuntimeRepository>();
+        services.AddScoped<INpmPackageRepository, NpmPackageRepository>();
+        services.AddScoped<IReactAppTemplateRepository, ReactAppTemplateRepository>();
+        services.AddScoped<IDotnetToolRepository, DotnetToolRepository>();
 
         debugLogger?.Information("{MethodName} Finished", nameof(AddSupportToolsServerRepositories));
 

@@ -27,8 +27,8 @@ public sealed class UpdateEnvironmentCommandHandler : ICommandHandler<UpdateEnvi
 
         //Version 0 — შექმნა, N — განახლება მხოლოდ მაშინ, თუ შენახული ვერსია N-ია
         DeploymentEnvironment? stored = await _environmentRepository.GetByName(model.Name, cancellationToken);
-        Result versionResult =
-            RecordVersions.Check(EnvironmentContractMapper.EntityName, model.Name, model.Version, stored?.Version);
+        Result versionResult = RecordVersions.Check(EnvironmentContractMapper.EntityName, model.Name, model.Version,
+            stored?.Version);
         if (versionResult.IsFailure)
         {
             return versionResult.Error;
@@ -48,8 +48,8 @@ public sealed class UpdateEnvironmentCommandHandler : ICommandHandler<UpdateEnvi
         }
 
         Result saveResult = await RecordVersions.SaveChanges(_unitOfWork, EnvironmentContractMapper.EntityName,
-            model.Name, model.Version,
-            async ct => (await _environmentRepository.GetByName(model.Name, ct))?.Version, cancellationToken);
+            model.Name, model.Version, async ct => (await _environmentRepository.GetByName(model.Name, ct))?.Version,
+            cancellationToken);
         if (saveResult.IsFailure)
         {
             return saveResult.Error;

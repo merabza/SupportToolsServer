@@ -17,14 +17,21 @@ public sealed class SupportToolsServerApiDependencyInjectionTests
 
         Assert.True(mapped);
         Assert.Equal([
-            "DELETE api/v1/environments/delete/{key}", "DELETE api/v1/git/deleteeditorconfigfiletype/{key}",
-            "DELETE api/v1/git/deletegitignorefiletype/{key}", "DELETE api/v1/git/deletegitrepo/{key}",
-            "GET api/v1/environments", "GET api/v1/environments/{key}",
-            "GET api/v1/git/editorconfigfiletypeslist", "GET api/v1/git/gitignorefiletypeslist",
-            "GET api/v1/git/gitrepo/{key}", "GET api/v1/git/gitrepos", "POST api/v1/environments/update/{key}",
+            "DELETE api/v1/dotnettools/delete/{key}", "DELETE api/v1/environments/delete/{key}",
+            "DELETE api/v1/git/deleteeditorconfigfiletype/{key}", "DELETE api/v1/git/deletegitignorefiletype/{key}",
+            "DELETE api/v1/git/deletegitrepo/{key}", "DELETE api/v1/npmpackages/delete/{key}",
+            "DELETE api/v1/reactapptemplates/delete/{key}", "DELETE api/v1/runtimes/delete/{key}",
+            "GET api/v1/dotnettools", "GET api/v1/dotnettools/{key}", "GET api/v1/environments",
+            "GET api/v1/environments/{key}", "GET api/v1/git/editorconfigfiletypeslist",
+            "GET api/v1/git/gitignorefiletypeslist", "GET api/v1/git/gitrepo/{key}", "GET api/v1/git/gitrepos",
+            "GET api/v1/npmpackages", "GET api/v1/npmpackages/{key}", "GET api/v1/reactapptemplates",
+            "GET api/v1/reactapptemplates/{key}", "GET api/v1/runtimes", "GET api/v1/runtimes/{key}",
+            "POST api/v1/dotnettools/update/{key}", "POST api/v1/environments/update/{key}",
             "POST api/v1/git/syncupeditorconfigfiletypes/{merge?}",
             "POST api/v1/git/syncupgitignorefiletypes/{merge?}", "POST api/v1/git/updategitignorefiletype/{key}",
-            "POST api/v1/git/updategitrepo/{key}", "POST api/v1/git/uploadgitrepos"
+            "POST api/v1/git/updategitrepo/{key}", "POST api/v1/git/uploadgitrepos",
+            "POST api/v1/npmpackages/update/{key}", "POST api/v1/reactapptemplates/update/{key}",
+            "POST api/v1/runtimes/update/{key}"
         ], routes);
     }
 
@@ -41,5 +48,9 @@ public sealed class SupportToolsServerApiDependencyInjectionTests
         logger.Verify(l => l.Information("{MethodName} Started", "UseGitReposEndpoints"), Times.Once);
         logger.Verify(l => l.Information("{MethodName} Started", "UseEditorConfigFileTypesEndpoints"), Times.Once);
         logger.Verify(l => l.Information("{MethodName} Started", "UseEnvironmentsEndpoints"), Times.Once);
+        logger.Verify(l => l.Information("{MethodName} Started", "UseRuntimesEndpoints"), Times.Once);
+        logger.Verify(l => l.Information("{MethodName} Started", "UseNpmPackagesEndpoints"), Times.Once);
+        logger.Verify(l => l.Information("{MethodName} Started", "UseReactAppTemplatesEndpoints"), Times.Once);
+        logger.Verify(l => l.Information("{MethodName} Started", "UseDotnetToolsEndpoints"), Times.Once);
     }
 }

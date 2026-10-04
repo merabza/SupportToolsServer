@@ -2,7 +2,6 @@ using System;
 using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 
 namespace SupportToolsServer.Tests.TestInfrastructure;
 
@@ -18,7 +17,7 @@ internal sealed class ClientAddressStartupFilter : IStartupFilter
     {
         return app =>
         {
-            app.Use((HttpContext context, RequestDelegate nextMiddleware) =>
+            app.Use((context, nextMiddleware) =>
             {
                 string? address = context.Request.Headers[ClientAddressHeader];
                 context.Connection.RemoteIpAddress = IPAddress.Parse(address ?? DefaultClientAddress);

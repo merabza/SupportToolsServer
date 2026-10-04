@@ -75,8 +75,8 @@ public sealed class EnvironmentValidatorsTests
     {
         var validator = new UpdateEnvironmentCommandValidator();
 
-        Assert.True(validator.Validate(new UpdateEnvironmentCommand(TestData.EnvironmentModel("Prod", null, 3)))
-            .IsValid);
+        Assert.True(
+            validator.Validate(new UpdateEnvironmentCommand(TestData.EnvironmentModel("Prod", null, 3))).IsValid);
         AssertSingleError(validator.Validate(new UpdateEnvironmentCommand(TestData.EnvironmentModel(""))),
             "ValueRequired", "Name Is Required");
     }

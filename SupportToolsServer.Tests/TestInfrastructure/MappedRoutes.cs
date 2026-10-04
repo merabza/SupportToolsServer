@@ -25,7 +25,8 @@ internal static class MappedRoutes
     {
         (_, List<RouteEndpoint> endpoints) = await Map(useEndpoints);
         return Describe(endpoints.Where(e =>
-            e.Metadata.GetOrderedMetadata<IAuthorizeData>().Count > 0 && e.Metadata.GetMetadata<IAllowAnonymous>() is null));
+            e.Metadata.GetOrderedMetadata<IAuthorizeData>().Count > 0 &&
+            e.Metadata.GetMetadata<IAllowAnonymous>() is null));
     }
 
     private static async Task<(bool Mapped, List<RouteEndpoint> Endpoints)> Map(Func<WebApplication, bool> useEndpoints)

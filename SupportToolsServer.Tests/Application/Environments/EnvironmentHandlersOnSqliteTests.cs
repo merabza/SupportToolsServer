@@ -118,7 +118,8 @@ public sealed class EnvironmentHandlersOnSqliteTests : IAsyncLifetime
     {
         await Upsert("Prod", "Production", 0);
 
-        Result<int> result = await Upsert("Prod", "Mine", 1, async () => Assert.True((await Delete("Prod", 1)).IsSuccess));
+        Result<int> result =
+            await Upsert("Prod", "Mine", 1, async () => Assert.True((await Delete("Prod", 1)).IsSuccess));
 
         Assert.Equal("RecordWithNameNotFound", result.Error.Code);
         Assert.Empty(await Stored());

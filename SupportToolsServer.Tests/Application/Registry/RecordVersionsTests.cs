@@ -120,9 +120,8 @@ public sealed class RecordVersionsTests
         var failure = new DbUpdateException("foreign key");
         _unitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ThrowsAsync(failure);
 
-        DbUpdateException thrown = await Assert.ThrowsAsync<DbUpdateException>(() =>
-            RecordVersions.SaveChanges(_unitOfWork.Object, "Environment", "Prod", 0, _ => Task.FromResult<int?>(null),
-                CancellationToken.None));
+        var thrown = await Assert.ThrowsAsync<DbUpdateException>(() => RecordVersions.SaveChanges(_unitOfWork.Object,
+            "Environment", "Prod", 0, _ => Task.FromResult<int?>(null), CancellationToken.None));
 
         Assert.Same(failure, thrown);
     }
@@ -133,8 +132,7 @@ public sealed class RecordVersionsTests
         _unitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ThrowsAsync(new InvalidOperationException("other"));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            RecordVersions.SaveChanges(_unitOfWork.Object, "Environment", "Prod", 1, _ => Task.FromResult<int?>(2),
-                CancellationToken.None));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => RecordVersions.SaveChanges(_unitOfWork.Object,
+            "Environment", "Prod", 1, _ => Task.FromResult<int?>(2), CancellationToken.None));
     }
 }

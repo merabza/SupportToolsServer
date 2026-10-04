@@ -1,9 +1,13 @@
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerCore.Domain.DeploymentEnvironments;
+using SupportToolsServerCore.Domain.DotnetTools;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
+using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.Primitives;
+using SupportToolsServerCore.Domain.ReactAppTemplates;
+using SupportToolsServerCore.Domain.Runtimes;
 
 namespace SupportToolsServer.Tests.TestInfrastructure;
 
@@ -43,6 +47,57 @@ internal static class TestData
     public static StsEnvironmentDataModel EnvironmentModel(string name, string? description = null, int version = 0)
     {
         return new StsEnvironmentDataModel { Name = name, Description = description, Version = version };
+    }
+
+    public static Runtime NewRuntime(string name, string? description = null, int version = EntityVersion.Initial)
+    {
+        return new Runtime(RuntimeId.CreateUnique(), name, description, version);
+    }
+
+    public static StsRuntimeDataModel RuntimeModel(string name, string? description = null, int version = 0)
+    {
+        return new StsRuntimeDataModel { Name = name, Description = description, Version = version };
+    }
+
+    public static NpmPackage NewNpmPackage(string name, string? description = null, int version = EntityVersion.Initial)
+    {
+        return new NpmPackage(NpmPackageId.CreateUnique(), name, description, version);
+    }
+
+    public static StsNpmPackageDataModel NpmPackageModel(string name, string? description = null, int version = 0)
+    {
+        return new StsNpmPackageDataModel { Name = name, Description = description, Version = version };
+    }
+
+    public static ReactAppTemplate NewReactAppTemplate(string name, string template = "typescript",
+        int version = EntityVersion.Initial)
+    {
+        return new ReactAppTemplate(ReactAppTemplateId.CreateUnique(), name, template, version);
+    }
+
+    public static StsReactAppTemplateDataModel ReactAppTemplateModel(string name, string template = "typescript",
+        int version = 0)
+    {
+        return new StsReactAppTemplateDataModel { Name = name, Template = template, Version = version };
+    }
+
+    public static DotnetTool NewDotnetTool(string name, string packageId = "dotnet-ef", string? maxVersion = null,
+        string? description = null, int version = EntityVersion.Initial)
+    {
+        return new DotnetTool(DotnetToolId.CreateUnique(), name, packageId, maxVersion, description, version);
+    }
+
+    public static StsDotnetToolDataModel DotnetToolModel(string name, string packageId = "dotnet-ef",
+        string? maxVersion = null, string? description = null, int version = 0)
+    {
+        return new StsDotnetToolDataModel
+        {
+            Name = name,
+            PackageId = packageId,
+            MaxVersion = maxVersion,
+            Description = description,
+            Version = version
+        };
     }
 
     public static StsGitDataModel GitModel(string name, string gitIgnorePatternName, string? address = null)

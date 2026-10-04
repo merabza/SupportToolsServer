@@ -14,6 +14,10 @@ public static class SupportToolsServerApiDependencyInjection
         endpoints.UseGitReposEndpoints(debugLogger);
         endpoints.UseEditorConfigFileTypesEndpoints(debugLogger);
         endpoints.UseEnvironmentsEndpoints(debugLogger);
+        endpoints.UseRuntimesEndpoints(debugLogger);
+        endpoints.UseNpmPackagesEndpoints(debugLogger);
+        endpoints.UseReactAppTemplatesEndpoints(debugLogger);
+        endpoints.UseDotnetToolsEndpoints(debugLogger);
 
         debugLogger?.Information("{MethodName} Finished", nameof(UseSupportToolsServerApi));
 

@@ -64,7 +64,8 @@ public static class EnvironmentsEndpoints
         CancellationToken cancellationToken = default)
     {
         string name = RouteKeys.Decode(key);
-        Debug.WriteLine($"Call {nameof(GetEnvironmentByNameQueryHandler)} for {name} from {nameof(GetEnvironmentByName)}");
+        Debug.WriteLine(
+            $"Call {nameof(GetEnvironmentByNameQueryHandler)} for {name} from {nameof(GetEnvironmentByName)}");
 
         Result<StsEnvironmentDataModel> result =
             await handler.Handle(new GetEnvironmentByNameQuery(name), cancellationToken);

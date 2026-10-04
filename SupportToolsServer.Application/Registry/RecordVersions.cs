@@ -34,8 +34,7 @@ internal static class RecordVersions
     //შენახული ვერსია თავიდან იკითხება და შემოწმება მეორდება. მისი შეცდომა (ConcurrencyConflict, RecordWithNameNotFound)
     //ბრუნდება, ხოლო თუ შემოწმება ისევ გადის, ჩავარდნის მიზეზი სხვაა და გამონაკლისი გადის
     public static async Task<Result> SaveChanges(IUnitOfWork unitOfWork, string entityName, string name,
-        int expectedVersion, Func<CancellationToken, Task<int?>> readStoredVersion,
-        CancellationToken cancellationToken)
+        int expectedVersion, Func<CancellationToken, Task<int?>> readStoredVersion, CancellationToken cancellationToken)
     {
         try
         {

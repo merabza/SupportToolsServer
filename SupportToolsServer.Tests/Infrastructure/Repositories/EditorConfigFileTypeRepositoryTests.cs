@@ -89,8 +89,8 @@ public sealed class EditorConfigFileTypeRepositoryTests : IAsyncLifetime
     {
         await using (SupportToolsServerDbContext context = _database.NewContext())
         {
-            new EditorConfigFileTypeRepository(context).Update(new EditorConfigFileType(_default.Id, "default",
-                "first", _default.Version + 1));
+            new EditorConfigFileTypeRepository(context).Update(new EditorConfigFileType(_default.Id, "default", "first",
+                _default.Version + 1));
             await context.SaveChangesAsync();
         }
 

@@ -14,8 +14,9 @@ public sealed class EnvironmentModelValidator : AbstractValidator<StsEnvironment
         RuleFor(x => x.Name).RequiredWithMaxLength(_ => nameof(StsEnvironmentDataModel.Name),
             DeploymentEnvironment.NameMaxLength);
 
-        RuleFor(x => x.Description).OptionalWithMaxLength(x => ValueName(x, nameof(StsEnvironmentDataModel.Description)),
-            DeploymentEnvironment.DescriptionMaxLength);
+        RuleFor(x => x.Description)
+            .OptionalWithMaxLength(x => ValueName(x, nameof(StsEnvironmentDataModel.Description)),
+                DeploymentEnvironment.DescriptionMaxLength);
     }
 
     private static string ValueName(StsEnvironmentDataModel environment, string propertyName)

@@ -10,6 +10,7 @@ using Moq;
 using Serilog;
 using SupportToolsServer.Application.Environments.GetEnvironmentByName;
 using SupportToolsServer.Application.GitRepos.GetGitRepos;
+using SupportToolsServer.Application.NpmPackages.GetNpmPackageByName;
 using SupportToolsServerApiContracts.Models;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.SharedKernel;
@@ -20,8 +21,11 @@ namespace SupportToolsServer.Tests.TestInfrastructure;
 //The environment is Production, so the User Secrets of the developer are never read.
 //Program.cs reads the connection string and the Serilog section before Build, so they come as settings,
 //which WebApplicationFactory passes as command line arguments. The rest is read later and comes from an in-memory source.
-//The connection string is valid only in format: the handlers of GET gitrepos and GET environments/{key} are stubs,
-//so no database is opened. The second one returns the name it received, which shows how the route key was decoded
+//The factory passes the parent keys of a setting as well, with empty values: Serilog takes the empty
+//Serilog:WriteTo:1 for a sink without a name and skips it, so the test hosts write no log file (only to the console).
+//The connection string is valid only in format: the handlers of GET gitrepos, GET environments/{key} and
+//GET npmpackages/{key} are stubs, so no database is opened. The last two return the name they received, which shows
+//how the route key was decoded
 public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Program>
 {
     public const string ValidApiKey = "valid-test-key";
@@ -56,6 +60,7 @@ public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Progra
             services.AddScoped(_ => HandlerMocks
                 .Query<GetGitReposQuery, List<StsGitDataModel>>(Result.Success(new List<StsGitDataModel>())).Object);
             services.AddScoped(_ => EnvironmentNameEchoHandler());
+            services.AddScoped(_ => NpmPackageNameEchoHandler());
         });
     }
 
@@ -65,6 +70,15 @@ public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Progra
         handler.Setup(h => h.Handle(It.IsAny<GetEnvironmentByNameQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((GetEnvironmentByNameQuery query, CancellationToken _) =>
                 Result.Success(new StsEnvironmentDataModel { Name = query.Name }));
+        return handler.Object;
+    }
+
+    private static IQueryHandler<GetNpmPackageByNameQuery, StsNpmPackageDataModel> NpmPackageNameEchoHandler()
+    {
+        var handler = new Mock<IQueryHandler<GetNpmPackageByNameQuery, StsNpmPackageDataModel>>();
+        handler.Setup(h => h.Handle(It.IsAny<GetNpmPackageByNameQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GetNpmPackageByNameQuery query, CancellationToken _) =>
+                Result.Success(new StsNpmPackageDataModel { Name = query.Name }));
         return handler.Object;
     }
 

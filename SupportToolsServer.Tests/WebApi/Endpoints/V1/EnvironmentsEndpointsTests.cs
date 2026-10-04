@@ -158,8 +158,9 @@ public sealed class EnvironmentsEndpointsTests
     {
         await AssertDebugTrace("Call GetEnvironmentByNameQueryHandler for Prod from GetEnvironmentByName",
             () => EnvironmentsEndpoints.GetEnvironmentByName("Prod",
-                HandlerMocks.Query<GetEnvironmentByNameQuery, StsEnvironmentDataModel>(
-                    TestData.EnvironmentModel("Prod")).Object));
+                HandlerMocks
+                    .Query<GetEnvironmentByNameQuery, StsEnvironmentDataModel>(TestData.EnvironmentModel("Prod"))
+                    .Object));
     }
 
     //The route key wins over the name of the body, as in updategitrepo
@@ -229,7 +230,8 @@ public sealed class EnvironmentsEndpointsTests
         var handler = HandlerMocks.Command<DeleteEnvironmentCommand>(Error.Conflict("RecordIsInUse",
             "Environment Prod Is Used By: ServerInfo AppA"));
 
-        Results<Ok, ProblemHttpResult> result = await EnvironmentsEndpoints.DeleteEnvironment("Prod", 1, handler.Object);
+        Results<Ok, ProblemHttpResult>
+            result = await EnvironmentsEndpoints.DeleteEnvironment("Prod", 1, handler.Object);
 
         var problem = Assert.IsType<ProblemHttpResult>(result.Result);
         Assert.Equal(StatusCodes.Status409Conflict, problem.StatusCode);
@@ -261,10 +263,12 @@ public sealed class EnvironmentsEndpointsTests
         await EnvironmentsEndpoints.UpdateEnvironment(key, body, update.Object);
         await EnvironmentsEndpoints.DeleteEnvironment(key, 1, delete.Object);
 
-        get.Verify(h => h.Handle(It.Is<GetEnvironmentByNameQuery>(q => q.Name == "@scope/name"),
-            It.IsAny<CancellationToken>()), Times.Once);
+        get.Verify(
+            h => h.Handle(It.Is<GetEnvironmentByNameQuery>(q => q.Name == "@scope/name"),
+                It.IsAny<CancellationToken>()), Times.Once);
         Assert.Equal("@scope/name", body.Name);
-        delete.Verify(h => h.Handle(It.Is<DeleteEnvironmentCommand>(c => c.Name == "@scope/name"),
-            It.IsAny<CancellationToken>()), Times.Once);
+        delete.Verify(
+            h => h.Handle(It.Is<DeleteEnvironmentCommand>(c => c.Name == "@scope/name"), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 }
