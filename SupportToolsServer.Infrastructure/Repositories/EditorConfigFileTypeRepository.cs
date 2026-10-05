@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,15 @@ public class EditorConfigFileTypeRepository : IEditorConfigFileTypeRepository
         //ჩანაწერები მხოლოდ შესადარებლად იტვირთება. თვალყურის დევნებისას Update-ისთვის გადაცემული
         //იგივე Id-ის მქონე ახალი ობიექტი EF-ში შეცდომას გამოიწვევდა
         return _dbContext.EditorConfigFileTypes.AsNoTracking().ToListAsync(cancellationToken);
+    }
+
+    //სახელი რეგისტრის გარეშე (OrdinalIgnoreCase) მეხსიერებაში ედრება, რომ შედეგი ბაზის collation-ზე არ იყოს
+    //დამოკიდებული. ცხრილი პატარაა, ამიტომ ყველა ჩანაწერი იკითხება
+    public async Task<EditorConfigFileType?> GetByName(string name, CancellationToken cancellationToken)
+    {
+        List<EditorConfigFileType> editorConfigFileTypes = await GetAll(cancellationToken);
+        return editorConfigFileTypes.SingleOrDefault(x =>
+            string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
     }
 
     public void Delete(EditorConfigFileType o)

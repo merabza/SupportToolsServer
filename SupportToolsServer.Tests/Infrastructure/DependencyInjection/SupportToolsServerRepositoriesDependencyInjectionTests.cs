@@ -12,6 +12,7 @@ using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
+using SupportToolsServerCore.Domain.Projects;
 using SupportToolsServerCore.Domain.ProjectTemplates;
 using SupportToolsServerCore.Domain.ReactAppTemplates;
 using SupportToolsServerCore.Domain.Runtimes;
@@ -84,6 +85,9 @@ public sealed class SupportToolsServerRepositoriesDependencyInjectionTests
         Assert.Contains(services,
             d => d.ServiceType == typeof(IProjectTemplateRepository) &&
                  d.ImplementationType == typeof(ProjectTemplateRepository) && d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IProjectRepository) && d.ImplementationType == typeof(ProjectRepository) &&
+                 d.Lifetime == ServiceLifetime.Scoped);
     }
 
     [Fact]

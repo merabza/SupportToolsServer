@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.Primitives;
+using SupportToolsServerCore.Domain.Projects;
 using SupportToolsServerCore.Domain.Sync;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
@@ -15,12 +16,14 @@ namespace SupportToolsServer.Application.EditorConfigFileTypes.SyncUp;
 public class SyncUpEditorConfigFileTypesCommandHandler : ICommandHandler<SyncUpEditorConfigFileTypesCommand>
 {
     private readonly IEditorConfigFileTypeRepository _editorConfigFileTypeRepository;
+    private readonly IProjectRepository _projectRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public SyncUpEditorConfigFileTypesCommandHandler(IEditorConfigFileTypeRepository editorConfigFileTypeRepository,
-        IUnitOfWork unitOfWork)
+        IProjectRepository projectRepository, IUnitOfWork unitOfWork)
     {
         _editorConfigFileTypeRepository = editorConfigFileTypeRepository;
+        _projectRepository = projectRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -33,6 +36,20 @@ public class SyncUpEditorConfigFileTypesCommandHandler : ICommandHandler<SyncUpE
             await _editorConfigFileTypeRepository.GetAll(cancellationToken);
         Dictionary<string, EditorConfigFileType> existingByName =
             existingEditorConfigFileTypes.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+
+        if (!request.Merge)
+        {
+            //სიაში არარსებული ჩანაწერები წაიშლება, ამიტომ არც ერთს არ უნდა იყენებდეს პროექტი
+            HashSet<string> uploadedNames = new(request.UploadEditorConfigFileTypes.Select(x => x.Name),
+                StringComparer.OrdinalIgnoreCase);
+            Result notUsedResult = EditorConfigFileTypeDeletion.CheckNotUsed(
+                existingEditorConfigFileTypes.Where(x => !uploadedNames.Contains(x.Name)),
+                await _projectRepository.GetAll(cancellationToken));
+            if (notUsedResult.IsFailure)
+            {
+                return notUsedResult;
+            }
+        }
 
         var syncer = new Syncroniser<EditorConfigFileType, EditorConfigFileTypeId>(_editorConfigFileTypeRepository, [
             .. request.UploadEditorConfigFileTypes.Select(s =>

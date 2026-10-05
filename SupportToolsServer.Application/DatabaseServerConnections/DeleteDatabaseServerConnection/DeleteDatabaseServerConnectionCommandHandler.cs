@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SupportToolsServer.Application.Projects;
 using SupportToolsServer.Application.Registry;
 using SupportToolsServer.Application.Settings;
 using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
+using SupportToolsServerCore.Domain.Projects;
 using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
@@ -16,14 +18,17 @@ public sealed class DeleteDatabaseServerConnectionCommandHandler : ICommandHandl
 {
     private readonly IDatabaseServerConnectionRepository _databaseServerConnectionRepository;
     private readonly IProjectCreatorSettingsRepository _projectCreatorSettingsRepository;
+    private readonly IProjectRepository _projectRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteDatabaseServerConnectionCommandHandler(
         IDatabaseServerConnectionRepository databaseServerConnectionRepository,
-        IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IUnitOfWork unitOfWork)
+        IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IProjectRepository projectRepository,
+        IUnitOfWork unitOfWork)
     {
         _databaseServerConnectionRepository = databaseServerConnectionRepository;
         _projectCreatorSettingsRepository = projectCreatorSettingsRepository;
+        _projectRepository = projectRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -45,9 +50,9 @@ public sealed class DeleteDatabaseServerConnectionCommandHandler : ICommandHandl
                 connection.Version);
         }
 
-        //DatabaseServerConnection-ს სხვა აგრეგატი მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409
-        //RecordIsInUse მომხმარებლების სიით. B6/B7 (ბაზის პარამეტრები) თავის მომხმარებლებს აქ დაამატებენ. folders
-        //set-ები კავშირთან ერთად იშლება
+        //DatabaseServerConnection-ს სხვა აგრეგატები მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409
+        //RecordIsInUse მომხმარებლების სიით. B7 (ServerInfo-ს ბაზის პარამეტრები) თავის მომხმარებლებს აქ დაამატებს.
+        //folders set-ები კავშირთან ერთად იშლება
         List<string> usages = await GetUsages(connection.Id, cancellationToken);
         if (usages.Count > 0)
         {
@@ -62,13 +67,15 @@ public sealed class DeleteDatabaseServerConnectionCommandHandler : ICommandHandl
             cancellationToken);
     }
 
-    //მომხმარებლები: პროექტის შემქმნელის პარამეტრების ველი ("ProjectCreatorSettings.<ველი>")
+    //მომხმარებლები: პროექტის შემქმნელის პარამეტრების ველი ("ProjectCreatorSettings.<ველი>"), მერე პროექტები, რომელთა
+    //ბაზის პარამეტრებიც კავშირს იყენებს ("Project <სახელი>")
     private async Task<List<string>> GetUsages(DatabaseServerConnectionId connectionId,
         CancellationToken cancellationToken)
     {
         ProjectCreatorSettings? projectCreatorSettings =
             await _projectCreatorSettingsRepository.Get(cancellationToken);
+        List<Project> projects = await _projectRepository.GetAll(cancellationToken);
 
-        return [.. projectCreatorSettings.GetUsages(connectionId)];
+        return [.. projectCreatorSettings.GetUsages(connectionId), .. projects.GetUsages(connectionId)];
     }
 }

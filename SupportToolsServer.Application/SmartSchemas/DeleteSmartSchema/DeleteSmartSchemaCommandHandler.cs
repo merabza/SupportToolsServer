@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SupportToolsServer.Application.Projects;
 using SupportToolsServer.Application.Registry;
 using SupportToolsServer.Application.Settings;
 using SupportToolsServerApiContracts.Errors;
+using SupportToolsServerCore.Domain.Projects;
 using SupportToolsServerCore.Domain.Settings;
 using SupportToolsServerCore.Domain.SmartSchemas;
 using SystemTools.Application.Abstractions.Messaging;
@@ -16,16 +18,19 @@ public sealed class DeleteSmartSchemaCommandHandler : ICommandHandler<DeleteSmar
 {
     private readonly IGlobalSettingsRepository _globalSettingsRepository;
     private readonly IProjectCreatorSettingsRepository _projectCreatorSettingsRepository;
+    private readonly IProjectRepository _projectRepository;
     private readonly ISmartSchemaRepository _smartSchemaRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteSmartSchemaCommandHandler(ISmartSchemaRepository smartSchemaRepository,
         IGlobalSettingsRepository globalSettingsRepository,
-        IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IUnitOfWork unitOfWork)
+        IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IProjectRepository projectRepository,
+        IUnitOfWork unitOfWork)
     {
         _smartSchemaRepository = smartSchemaRepository;
         _globalSettingsRepository = globalSettingsRepository;
         _projectCreatorSettingsRepository = projectCreatorSettingsRepository;
+        _projectRepository = projectRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -45,8 +50,8 @@ public sealed class DeleteSmartSchemaCommandHandler : ICommandHandler<DeleteSmar
         }
 
         //SmartSchema-ს სხვა აგრეგატები მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409 RecordIsInUse
-        //მომხმარებლების სიით. B6/B7 (ბაზის პარამეტრები) თავის მომხმარებლებს აქ დაამატებენ. დეტალები სქემასთან ერთად
-        //იშლება
+        //მომხმარებლების სიით. B7 (ServerInfo-ს ბაზის პარამეტრები) თავის მომხმარებლებს აქ დაამატებს. დეტალები სქემასთან
+        //ერთად იშლება
         List<string> usages = await GetUsages(smartSchema.Id, cancellationToken);
         if (usages.Count > 0)
         {
@@ -60,13 +65,19 @@ public sealed class DeleteSmartSchemaCommandHandler : ICommandHandler<DeleteSmar
             cancellationToken);
     }
 
-    //მომხმარებლები: ჯერ გლობალური პარამეტრების, მერე პროექტის შემქმნელის პარამეტრების ველები, კონტრაქტის რიგით
+    //მომხმარებლები: ჯერ გლობალური პარამეტრების, მერე პროექტის შემქმნელის პარამეტრების ველები, კონტრაქტის რიგით, და
+    //ბოლოს პროექტები, რომელთა ბაზის პარამეტრებიც სქემას იყენებს
     private async Task<List<string>> GetUsages(SmartSchemaId smartSchemaId, CancellationToken cancellationToken)
     {
         GlobalSettings? globalSettings = await _globalSettingsRepository.Get(cancellationToken);
         ProjectCreatorSettings? projectCreatorSettings =
             await _projectCreatorSettingsRepository.Get(cancellationToken);
+        List<Project> projects = await _projectRepository.GetAll(cancellationToken);
 
-        return [.. globalSettings.GetUsages(smartSchemaId), .. projectCreatorSettings.GetUsages(smartSchemaId)];
+        return
+        [
+            .. globalSettings.GetUsages(smartSchemaId), .. projectCreatorSettings.GetUsages(smartSchemaId),
+            .. projects.GetUsages(smartSchemaId)
+        ];
     }
 }

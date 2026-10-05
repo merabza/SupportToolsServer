@@ -6,6 +6,7 @@ using SupportToolsServer.Application.EditorConfigFileTypes.SyncUp;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
+using SupportToolsServerCore.Domain.Projects;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -19,11 +20,14 @@ public sealed class SyncUpEditorConfigFileTypesCommandHandlerTests
     private readonly EditorConfigFileType _default = TestData.NewEditorConfigFileType("default", "old", 6);
     private readonly List<EditorConfigFileType> _deleted = [];
     private readonly Mock<IEditorConfigFileTypeRepository> _editorConfigFileTypes = new();
+    private readonly List<Project> _projectList = [];
+    private readonly Mock<IProjectRepository> _projects = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
     private readonly List<EditorConfigFileType> _updated = [];
 
     public SyncUpEditorConfigFileTypesCommandHandlerTests()
     {
+        _projects.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => _projectList);
         _editorConfigFileTypes.Setup(r => r.GetAll(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => [_default, _baGetter]);
         _editorConfigFileTypes.Setup(r => r.Add(It.IsAny<EditorConfigFileType>()))
@@ -36,8 +40,52 @@ public sealed class SyncUpEditorConfigFileTypesCommandHandlerTests
 
     private Task<Result> Handle(bool merge, params StsEditorConfigFileTypeDataModel[] uploaded)
     {
-        var handler = new SyncUpEditorConfigFileTypesCommandHandler(_editorConfigFileTypes.Object, _unitOfWork.Object);
+        var handler = new SyncUpEditorConfigFileTypesCommandHandler(_editorConfigFileTypes.Object, _projects.Object,
+            _unitOfWork.Object);
         return handler.Handle(new SyncUpEditorConfigFileTypesCommand(merge, [.. uploaded]), CancellationToken.None);
+    }
+
+    //Without merge the types missing from the list would be deleted, so none of them may be in use. Every type in use
+    //is named in one error, in name order, with its projects
+    [Fact]
+    public async Task Handle_WithoutMerge_ReturnsRecordIsInUseAndChangesNothing_WhenAMissingTypeIsInUse()
+    {
+        _projectList.AddRange(TestData.NewProject("AppB", _default), TestData.NewProject("AppA", _baGetter),
+            TestData.NewProject("AppC", _default));
+
+        Result result = await Handle(false);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(ErrorType.Conflict, result.Error.Type);
+        Assert.Equal("EditorConfigFileType BaGetter Is Used By: Project AppA; " +
+                     "EditorConfigFileType default Is Used By: Project AppB, Project AppC", result.Error.Description);
+        Assert.Empty(_deleted);
+        Assert.Empty(_updated);
+        _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    //A type in use that stays in the list is not deleted
+    [Fact]
+    public async Task Handle_WithoutMerge_DeletesTheUnusedTypes_WhenTheTypesInUseAreInTheList()
+    {
+        _projectList.Add(TestData.NewProject("AppA", _default));
+
+        Result result = await Handle(false, TestData.EditorConfigModel("DEFAULT"));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(_baGetter.Id, Assert.Single(_deleted).Id);
+    }
+
+    //With merge nothing is deleted, so the projects are not read
+    [Fact]
+    public async Task Handle_WithMerge_DoesNotCheckTheProjects()
+    {
+        _projectList.Add(TestData.NewProject("AppA", _baGetter));
+
+        Result result = await Handle(true, TestData.EditorConfigModel("default"));
+
+        Assert.True(result.IsSuccess);
+        _projects.Verify(r => r.GetAll(It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]

@@ -27,7 +27,23 @@ internal sealed class ReferencedRecords
             return null;
         }
 
-        TEntity? entity = await getByName(name, cancellationToken);
+        return Found(entityName, name, await getByName(name, cancellationToken));
+    }
+
+    //იგივე უკვე წაკითხული ჩანაწერებიდან: მაგალითად, პროექტის git-ების სიისთვის ყველა git ერთხელ იკითხება
+    public TEntity? Find<TEntity>(string? name, string entityName, Func<string, TEntity?> findByName)
+        where TEntity : class
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return null;
+        }
+
+        return Found(entityName, name, findByName(name));
+    }
+
+    private TEntity? Found<TEntity>(string entityName, string name, TEntity? entity) where TEntity : class
+    {
         if (entity is null)
         {
             _missing.Add((entityName, name));

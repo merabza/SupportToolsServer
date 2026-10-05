@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,7 @@ using Moq;
 using SupportToolsServer.Application.FileStorages.DeleteFileStorage;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerCore.Domain.FileStorages;
+using SupportToolsServerCore.Domain.Projects;
 using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
@@ -18,13 +20,45 @@ public sealed class DeleteFileStorageCommandHandlerTests
     private readonly Mock<IFileStorageRepository> _fileStorages = new();
     private readonly Mock<IGlobalSettingsRepository> _globalSettings = new();
     private readonly Mock<IProjectCreatorSettingsRepository> _projectCreatorSettings = new();
+    private readonly List<Project> _projectList = [];
+    private readonly Mock<IProjectRepository> _projects = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
+
+    public DeleteFileStorageCommandHandlerTests()
+    {
+        _projects.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => _projectList);
+    }
 
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
         var handler = new DeleteFileStorageCommandHandler(_fileStorages.Object, _globalSettings.Object,
-            _projectCreatorSettings.Object, _unitOfWork.Object);
+            _projectCreatorSettings.Object, _projects.Object, _unitOfWork.Object);
         return handler.Handle(new DeleteFileStorageCommand(name, version), cancellationToken);
+    }
+
+    //The fields of the singletons come first, then the projects whose database parameters use the file storage, in
+    //name order and each once
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheSettingsFieldsAndTheProjects()
+    {
+        _fileStorages.Setup(r => r.GetByName("Exchange", It.IsAny<CancellationToken>())).ReturnsAsync(_fileStorage);
+        _projectCreatorSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewProjectCreatorSettings(databaseExchangeFileStorage: _fileStorage));
+        _projectList.AddRange(
+            TestData.NewProject("AppB",
+                devDatabaseParameters: TestData.NewDatabaseParameters(fileStorage: _fileStorage),
+                prodCopyDatabaseParameters: TestData.NewDatabaseParameters(fileStorage: _fileStorage)),
+            TestData.NewProject("AppC", devDatabaseParameters: TestData.NewDatabaseParameters()),
+            TestData.NewProject("AppA",
+                prodCopyDatabaseParameters: TestData.NewDatabaseParameters(fileStorage: _fileStorage)));
+
+        Result result = await Handle("Exchange", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(
+            "FileStorage Exchange Is Used By: ProjectCreatorSettings.DatabaseExchangeFileStorageName, " +
+            "Project AppA, Project AppB", result.Error.Description);
+        VerifyNothingDeleted();
     }
 
     private void VerifyNothingDeleted()

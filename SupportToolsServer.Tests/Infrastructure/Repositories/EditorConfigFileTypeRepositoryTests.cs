@@ -43,6 +43,33 @@ public sealed class EditorConfigFileTypeRepositoryTests : IAsyncLifetime
         Assert.Empty(context.ChangeTracker.Entries());
     }
 
+    //SQLite compares with case, so a case-insensitive result proves that the repository does not depend on the
+    //collation of the database
+    [Theory]
+    [InlineData("BaGetter")]
+    [InlineData("bagetter")]
+    [InlineData("BAGETTER")]
+    public async Task GetByName_FindsTheNameWithoutCaseAndWithoutTrackingIt(string name)
+    {
+        await using SupportToolsServerDbContext context = _database.NewContext();
+
+        EditorConfigFileType? found =
+            await new EditorConfigFileTypeRepository(context).GetByName(name, CancellationToken.None);
+
+        Assert.NotNull(found);
+        Assert.Equal(_baGetter.Id, found.Id);
+        Assert.Equal("BaGetter", found.Name);
+        Assert.Empty(context.ChangeTracker.Entries());
+    }
+
+    [Fact]
+    public async Task GetByName_ReturnsNull_WhenThereIsNoSuchName()
+    {
+        await using SupportToolsServerDbContext context = _database.NewContext();
+
+        Assert.Null(await new EditorConfigFileTypeRepository(context).GetByName("React", CancellationToken.None));
+    }
+
     [Fact]
     public async Task Add_StoresTheTypeOnSave()
     {

@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using SupportToolsServer.Application.SmartSchemas.DeleteSmartSchema;
 using SupportToolsServer.Tests.TestInfrastructure;
+using SupportToolsServerCore.Domain.Projects;
 using SupportToolsServerCore.Domain.Settings;
 using SupportToolsServerCore.Domain.SmartSchemas;
 using SystemTools.Domain.Abstractions;
@@ -16,15 +18,48 @@ public sealed class DeleteSmartSchemaCommandHandlerTests
 {
     private readonly Mock<IGlobalSettingsRepository> _globalSettings = new();
     private readonly Mock<IProjectCreatorSettingsRepository> _projectCreatorSettings = new();
+    private readonly List<Project> _projectList = [];
+    private readonly Mock<IProjectRepository> _projects = new();
     private readonly SmartSchema _smartSchema = TestData.NewSmartSchema("Reduce", 1, [("Day", 3)], 3);
     private readonly Mock<ISmartSchemaRepository> _smartSchemas = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
+    public DeleteSmartSchemaCommandHandlerTests()
+    {
+        _projects.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => _projectList);
+    }
+
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
         var handler = new DeleteSmartSchemaCommandHandler(_smartSchemas.Object, _globalSettings.Object,
-            _projectCreatorSettings.Object, _unitOfWork.Object);
+            _projectCreatorSettings.Object, _projects.Object, _unitOfWork.Object);
         return handler.Handle(new DeleteSmartSchemaCommand(name, version), cancellationToken);
+    }
+
+    //The fields of the singletons come first, then the projects whose database parameters use the schema, in name
+    //order
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheSettingsFieldsAndTheProjects()
+    {
+        _smartSchemas.Setup(r => r.GetByName("Reduce", It.IsAny<CancellationToken>())).ReturnsAsync(_smartSchema);
+        _globalSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewGlobalSettings(smartSchemaForLocal: _smartSchema));
+        _projectList.AddRange(
+            TestData.NewProject("AppB",
+                devDatabaseParameters: TestData.NewDatabaseParameters(smartSchema: _smartSchema)),
+            TestData.NewProject("AppA",
+                prodCopyDatabaseParameters: TestData.NewDatabaseParameters(smartSchema: _smartSchema)),
+            TestData.NewProject("AppC",
+                prodCopyDatabaseParameters: TestData.NewDatabaseParameters(
+                    smartSchema: TestData.NewSmartSchema("Hourly"))));
+
+        Result result = await Handle("Reduce", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(
+            "SmartSchema Reduce Is Used By: GlobalSettings.SmartSchemaNameForLocal, Project AppA, Project AppB",
+            result.Error.Description);
+        VerifyNothingDeleted();
     }
 
     private void VerifyNothingDeleted()

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
+using SupportToolsServer.Application.EditorConfigFileTypes;
 using SupportToolsServer.Application.EditorConfigFileTypes.GetEditorConfigFileTypes;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerApiContracts.Models;
@@ -30,5 +31,19 @@ public sealed class GetEditorConfigFileTypesQueryHandlerTests
         Assert.Equal(["basic", "CSharp", "React"], result.Value.Select(x => x.Name));
         Assert.Equal("[*.ts]", result.Value[2].Content);
         Assert.Equal([1, 1, 4], result.Value.Select(x => x.Version));
+    }
+
+    //Projects store a template by its id and give its name in the contract
+    [Fact]
+    public void ToNamesById_MapsTheIdOfEveryTypeToItsName()
+    {
+        EditorConfigFileType basic = TestData.NewEditorConfigFileType("basic");
+        EditorConfigFileType strict = TestData.NewEditorConfigFileType("strict");
+
+        Dictionary<EditorConfigFileTypeId, string> names = new[] { basic, strict }.ToNamesById();
+
+        Assert.Equal(2, names.Count);
+        Assert.Equal("basic", names[basic.Id]);
+        Assert.Equal("strict", names[strict.Id]);
     }
 }

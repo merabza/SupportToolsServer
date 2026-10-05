@@ -76,4 +76,18 @@ public sealed class NpmPackageQueryHandlersTests
         Assert.Equal("UI library", model.Description);
         Assert.Equal(7, model.Version);
     }
+
+    //Projects store a package by its id and give its name in the contract
+    [Fact]
+    public void ToNamesById_MapsTheIdOfEveryPackageToItsName()
+    {
+        NpmPackage react = TestData.NewNpmPackage("react");
+        NpmPackage toolkit = TestData.NewNpmPackage("@reduxjs/toolkit");
+
+        Dictionary<NpmPackageId, string> names = new[] { react, toolkit }.ToNamesById();
+
+        Assert.Equal(2, names.Count);
+        Assert.Equal("react", names[react.Id]);
+        Assert.Equal("@reduxjs/toolkit", names[toolkit.Id]);
+    }
 }

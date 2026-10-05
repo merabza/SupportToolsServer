@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,7 @@ using Moq;
 using SupportToolsServer.Application.DatabaseServerConnections.DeleteDatabaseServerConnection;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
+using SupportToolsServerCore.Domain.Projects;
 using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
@@ -19,13 +21,45 @@ public sealed class DeleteDatabaseServerConnectionCommandHandlerTests
 
     private readonly Mock<IDatabaseServerConnectionRepository> _connections = new();
     private readonly Mock<IProjectCreatorSettingsRepository> _projectCreatorSettings = new();
+    private readonly List<Project> _projectList = [];
+    private readonly Mock<IProjectRepository> _projects = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
+
+    public DeleteDatabaseServerConnectionCommandHandlerTests()
+    {
+        _projects.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => _projectList);
+    }
 
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
         var handler = new DeleteDatabaseServerConnectionCommandHandler(_connections.Object,
-            _projectCreatorSettings.Object, _unitOfWork.Object);
+            _projectCreatorSettings.Object, _projects.Object, _unitOfWork.Object);
         return handler.Handle(new DeleteDatabaseServerConnectionCommand(name, version), cancellationToken);
+    }
+
+    //The field of the singleton comes first, then the projects whose dev or prod copy database parameters use the
+    //connection, in name order and each once
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheSettingsFieldAndTheProjects()
+    {
+        _connections.Setup(r => r.GetByName("Pc1.Sql", It.IsAny<CancellationToken>())).ReturnsAsync(_connection);
+        _projectCreatorSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewProjectCreatorSettings(developerDbConnection: _connection));
+        DatabaseServerConnection other = TestData.NewDatabaseServerConnection("Pc2.Sql");
+        _projectList.AddRange(
+            TestData.NewProject("AppC", prodCopyDatabaseParameters: TestData.NewDatabaseParameters(_connection)),
+            TestData.NewProject("AppB", devDatabaseParameters: TestData.NewDatabaseParameters(other),
+                prodCopyDatabaseParameters: TestData.NewDatabaseParameters(other)),
+            TestData.NewProject("AppA", TestData.NewEditorConfigFileType("default"),
+                TestData.NewDatabaseParameters(_connection), TestData.NewDatabaseParameters(_connection)));
+
+        Result result = await Handle("Pc1.Sql", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(
+            "DatabaseServerConnection Pc1.Sql Is Used By: ProjectCreatorSettings.DeveloperDbConnectionName, " +
+            "Project AppA, Project AppC", result.Error.Description);
+        VerifyNothingDeleted();
     }
 
     private void VerifyNothingDeleted()

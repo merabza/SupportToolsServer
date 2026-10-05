@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SupportToolsServer.Application.Projects;
 using SupportToolsServer.Application.Registry;
 using SupportToolsServer.Application.Settings;
 using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerCore.Domain.FileStorages;
+using SupportToolsServerCore.Domain.Projects;
 using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
@@ -17,15 +19,18 @@ public sealed class DeleteFileStorageCommandHandler : ICommandHandler<DeleteFile
     private readonly IFileStorageRepository _fileStorageRepository;
     private readonly IGlobalSettingsRepository _globalSettingsRepository;
     private readonly IProjectCreatorSettingsRepository _projectCreatorSettingsRepository;
+    private readonly IProjectRepository _projectRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteFileStorageCommandHandler(IFileStorageRepository fileStorageRepository,
         IGlobalSettingsRepository globalSettingsRepository,
-        IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IUnitOfWork unitOfWork)
+        IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IProjectRepository projectRepository,
+        IUnitOfWork unitOfWork)
     {
         _fileStorageRepository = fileStorageRepository;
         _globalSettingsRepository = globalSettingsRepository;
         _projectCreatorSettingsRepository = projectCreatorSettingsRepository;
+        _projectRepository = projectRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -45,7 +50,7 @@ public sealed class DeleteFileStorageCommandHandler : ICommandHandler<DeleteFile
         }
 
         //FileStorage-ს სხვა აგრეგატები მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409 RecordIsInUse
-        //მომხმარებლების სიით. B6/B7 (ბაზის პარამეტრები) თავის მომხმარებლებს აქ დაამატებენ
+        //მომხმარებლების სიით. B7 (ServerInfo-ს ბაზის პარამეტრები) თავის მომხმარებლებს აქ დაამატებს
         List<string> usages = await GetUsages(fileStorage.Id, cancellationToken);
         if (usages.Count > 0)
         {
@@ -59,13 +64,19 @@ public sealed class DeleteFileStorageCommandHandler : ICommandHandler<DeleteFile
             cancellationToken);
     }
 
-    //მომხმარებლები: ჯერ გლობალური პარამეტრების, მერე პროექტის შემქმნელის პარამეტრების ველები, კონტრაქტის რიგით
+    //მომხმარებლები: ჯერ გლობალური პარამეტრების, მერე პროექტის შემქმნელის პარამეტრების ველები, კონტრაქტის რიგით, და
+    //ბოლოს პროექტები, რომელთა ბაზის პარამეტრებიც ფაილსაცავს იყენებს
     private async Task<List<string>> GetUsages(FileStorageId fileStorageId, CancellationToken cancellationToken)
     {
         GlobalSettings? globalSettings = await _globalSettingsRepository.Get(cancellationToken);
         ProjectCreatorSettings? projectCreatorSettings =
             await _projectCreatorSettingsRepository.Get(cancellationToken);
+        List<Project> projects = await _projectRepository.GetAll(cancellationToken);
 
-        return [.. globalSettings.GetUsages(fileStorageId), .. projectCreatorSettings.GetUsages(fileStorageId)];
+        return
+        [
+            .. globalSettings.GetUsages(fileStorageId), .. projectCreatorSettings.GetUsages(fileStorageId),
+            .. projects.GetUsages(fileStorageId)
+        ];
     }
 }

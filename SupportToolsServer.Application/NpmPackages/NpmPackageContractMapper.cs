@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerCore.Domain.NpmPackages;
 
@@ -14,5 +16,12 @@ internal static class NpmPackageContractMapper
         {
             Name = npmPackage.Name, Description = npmPackage.Description, Version = npmPackage.Version
         };
+    }
+
+    //სხვა აგრეგატები npm პაკეტს Id-ით ინახავენ, კონტრაქტში კი მის სახელს გადასცემენ
+    //(StsProjectDataModel.FrontNpmPackageNames)
+    public static Dictionary<NpmPackageId, string> ToNamesById(this IEnumerable<NpmPackage> npmPackages)
+    {
+        return npmPackages.ToDictionary(x => x.Id, x => x.Name);
     }
 }

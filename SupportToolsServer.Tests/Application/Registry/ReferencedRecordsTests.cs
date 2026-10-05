@@ -62,4 +62,49 @@ public sealed class ReferencedRecordsTests
         Assert.Equal("Referenced Second Records Not Found: x1, x3; Referenced First Records Not Found: x2",
             error.Description);
     }
+
+    //The records that were read before, e.g. every git of a project at once
+    [Fact]
+    public void Find_FromTheRecordsThatWereRead_ReturnsTheRecordOfTheName()
+    {
+        var references = new ReferencedRecords();
+
+        string? found = references.Find("a", "Type", name => $"record {name}");
+
+        Assert.Equal("record a", found);
+        Assert.True(references.AreAllFound);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void Find_FromTheRecordsThatWereRead_ReturnsNullWithoutLooking_WhenThereIsNoName(string? name)
+    {
+        var references = new ReferencedRecords();
+        List<string> looked = [];
+
+        Assert.Null(references.Find(name, "Type", x =>
+        {
+            looked.Add(x);
+            return "record";
+        }));
+        Assert.True(references.AreAllFound);
+        Assert.Empty(looked);
+    }
+
+    //Both kinds of lookup add their missing names to the same error, in the order they were looked for
+    [Fact]
+    public async Task Find_FromTheRecordsThatWereRead_AddsAMissingNameToTheSameError()
+    {
+        var references = new ReferencedRecords();
+
+        await references.Find("x1", "First", GetByName, CancellationToken.None);
+        references.Find("x2", "Second", _ => (string?)null);
+        references.Find("x3", "First", _ => (string?)null);
+
+        Assert.False(references.AreAllFound);
+        Assert.Equal("Referenced First Records Not Found: x1, x3; Referenced Second Records Not Found: x2",
+            references.MissingError().Description);
+    }
 }

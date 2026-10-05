@@ -45,7 +45,7 @@ public sealed class NpmPackageHandlersOnSqliteTests : IAsyncLifetime
     {
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteNpmPackageCommandHandler(new NpmPackageRepository(context),
-            UnitOfWork(context, concurrentChange));
+            new ProjectRepository(context), UnitOfWork(context, concurrentChange));
         return await handler.Handle(new DeleteNpmPackageCommand(name, version), CancellationToken.None);
     }
 

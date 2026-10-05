@@ -109,7 +109,7 @@ FK-ების წესი: მითითება სხვა აგრე
 | GlobalSettings (singleton) | `GlobalSettings` | FileStorage, SmartSchema, ApiClient | B5 |
 | ProjectCreatorSettings (singleton) | `ProjectCreatorSettings` | Server, Environment, DatabaseServerConnection, FileStorage, SmartSchema | B5 |
 | ProjectTemplate | `ProjectTemplates` | ReactTemplateName → ReactAppTemplate | B5 |
-| Project | `Projects`, `ProjectGitRepos`, `ProjectNpmPackages`, `ProjectRedundantFiles`, `ProjectAllowedTools`, `ProjectEndpoints`, `ProjectRouteClasses`, Dev/ProdCopy DatabaseParameters (owned) | GitRepo, NpmPackage, EditorConfigFileType, DatabaseServerConnection, SmartSchema, FileStorage | B6 |
+| Project | `Projects`, `ProjectGitRepos`, `ProjectNpmPackages`, `ProjectRedundantFiles`, `ProjectAllowedTools`, `ProjectEndpoints`, `ProjectRouteClasses`, Dev/ProdCopy DatabaseParameters (owned, `Projects`-ის სტრიქონში, table splitting) | GitRepo, NpmPackage, EditorConfigFileType, DatabaseServerConnection, SmartSchema, FileStorage | B6 |
 | ServerInfo (Project-ის შვილი) | `ServerInfos`, `ServerInfoAllowedTools`, Current/New DatabaseParameters (owned) | Server, Environment, ApiClient (WebAgentNameForCheck) | B7 |
 | StoredFile | `StoredFiles` | — | B8 |
 | GitRepo, GitIgnoreFileType, EditorConfigFileType | არსებული ცხრილები | GitRepo → GitIgnoreFileType | B1 (`Version`) |
@@ -187,13 +187,13 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [B3](tasks/B3-infrastructure-resources.md) | რესურსები: SmartSchemas, FileStorages, ApiClients, DatabaseServerConnections | SupportToolsServer | B1 | L | ✅ |
 | [B4](tasks/B4-servers.md) | Servers | SupportToolsServer | B2, B3 | M | ✅ |
 | [B5](tasks/B5-settings-and-templates.md) | გლობალური პარამეტრები, პროექტის შემქმნელის პარამეტრები, შაბლონები | SupportToolsServer | B4 | M | ✅ |
-| [B6](tasks/B6-projects.md) | Projects-ის აგრეგატი | SupportToolsServer | B2, B3 | XL | ⬜ |
+| [B6](tasks/B6-projects.md) | Projects-ის აგრეგატი | SupportToolsServer | B2, B3 | XL | ✅ |
 | [B7](tasks/B7-server-infos.md) | ServerInfo-ები Project-ის აგრეგატში | SupportToolsServer | B4, B6 | L | ⬜ |
 | [B8](tasks/B8-stored-files.md) | საიდუმლო ფაილების საცავი | SupportToolsServer | B1 | M | ⬜ |
 | [B9](tasks/B9-server-git-projects.md) | (სურვილისამებრ) `GitProjects`-ის გამოთვლა სერვერზე | SupportToolsServer | B1, C5 | L | ⬜ |
 | [C1](tasks/C1-machine-profile-path-mapping.md) | კომპიუტერის პროფილი და გზების გარდაქმნა | SupportTools | A4 | M | ✅ |
 | [C2](tasks/C2-sync-engine-core.md) | სინქრონიზაციის ძრავის ბირთვი | SupportTools | A4 | L | ✅ |
-| [C3](tasks/C3-adapters-reference-data.md) | ადაპტერები: ცნობარები, რესურსები, სერვერები, პარამეტრები, გიტები, შაბლონები | SupportTools | C1, C2, B1–B5 | L | ⬜ |
+| [C3](tasks/C3-adapters-reference-data.md) | ადაპტერები: ცნობარები, რესურსები, სერვერები, პარამეტრები, გიტები, შაბლონები | SupportTools | C1, C2, B1–B5 | L | ✅ |
 | [C4](tasks/C4-adapter-projects.md) | ადაპტერი: Projects და ServerInfo-ები | SupportTools | C3, B6, B7 | L | ⬜ |
 | [C5](tasks/C5-sync-command-seed.md) | სინქრონიზაციის ბრძანება და საწყისი ატვირთვა (seed) | SupportTools | C4, A3 | L | ⬜ |
 | [C6](tasks/C6-stored-files-sync.md) | საიდუმლო ფაილების სინქრონიზაცია | SupportTools | C5, B8 | M | ⬜ |

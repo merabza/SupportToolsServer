@@ -50,7 +50,7 @@ public sealed class SmartSchemaHandlersOnSqliteTests : IAsyncLifetime
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteSmartSchemaCommandHandler(new SmartSchemaRepository(context),
             new GlobalSettingsRepository(context), new ProjectCreatorSettingsRepository(context),
-            UnitOfWork(context, concurrentChange));
+            new ProjectRepository(context), UnitOfWork(context, concurrentChange));
         return await handler.Handle(new DeleteSmartSchemaCommand(name, version), CancellationToken.None);
     }
 

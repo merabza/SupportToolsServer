@@ -11,6 +11,7 @@ using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.Primitives;
+using SupportToolsServerCore.Domain.Projects;
 using SupportToolsServerCore.Domain.ProjectTemplates;
 using SupportToolsServerCore.Domain.ReactAppTemplates;
 using SupportToolsServerCore.Domain.Runtimes;
@@ -20,13 +21,129 @@ using SupportToolsServerCore.Domain.SmartSchemas;
 
 namespace SupportToolsServer.Tests.TestInfrastructure;
 
-//The secrets of the resources (passwords, API keys, users, the MediatR license key) are made up
+//The secrets of the resources (passwords, API keys, users, the MediatR license key, the key part of a project) are
+//made up
 internal static class TestData
 {
     public const string MadeUpApiKey = "made-up-api-key";
     public const string MadeUpUser = "made-up-user";
     public const string MadeUpPassword = "made-up-password";
     public const string MadeUpLicenseKey = "made-up-license-key";
+    public const string MadeUpKeyGuidPart = "made-up-key-guid-part";
+
+    //The references are the records given. Every project has one redundant file, one allowed tool, one endpoint and
+    //one route class. The children come with the update that gives the stored version, as the constructor takes none
+    public static Project NewProject(string name, EditorConfigFileType? editorConfigFileType = null,
+        DatabaseParameters? devDatabaseParameters = null, DatabaseParameters? prodCopyDatabaseParameters = null,
+        IEnumerable<GitRepo>? gitRepos = null, IEnumerable<GitRepo>? scaffoldSeederGitRepos = null,
+        IEnumerable<NpmPackage>? npmPackages = null, int version = EntityVersion.Initial)
+    {
+        var project = new Project(ProjectId.CreateUnique(), name, "Standard", null, null, 1, 0, false, null, null,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null, version - 1);
+        project.Update(name, "IsService", "Apps", "Application", 2, 1, false, editorConfigFileType?.Id, name,
+            $"{name}ApiContracts", null, $"{name}DbContext", "ap", $"{name}ScaffoldSeeder", $"{name}Db", null,
+            "yyyyMMddHHmmss", ".zip", "yyyyMMdd", ".json", $@"D:\1WorkDotnet\{name}",
+            $@"D:\1WorkDotnet\{name}\{name}.slnx", $@"D:\1WorkSecurity\{name}", null,
+            $@"D:\1WorkDotnet\{name}\{name}Db\{name}Db.csproj", null, null, null, null, null, null, null, null, null,
+            null, MadeUpKeyGuidPart, devDatabaseParameters, prodCopyDatabaseParameters,
+            [
+                .. (gitRepos ?? []).Select(x => ProjectGitRepo.Create(x.Id, EProjectGitRepoKind.Main)),
+                .. (scaffoldSeederGitRepos ?? []).Select(x =>
+                    ProjectGitRepo.Create(x.Id, EProjectGitRepoKind.ScaffoldSeed))
+            ], (npmPackages ?? []).Select(x => ProjectNpmPackage.Create(x.Id)), [ProjectRedundantFile.Create("*.pdb")],
+            [ProjectAllowedTool.Create("SeedData")],
+            [ProjectEndpoint.Create("Upload", "Upload", "/upload", true, "Post", "Command", null, false)],
+            [ProjectRouteClass.Create("Main", "api", "v1", "/main")]);
+        return project;
+    }
+
+    public static DatabaseParameters NewDatabaseParameters(DatabaseServerConnection? connection = null,
+        SmartSchema? smartSchema = null, FileStorage? fileStorage = null, string databaseName = "AppDev")
+    {
+        return new DatabaseParameters(connection?.Id, "Full", "Default", databaseName, smartSchema?.Id,
+            fileStorage?.Id, 120, false, "dev", "yyyyMMddHHmmss", ".bak", "_FullDb_", true, null, "Full");
+    }
+
+    //The values of NewProject. version is the expected version of an upsert: 0 creates the record
+    public static StsProjectDataModel ProjectModel(string name, string? editorConfigPatternName = null,
+        StsDatabaseParametersDataModel? devDatabaseParameters = null,
+        StsDatabaseParametersDataModel? prodCopyDatabaseParameters = null, List<string>? gitProjectNames = null,
+        List<string>? scaffoldSeederGitProjectNames = null, List<string>? frontNpmPackageNames = null,
+        int version = 0)
+    {
+        return new StsProjectDataModel
+        {
+            Name = name,
+            ProjectType = "IsService",
+            ProjectGroupName = "Apps",
+            ProjectDescription = "Application",
+            MajorVersion = 2,
+            MinorVersion = 1,
+            EditorConfigPatternName = editorConfigPatternName,
+            MainProjectName = name,
+            ApiContractsProjectName = $"{name}ApiContracts",
+            DbContextName = $"{name}DbContext",
+            ProjectShortPrefix = "ap",
+            ScaffoldSeederProjectName = $"{name}ScaffoldSeeder",
+            DbContextProjectName = $"{name}Db",
+            ProgramArchiveDateMask = "yyyyMMddHHmmss",
+            ProgramArchiveExtension = ".zip",
+            ParametersFileDateMask = "yyyyMMdd",
+            ParametersFileExtension = ".json",
+            ProjectFolderName = $@"D:\1WorkDotnet\{name}",
+            SolutionFileName = $@"D:\1WorkDotnet\{name}\{name}.slnx",
+            ProjectSecurityFolderPath = $@"D:\1WorkSecurity\{name}",
+            MigrationProjectFilePath = $@"D:\1WorkDotnet\{name}\{name}Db\{name}Db.csproj",
+            KeyGuidPart = MadeUpKeyGuidPart,
+            DevDatabaseParameters = devDatabaseParameters,
+            ProdCopyDatabaseParameters = prodCopyDatabaseParameters,
+            GitProjectNames = gitProjectNames ?? [],
+            ScaffoldSeederGitProjectNames = scaffoldSeederGitProjectNames ?? [],
+            FrontNpmPackageNames = frontNpmPackageNames ?? [],
+            RedundantFileNames = ["*.pdb"],
+            AllowToolsList = ["SeedData"],
+            Endpoints =
+            [
+                new StsProjectEndpointDataModel
+                {
+                    Name = "Upload",
+                    EndpointName = "Upload",
+                    EndpointRoute = "/upload",
+                    RequireAuthorization = true,
+                    HttpMethod = "Post",
+                    EndpointType = "Command"
+                }
+            ],
+            RouteClasses =
+            [
+                new StsProjectRouteClassDataModel { Name = "Main", Root = "api", ApiVersion = "v1", Base = "/main" }
+            ],
+            Version = version
+        };
+    }
+
+    //The values of NewDatabaseParameters
+    public static StsDatabaseParametersDataModel DatabaseParametersModel(string? dbConnectionName = null,
+        string? smartSchemaName = null, string? fileStorageName = null, string databaseName = "AppDev")
+    {
+        return new StsDatabaseParametersDataModel
+        {
+            DbConnectionName = dbConnectionName,
+            DatabaseRecoveryModel = "Full",
+            DbServerFoldersSetName = "Default",
+            DatabaseName = databaseName,
+            SmartSchemaName = smartSchemaName,
+            FileStorageName = fileStorageName,
+            CommandTimeOut = 120,
+            BackupNamePrefix = "dev",
+            DateMask = "yyyyMMddHHmmss",
+            BackupFileExtension = ".bak",
+            BackupNameMiddlePart = "_FullDb_",
+            Compress = true,
+            BackupType = "Full"
+        };
+    }
 
     //The singleton with its fixed key. The references are the records given, the exchange parameters included
     public static GlobalSettings NewGlobalSettings(FileStorage? fileStorageForExchange = null,

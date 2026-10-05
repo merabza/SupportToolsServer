@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,7 @@ using Moq;
 using SupportToolsServer.Application.NpmPackages.DeleteNpmPackage;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerCore.Domain.NpmPackages;
+using SupportToolsServerCore.Domain.Projects;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -15,12 +17,36 @@ public sealed class DeleteNpmPackageCommandHandlerTests
 {
     private readonly NpmPackage _npmPackage = TestData.NewNpmPackage("react", "UI library", 3);
     private readonly Mock<INpmPackageRepository> _npmPackages = new();
+    private readonly List<Project> _projectList = [];
+    private readonly Mock<IProjectRepository> _projects = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
+
+    public DeleteNpmPackageCommandHandlerTests()
+    {
+        _projects.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => _projectList);
+    }
 
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
-        var handler = new DeleteNpmPackageCommandHandler(_npmPackages.Object, _unitOfWork.Object);
+        var handler = new DeleteNpmPackageCommandHandler(_npmPackages.Object, _projects.Object, _unitOfWork.Object);
         return handler.Handle(new DeleteNpmPackageCommand(name, version), cancellationToken);
+    }
+
+    //The projects that use the package, in name order. A project that uses another package does not use this one
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheProjects_WhenProjectsUseThePackage()
+    {
+        _npmPackages.Setup(r => r.GetByName("react", It.IsAny<CancellationToken>())).ReturnsAsync(_npmPackage);
+        _projectList.AddRange(TestData.NewProject("AppB", npmPackages: [_npmPackage]),
+            TestData.NewProject("AppC", npmPackages: [TestData.NewNpmPackage("yup")]),
+            TestData.NewProject("appA", npmPackages: [TestData.NewNpmPackage("yup"), _npmPackage]));
+
+        Result result = await Handle("react", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(ErrorType.Conflict, result.Error.Type);
+        Assert.Equal("NpmPackage react Is Used By: Project appA, Project AppB", result.Error.Description);
+        VerifyNothingDeleted();
     }
 
     private void VerifyNothingDeleted()
