@@ -1,7 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SupportToolsServer.Application.ProjectTemplates;
 using SupportToolsServer.Application.Registry;
 using SupportToolsServerApiContracts.Errors;
+using SupportToolsServerCore.Domain.ProjectTemplates;
 using SupportToolsServerCore.Domain.ReactAppTemplates;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
@@ -11,13 +16,15 @@ namespace SupportToolsServer.Application.ReactAppTemplates.DeleteReactAppTemplat
 
 public sealed class DeleteReactAppTemplateCommandHandler : ICommandHandler<DeleteReactAppTemplateCommand>
 {
+    private readonly IProjectTemplateRepository _projectTemplateRepository;
     private readonly IReactAppTemplateRepository _reactAppTemplateRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteReactAppTemplateCommandHandler(IReactAppTemplateRepository reactAppTemplateRepository,
-        IUnitOfWork unitOfWork)
+        IProjectTemplateRepository projectTemplateRepository, IUnitOfWork unitOfWork)
     {
         _reactAppTemplateRepository = reactAppTemplateRepository;
+        _projectTemplateRepository = projectTemplateRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -37,13 +44,32 @@ public sealed class DeleteReactAppTemplateCommandHandler : ICommandHandler<Delet
                 command.Name, command.Version.Value, reactAppTemplate.Version);
         }
 
-        //აქ მოწმდება, ხომ არ მიმართავს ჩანაწერს სხვა აგრეგატი (409 RecordIsInUse მომხმარებლების სიით).
-        //ReactAppTemplate-ს ჯერ არავინ მიმართავს: B5 (ProjectTemplate.ReactTemplateName) FK-ს Restrict-ით დაამატებს და
-        //შაბლონების შემოწმებას აქ ჩასვამს
+        //ReactAppTemplate-ს პროექტის შაბლონები მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409
+        //RecordIsInUse მომხმარებლების სიით
+        List<string> usages = await GetUsages(reactAppTemplate.Id, cancellationToken);
+        if (usages.Count > 0)
+        {
+            return SupportToolsServerApiClientErrors.RecordIsInUse(ReactAppTemplateContractMapper.EntityName,
+                command.Name, usages);
+        }
 
         _reactAppTemplateRepository.Delete(reactAppTemplate);
         return await RecordVersions.SaveChanges(_unitOfWork, ReactAppTemplateContractMapper.EntityName, command.Name,
             reactAppTemplate.Version,
             async ct => (await _reactAppTemplateRepository.GetByName(command.Name, ct))?.Version, cancellationToken);
+    }
+
+    //მომხმარებლები "<ტიპი> <სახელი>" ფორმით, სახელით დალაგებული
+    private async Task<List<string>> GetUsages(ReactAppTemplateId reactAppTemplateId,
+        CancellationToken cancellationToken)
+    {
+        List<ProjectTemplate> projectTemplates = await _projectTemplateRepository.GetAll(cancellationToken);
+
+        return
+        [
+            .. projectTemplates.Where(x => reactAppTemplateId.Equals(x.ReactTemplateId)).Select(x => x.Name)
+                .Order(StringComparer.OrdinalIgnoreCase)
+                .Select(x => $"{ProjectTemplateContractMapper.EntityName} {x}")
+        ];
     }
 }

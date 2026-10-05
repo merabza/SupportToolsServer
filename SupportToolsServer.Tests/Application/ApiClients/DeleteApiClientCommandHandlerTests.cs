@@ -7,6 +7,7 @@ using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerCore.Domain.ApiClients;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
 using SupportToolsServerCore.Domain.Servers;
+using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -18,6 +19,7 @@ public sealed class DeleteApiClientCommandHandlerTests
     private readonly ApiClient _apiClient = TestData.NewApiClient("Pc1.WebAgent", version: 3);
     private readonly Mock<IApiClientRepository> _apiClients = new();
     private readonly Mock<IDatabaseServerConnectionRepository> _connections = new();
+    private readonly Mock<IGlobalSettingsRepository> _globalSettings = new();
     private readonly Mock<IServerRepository> _servers = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
@@ -30,7 +32,7 @@ public sealed class DeleteApiClientCommandHandlerTests
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
         var handler = new DeleteApiClientCommandHandler(_apiClients.Object, _connections.Object, _servers.Object,
-            _unitOfWork.Object);
+            _globalSettings.Object, _unitOfWork.Object);
         return handler.Handle(new DeleteApiClientCommand(name, version), cancellationToken);
     }
 
@@ -92,6 +94,44 @@ public sealed class DeleteApiClientCommandHandlerTests
         Assert.Equal("RecordIsInUse", result.Error.Code);
         Assert.Equal("ApiClient Pc1.WebAgent Is Used By: Server bee, Server guria, Server PAZISI",
             result.Error.Description);
+        VerifyNothingDeleted();
+    }
+
+    //Global settings that name another ApiClient, or none, do not use it
+    [Fact]
+    public async Task Handle_DeletesTheRecord_WhenTheGlobalSettingsUseAnotherApiClient()
+    {
+        _apiClients.Setup(r => r.GetByName("Pc1.WebAgent", It.IsAny<CancellationToken>())).ReturnsAsync(_apiClient);
+        ApiClient other = TestData.NewApiClient("Bagetter");
+        _globalSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewGlobalSettings(localPackageManagerWebApiClient: other));
+        using var cancellation = new CancellationTokenSource();
+
+        Result result = await Handle("Pc1.WebAgent", 3, cancellation.Token);
+
+        Assert.True(result.IsSuccess);
+        _globalSettings.Verify(r => r.Get(cancellation.Token), Times.Once);
+        _apiClients.Verify(r => r.Delete(_apiClient), Times.Once);
+    }
+
+    //The singleton has no name, so its field names the user. It comes after the connections and the servers
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheFieldOfTheGlobalSettingsAfterTheOtherUsers()
+    {
+        _apiClients.Setup(r => r.GetByName("Pc1.WebAgent", It.IsAny<CancellationToken>())).ReturnsAsync(_apiClient);
+        _connections.Setup(r => r.GetAll(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([TestData.NewDatabaseServerConnection("Pc1.Sql", _apiClient)]);
+        _servers.Setup(r => r.GetAll(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([TestData.NewServer("PAZISI", _apiClient)]);
+        _globalSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewGlobalSettings(localPackageManagerWebApiClient: _apiClient));
+
+        Result result = await Handle("Pc1.WebAgent", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(
+            "ApiClient Pc1.WebAgent Is Used By: DatabaseServerConnection Pc1.Sql, Server PAZISI, " +
+            "GlobalSettings.LocalPackageManagerWebApiClientName", result.Error.Description);
         VerifyNothingDeleted();
     }
 

@@ -5,6 +5,7 @@ using Moq;
 using SupportToolsServer.Application.Environments.DeleteEnvironment;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerCore.Domain.DeploymentEnvironments;
+using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -15,11 +16,13 @@ public sealed class DeleteEnvironmentCommandHandlerTests
 {
     private readonly Mock<IDeploymentEnvironmentRepository> _environments = new();
     private readonly DeploymentEnvironment _prod = TestData.NewEnvironment("Prod", "Production", 3);
+    private readonly Mock<IProjectCreatorSettingsRepository> _projectCreatorSettings = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
-        var handler = new DeleteEnvironmentCommandHandler(_environments.Object, _unitOfWork.Object);
+        var handler = new DeleteEnvironmentCommandHandler(_environments.Object, _projectCreatorSettings.Object,
+            _unitOfWork.Object);
         return handler.Handle(new DeleteEnvironmentCommand(name, version), cancellationToken);
     }
 
@@ -43,17 +46,38 @@ public sealed class DeleteEnvironmentCommandHandlerTests
         VerifyNothingDeleted();
     }
 
+    //Project creator settings that name another environment do not use it
     [Fact]
     public async Task Handle_DeletesTheRecord_WhenTheExpectedVersionIsStored()
     {
         _environments.Setup(r => r.GetByName("prod", It.IsAny<CancellationToken>())).ReturnsAsync(_prod);
+        _projectCreatorSettings.Setup(r => r.Get(It.IsAny<CancellationToken>())).ReturnsAsync(
+            TestData.NewProjectCreatorSettings(productionEnvironment: TestData.NewEnvironment("Stage")));
         using var cancellation = new CancellationTokenSource();
 
         Result result = await Handle("prod", 3, cancellation.Token);
 
         Assert.True(result.IsSuccess);
+        _projectCreatorSettings.Verify(r => r.Get(cancellation.Token), Times.Once);
         _environments.Verify(r => r.Delete(_prod), Times.Once);
         _unitOfWork.Verify(u => u.SaveChangesAsync(cancellation.Token), Times.Once);
+    }
+
+    //The singleton has no name, so its field names the user
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheFieldOfTheProjectCreatorSettings()
+    {
+        _environments.Setup(r => r.GetByName("Prod", It.IsAny<CancellationToken>())).ReturnsAsync(_prod);
+        _projectCreatorSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewProjectCreatorSettings(productionEnvironment: _prod));
+
+        Result result = await Handle("Prod", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(ErrorType.Conflict, result.Error.Type);
+        Assert.Equal("Environment Prod Is Used By: ProjectCreatorSettings.ProductionEnvironmentName",
+            result.Error.Description);
+        VerifyNothingDeleted();
     }
 
     [Theory]

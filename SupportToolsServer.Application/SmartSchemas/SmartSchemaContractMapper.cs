@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerCore.Domain.SmartSchemas;
@@ -25,5 +26,12 @@ internal static class SmartSchemaContractMapper
             ],
             Version = smartSchema.Version
         };
+    }
+
+    //სხვა აგრეგატები ჭკვიან სქემას Id-ით ინახავენ, კონტრაქტში კი მის სახელს გადასცემენ (მაგალითად,
+    //ProjectCreatorSettings.UseSmartSchema)
+    public static Dictionary<SmartSchemaId, string> ToNamesById(this IEnumerable<SmartSchema> smartSchemas)
+    {
+        return smartSchemas.ToDictionary(x => x.Id, x => x.Name);
     }
 }

@@ -12,9 +12,11 @@ using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
+using SupportToolsServerCore.Domain.ProjectTemplates;
 using SupportToolsServerCore.Domain.ReactAppTemplates;
 using SupportToolsServerCore.Domain.Runtimes;
 using SupportToolsServerCore.Domain.Servers;
+using SupportToolsServerCore.Domain.Settings;
 using SupportToolsServerCore.Domain.SmartSchemas;
 using Xunit;
 
@@ -72,6 +74,16 @@ public sealed class SupportToolsServerRepositoriesDependencyInjectionTests
         Assert.Contains(services,
             d => d.ServiceType == typeof(IServerRepository) && d.ImplementationType == typeof(ServerRepository) &&
                  d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IGlobalSettingsRepository) &&
+                 d.ImplementationType == typeof(GlobalSettingsRepository) && d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IProjectCreatorSettingsRepository) &&
+                 d.ImplementationType == typeof(ProjectCreatorSettingsRepository) &&
+                 d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IProjectTemplateRepository) &&
+                 d.ImplementationType == typeof(ProjectTemplateRepository) && d.Lifetime == ServiceLifetime.Scoped);
     }
 
     [Fact]

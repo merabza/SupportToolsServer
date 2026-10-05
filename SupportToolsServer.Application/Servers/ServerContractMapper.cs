@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerCore.Domain.ApiClients;
 using SupportToolsServerCore.Domain.Runtimes;
@@ -28,5 +29,12 @@ internal static class ServerContractMapper
             ServerSideDeployFolder = server.ServerSideDeployFolder,
             Version = server.Version
         };
+    }
+
+    //სხვა აგრეგატები სერვერს Id-ით ინახავენ, კონტრაქტში კი მის სახელს გადასცემენ
+    //(ProjectCreatorSettings.ProductionServerName)
+    public static Dictionary<ServerId, string> ToNamesById(this IEnumerable<Server> servers)
+    {
+        return servers.ToDictionary(x => x.Id, x => x.Name);
     }
 }

@@ -11,19 +11,125 @@ using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.Primitives;
+using SupportToolsServerCore.Domain.ProjectTemplates;
 using SupportToolsServerCore.Domain.ReactAppTemplates;
 using SupportToolsServerCore.Domain.Runtimes;
 using SupportToolsServerCore.Domain.Servers;
+using SupportToolsServerCore.Domain.Settings;
 using SupportToolsServerCore.Domain.SmartSchemas;
 
 namespace SupportToolsServer.Tests.TestInfrastructure;
 
-//The secrets of the resources (passwords, API keys, users) are made up
+//The secrets of the resources (passwords, API keys, users, the MediatR license key) are made up
 internal static class TestData
 {
     public const string MadeUpApiKey = "made-up-api-key";
     public const string MadeUpUser = "made-up-user";
     public const string MadeUpPassword = "made-up-password";
+    public const string MadeUpLicenseKey = "made-up-license-key";
+
+    //The singleton with its fixed key. The references are the records given, the exchange parameters included
+    public static GlobalSettings NewGlobalSettings(FileStorage? fileStorageForExchange = null,
+        SmartSchema? smartSchemaForExchange = null, SmartSchema? smartSchemaForLocal = null,
+        ApiClient? localPackageManagerWebApiClient = null, FileStorage? exchangeFileStorage = null,
+        SmartSchema? exchangeSmartSchema = null, SmartSchema? localSmartSchema = null,
+        int version = EntityVersion.Initial)
+    {
+        return new GlobalSettings(GlobalSettingsId.Singleton, "ltgmz", ".up!", "yyyyMMddHHmmss", ".zip", "yyyyMMdd",
+            ".json", MadeUpLicenseKey, fileStorageForExchange?.Id, smartSchemaForExchange?.Id, smartSchemaForLocal?.Id,
+            localPackageManagerWebApiClient?.Id,
+            new DatabasesBackupFilesExchange(".down!", ".up!", exchangeFileStorage?.Id, exchangeSmartSchema?.Id,
+                localSmartSchema?.Id), version);
+    }
+
+    //version is the expected version of an upsert: 0 creates the singleton
+    public static StsGlobalSettingsDataModel GlobalSettingsModel(string? fileStorageNameForExchange = null,
+        string? smartSchemaNameForExchange = null, string? smartSchemaNameForLocal = null,
+        string? localPackageManagerWebApiClientName = null, string? exchangeFileStorageName = null,
+        string? exchangeSmartSchemaName = null, string? localSmartSchemaName = null, int version = 0)
+    {
+        return new StsGlobalSettingsDataModel
+        {
+            ServiceDescriptionSignature = "ltgmz",
+            UploadTempExtension = ".up!",
+            ProgramArchiveDateMask = "yyyyMMddHHmmss",
+            ProgramArchiveExtension = ".zip",
+            ParametersFileDateMask = "yyyyMMdd",
+            ParametersFileExtension = ".json",
+            MediatRLicenseKey = MadeUpLicenseKey,
+            FileStorageNameForExchange = fileStorageNameForExchange,
+            SmartSchemaNameForExchange = smartSchemaNameForExchange,
+            SmartSchemaNameForLocal = smartSchemaNameForLocal,
+            LocalPackageManagerWebApiClientName = localPackageManagerWebApiClientName,
+            DatabasesBackupFilesExchange = new StsDatabasesBackupFilesExchangeDataModel
+            {
+                DownloadTempExtension = ".down!",
+                UploadTempExtension = ".up!",
+                ExchangeFileStorageName = exchangeFileStorageName,
+                ExchangeSmartSchemaName = exchangeSmartSchemaName,
+                LocalSmartSchemaName = localSmartSchemaName
+            },
+            Version = version
+        };
+    }
+
+    //The singleton with its fixed key and the references to the records given
+    public static ProjectCreatorSettings NewProjectCreatorSettings(Server? productionServer = null,
+        DeploymentEnvironment? productionEnvironment = null, DatabaseServerConnection? developerDbConnection = null,
+        FileStorage? databaseExchangeFileStorage = null, SmartSchema? useSmartSchema = null,
+        int version = EntityVersion.Initial)
+    {
+        return new ProjectCreatorSettings(ProjectCreatorSettingsId.Singleton, 4, "FakeHost", @"D:\1WorkDotnet",
+            @"D:\1WorkSecurity", productionServer?.Id, productionEnvironment?.Id, developerDbConnection?.Id,
+            databaseExchangeFileStorage?.Id, useSmartSchema?.Id, version);
+    }
+
+    //version is the expected version of an upsert: 0 creates the singleton
+    public static StsProjectCreatorSettingsDataModel ProjectCreatorSettingsModel(string? productionServerName = null,
+        string? productionEnvironmentName = null, string? developerDbConnectionName = null,
+        string? databaseExchangeFileStorageName = null, string? useSmartSchema = null, int version = 0)
+    {
+        return new StsProjectCreatorSettingsDataModel
+        {
+            IndentSize = 4,
+            FakeHostProjectName = "FakeHost",
+            ProjectsFolderPathReal = @"D:\1WorkDotnet",
+            SecretsFolderPathReal = @"D:\1WorkSecurity",
+            ProductionServerName = productionServerName,
+            ProductionEnvironmentName = productionEnvironmentName,
+            DeveloperDbConnectionName = developerDbConnectionName,
+            DatabaseExchangeFileStorageName = databaseExchangeFileStorageName,
+            UseSmartSchema = useSmartSchema,
+            Version = version
+        };
+    }
+
+    public static ProjectTemplate NewProjectTemplate(string name, ReactAppTemplate? reactTemplate = null,
+        int version = EntityVersion.Initial)
+    {
+        return new ProjectTemplate(ProjectTemplateId.CreateUnique(), name, "Api", "ReactTest", "Rt", true, false, true,
+            false, true, false, true, false, true, false, reactTemplate?.Id, version);
+    }
+
+    //version is the expected version of an upsert: 0 creates the record
+    public static StsProjectTemplateDataModel ProjectTemplateModel(string name, string? reactTemplateName = null,
+        int version = 0)
+    {
+        return new StsProjectTemplateDataModel
+        {
+            Name = name,
+            SupportProjectType = "Api",
+            TestProjectName = "ReactTest",
+            TestProjectShortName = "Rt",
+            UseDatabase = true,
+            UseMenu = true,
+            UseReact = true,
+            UseIdentity = true,
+            UseSignalR = true,
+            ReactTemplateName = reactTemplateName,
+            Version = version
+        };
+    }
 
     //The details come with the update that gives the stored version, as the constructor takes none
     public static SmartSchema NewSmartSchema(string name, int lastPreserveCount = 1,

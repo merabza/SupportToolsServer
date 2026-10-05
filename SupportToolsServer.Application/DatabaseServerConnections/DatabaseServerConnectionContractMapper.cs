@@ -41,4 +41,12 @@ internal static class DatabaseServerConnectionContractMapper
             Version = connection.Version
         };
     }
+
+    //სხვა აგრეგატები ბაზის კავშირს Id-ით ინახავენ, კონტრაქტში კი მის სახელს გადასცემენ
+    //(ProjectCreatorSettings.DeveloperDbConnectionName)
+    public static Dictionary<DatabaseServerConnectionId, string> ToNamesById(
+        this IEnumerable<DatabaseServerConnection> connections)
+    {
+        return connections.ToDictionary(x => x.Id, x => x.Name);
+    }
 }

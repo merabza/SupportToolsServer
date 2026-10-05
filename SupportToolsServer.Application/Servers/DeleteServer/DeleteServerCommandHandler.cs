@@ -1,8 +1,11 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using SupportToolsServer.Application.Registry;
+using SupportToolsServer.Application.Settings;
 using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerCore.Domain.Servers;
+using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
@@ -11,12 +14,15 @@ namespace SupportToolsServer.Application.Servers.DeleteServer;
 
 public sealed class DeleteServerCommandHandler : ICommandHandler<DeleteServerCommand>
 {
+    private readonly IProjectCreatorSettingsRepository _projectCreatorSettingsRepository;
     private readonly IServerRepository _serverRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteServerCommandHandler(IServerRepository serverRepository, IUnitOfWork unitOfWork)
+    public DeleteServerCommandHandler(IServerRepository serverRepository,
+        IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IUnitOfWork unitOfWork)
     {
         _serverRepository = serverRepository;
+        _projectCreatorSettingsRepository = projectCreatorSettingsRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -35,13 +41,27 @@ public sealed class DeleteServerCommandHandler : ICommandHandler<DeleteServerCom
                 command.Version.Value, server.Version);
         }
 
-        //აქ მოწმდება, ხომ არ მიმართავს ჩანაწერს სხვა აგრეგატი (409 RecordIsInUse მომხმარებლების სიით). Server-ს ჯერ
-        //არავინ მიმართავს: B5 (ProjectCreatorSettings.ProductionServerName) და B7 (ServerInfo) FK-ს Restrict-ით
-        //დაამატებენ და მომხმარებლების შემოწმებას აქ ჩასვამენ
+        //Server-ს სხვა აგრეგატი მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409 RecordIsInUse
+        //მომხმარებლების სიით. B7 (ServerInfo) თავის მომხმარებლებს აქ დაამატებს
+        List<string> usages = await GetUsages(server.Id, cancellationToken);
+        if (usages.Count > 0)
+        {
+            return SupportToolsServerApiClientErrors.RecordIsInUse(ServerContractMapper.EntityName, command.Name,
+                usages);
+        }
 
         _serverRepository.Delete(server);
         return await RecordVersions.SaveChanges(_unitOfWork, ServerContractMapper.EntityName, command.Name,
             server.Version, async ct => (await _serverRepository.GetByName(command.Name, ct))?.Version,
             cancellationToken);
+    }
+
+    //მომხმარებლები: პროექტის შემქმნელის პარამეტრების ველი ("ProjectCreatorSettings.<ველი>")
+    private async Task<List<string>> GetUsages(ServerId serverId, CancellationToken cancellationToken)
+    {
+        ProjectCreatorSettings? projectCreatorSettings =
+            await _projectCreatorSettingsRepository.Get(cancellationToken);
+
+        return [.. projectCreatorSettings.GetUsages(serverId)];
     }
 }

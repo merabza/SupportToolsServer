@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerCore.Domain.ReactAppTemplates;
 
@@ -14,5 +16,13 @@ internal static class ReactAppTemplateContractMapper
         {
             Name = reactAppTemplate.Name, Template = reactAppTemplate.Template, Version = reactAppTemplate.Version
         };
+    }
+
+    //სხვა აგრეგატები React-ის შაბლონს Id-ით ინახავენ, კონტრაქტში კი მის სახელს გადასცემენ
+    //(ProjectTemplate.ReactTemplateName)
+    public static Dictionary<ReactAppTemplateId, string> ToNamesById(
+        this IEnumerable<ReactAppTemplate> reactAppTemplates)
+    {
+        return reactAppTemplates.ToDictionary(x => x.Id, x => x.Name);
     }
 }

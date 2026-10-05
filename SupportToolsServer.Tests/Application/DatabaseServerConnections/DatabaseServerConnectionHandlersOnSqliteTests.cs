@@ -53,7 +53,7 @@ public sealed class DatabaseServerConnectionHandlersOnSqliteTests : IAsyncLifeti
     {
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteDatabaseServerConnectionCommandHandler(new DatabaseServerConnectionRepository(context),
-            UnitOfWork(context, concurrentChange));
+            new ProjectCreatorSettingsRepository(context), UnitOfWork(context, concurrentChange));
         return await handler.Handle(new DeleteDatabaseServerConnectionCommand(name, version), CancellationToken.None);
     }
 
@@ -71,7 +71,7 @@ public sealed class DatabaseServerConnectionHandlersOnSqliteTests : IAsyncLifeti
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteApiClientCommandHandler(new ApiClientRepository(context),
             new DatabaseServerConnectionRepository(context), new ServerRepository(context),
-            new SupportToolsServerUnitOfWork(context));
+            new GlobalSettingsRepository(context), new SupportToolsServerUnitOfWork(context));
         return await handler.Handle(new DeleteApiClientCommand(name, version), CancellationToken.None);
     }
 

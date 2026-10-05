@@ -10,9 +10,11 @@ using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
+using SupportToolsServerCore.Domain.ProjectTemplates;
 using SupportToolsServerCore.Domain.ReactAppTemplates;
 using SupportToolsServerCore.Domain.Runtimes;
 using SupportToolsServerCore.Domain.Servers;
+using SupportToolsServerCore.Domain.Settings;
 using SupportToolsServerCore.Domain.SmartSchemas;
 
 namespace SupportToolsServer.Infrastructure.DependencyInjection;
@@ -38,6 +40,9 @@ public static class SupportToolsServerRepositoriesDependencyInjection
         services.AddScoped<IApiClientRepository, ApiClientRepository>();
         services.AddScoped<IDatabaseServerConnectionRepository, DatabaseServerConnectionRepository>();
         services.AddScoped<IServerRepository, ServerRepository>();
+        services.AddScoped<IGlobalSettingsRepository, GlobalSettingsRepository>();
+        services.AddScoped<IProjectCreatorSettingsRepository, ProjectCreatorSettingsRepository>();
+        services.AddScoped<IProjectTemplateRepository, ProjectTemplateRepository>();
 
         debugLogger?.Information("{MethodName} Finished", nameof(AddSupportToolsServerRepositories));
 

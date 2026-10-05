@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using SupportToolsServer.Application.DatabaseServerConnections;
 using SupportToolsServer.Application.Registry;
 using SupportToolsServer.Application.Servers;
+using SupportToolsServer.Application.Settings;
 using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerCore.Domain.ApiClients;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
 using SupportToolsServerCore.Domain.Servers;
+using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
@@ -20,16 +22,18 @@ public sealed class DeleteApiClientCommandHandler : ICommandHandler<DeleteApiCli
 {
     private readonly IApiClientRepository _apiClientRepository;
     private readonly IDatabaseServerConnectionRepository _databaseServerConnectionRepository;
+    private readonly IGlobalSettingsRepository _globalSettingsRepository;
     private readonly IServerRepository _serverRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteApiClientCommandHandler(IApiClientRepository apiClientRepository,
         IDatabaseServerConnectionRepository databaseServerConnectionRepository, IServerRepository serverRepository,
-        IUnitOfWork unitOfWork)
+        IGlobalSettingsRepository globalSettingsRepository, IUnitOfWork unitOfWork)
     {
         _apiClientRepository = apiClientRepository;
         _databaseServerConnectionRepository = databaseServerConnectionRepository;
         _serverRepository = serverRepository;
+        _globalSettingsRepository = globalSettingsRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -49,8 +53,7 @@ public sealed class DeleteApiClientCommandHandler : ICommandHandler<DeleteApiCli
         }
 
         //ApiClient-ს სხვა აგრეგატები მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409 RecordIsInUse
-        //მომხმარებლების სიით. B5 (GlobalSettings) და B7 (ServerInfo.WebAgentNameForCheck) თავის მომხმარებლებს აქ
-        //დაამატებენ
+        //მომხმარებლების სიით. B7 (ServerInfo.WebAgentNameForCheck) თავის მომხმარებლებს აქ დაამატებს
         List<string> usages = await GetUsages(apiClient.Id, cancellationToken);
         if (usages.Count > 0)
         {
@@ -65,11 +68,13 @@ public sealed class DeleteApiClientCommandHandler : ICommandHandler<DeleteApiCli
     }
 
     //მომხმარებლები "<ტიპი> <სახელი>" ფორმით: ჯერ ბაზის კავშირები, მერე სერვერები, თითოეული სახელით დალაგებული.
-    //სერვერი ერთხელ ჩანს, თუნდაც ApiClient მისი ორივე ვებაგენტი იყოს
+    //სერვერი ერთხელ ჩანს, თუნდაც ApiClient მისი ორივე ვებაგენტი იყოს. ბოლოს გლობალური პარამეტრების ველი
+    //("GlobalSettings.<ველი>")
     private async Task<List<string>> GetUsages(ApiClientId apiClientId, CancellationToken cancellationToken)
     {
         List<DatabaseServerConnection> connections = await _databaseServerConnectionRepository.GetAll(cancellationToken);
         List<Server> servers = await _serverRepository.GetAll(cancellationToken);
+        GlobalSettings? globalSettings = await _globalSettingsRepository.Get(cancellationToken);
 
         return
         [
@@ -78,7 +83,8 @@ public sealed class DeleteApiClientCommandHandler : ICommandHandler<DeleteApiCli
                 .Select(x => $"{DatabaseServerConnectionContractMapper.EntityName} {x}"),
             .. servers.Where(x => apiClientId.Equals(x.WebAgentId) || apiClientId.Equals(x.WebAgentInstallerId))
                 .Select(x => x.Name).Order(StringComparer.OrdinalIgnoreCase)
-                .Select(x => $"{ServerContractMapper.EntityName} {x}")
+                .Select(x => $"{ServerContractMapper.EntityName} {x}"),
+            .. globalSettings.GetUsages(apiClientId)
         ];
     }
 }

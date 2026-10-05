@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerCore.Domain.FileStorages;
 
@@ -21,5 +23,12 @@ internal static class FileStorageContractMapper
             FtpSiteLsFileOffset = fileStorage.FtpSiteLsFileOffset,
             Version = fileStorage.Version
         };
+    }
+
+    //სხვა აგრეგატები ფაილსაცავს Id-ით ინახავენ, კონტრაქტში კი მის სახელს გადასცემენ (მაგალითად,
+    //GlobalSettings.FileStorageNameForExchange)
+    public static Dictionary<FileStorageId, string> ToNamesById(this IEnumerable<FileStorage> fileStorages)
+    {
+        return fileStorages.ToDictionary(x => x.Id, x => x.Name);
     }
 }

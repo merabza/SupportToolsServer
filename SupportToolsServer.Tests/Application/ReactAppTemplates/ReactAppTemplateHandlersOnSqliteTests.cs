@@ -46,7 +46,7 @@ public sealed class ReactAppTemplateHandlersOnSqliteTests : IAsyncLifetime
     {
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteReactAppTemplateCommandHandler(new ReactAppTemplateRepository(context),
-            UnitOfWork(context, concurrentChange));
+            new ProjectTemplateRepository(context), UnitOfWork(context, concurrentChange));
         return await handler.Handle(new DeleteReactAppTemplateCommand(name, version), CancellationToken.None);
     }
 

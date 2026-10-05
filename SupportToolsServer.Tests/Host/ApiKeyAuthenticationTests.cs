@@ -169,6 +169,14 @@ public sealed class ApiKeyAuthenticationTests : IClassFixture<SupportToolsServer
     [InlineData("GET", "api/v1/servers/dl360")]
     [InlineData("POST", "api/v1/servers/update/dl360")]
     [InlineData("DELETE", "api/v1/servers/delete/dl360?version=1")]
+    [InlineData("GET", "api/v1/settings/global")]
+    [InlineData("POST", "api/v1/settings/global/update")]
+    [InlineData("GET", "api/v1/settings/projectcreator")]
+    [InlineData("POST", "api/v1/settings/projectcreator/update")]
+    [InlineData("GET", "api/v1/projecttemplates")]
+    [InlineData("GET", "api/v1/projecttemplates/Console%20With%20Database")]
+    [InlineData("POST", "api/v1/projecttemplates/update/Console%20With%20Database")]
+    [InlineData("DELETE", "api/v1/projecttemplates/delete/Console%20With%20Database?version=1")]
     [InlineData("POST", NegotiateRoute)]
     public async Task EveryProtectedRoute_ReturnsUnauthorized_WithoutApiKey(string method, string route)
     {

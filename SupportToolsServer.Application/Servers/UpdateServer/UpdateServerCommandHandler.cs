@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SupportToolsServer.Application.ApiClients;
 using SupportToolsServer.Application.Registry;
 using SupportToolsServer.Application.Runtimes;
-using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerCore.Domain.ApiClients;
 using SupportToolsServerCore.Domain.Runtimes;
@@ -48,18 +44,16 @@ public sealed class UpdateServerCommandHandler : ICommandHandler<UpdateServerCom
 
         //ვებაგენტები და Runtime სახელით მოდის, ბაზაში კი მათი Id-ები ინახება. ცარიელი სახელი ნიშნავს, რომ მითითება არ
         //არის. ყველა არარსებული სახელი ერთ შეცდომაში ბრუნდება, ჩანაწერის ტიპებად დაჯგუფებული
-        List<(string EntityName, string Name)> missing = [];
-        ApiClient? webAgent = await FindReferenced(model.WebAgentName, ApiClientContractMapper.EntityName,
-            _apiClientRepository.GetByName, missing, cancellationToken);
-        ApiClient? webAgentInstaller = await FindReferenced(model.WebAgentInstallerName,
-            ApiClientContractMapper.EntityName, _apiClientRepository.GetByName, missing, cancellationToken);
-        Runtime? runtime = await FindReferenced(model.Runtime, RuntimeContractMapper.EntityName,
-            _runtimeRepository.GetByName, missing, cancellationToken);
-        if (missing.Count > 0)
+        var references = new ReferencedRecords();
+        ApiClient? webAgent = await references.Find(model.WebAgentName, ApiClientContractMapper.EntityName,
+            _apiClientRepository.GetByName, cancellationToken);
+        ApiClient? webAgentInstaller = await references.Find(model.WebAgentInstallerName,
+            ApiClientContractMapper.EntityName, _apiClientRepository.GetByName, cancellationToken);
+        Runtime? runtime = await references.Find(model.Runtime, RuntimeContractMapper.EntityName,
+            _runtimeRepository.GetByName, cancellationToken);
+        if (!references.AreAllFound)
         {
-            //ორივე ვებაგენტი ერთი და იგივე ApiClient შეიძლება იყოს, ამიტომ სახელი ერთხელ იწერება
-            return SupportToolsServerApiClientErrors.ReferencedRecordsNotFound(missing.Distinct()
-                .ToLookup(x => x.EntityName, x => x.Name));
+            return references.MissingError();
         }
 
         Server server;
@@ -86,24 +80,5 @@ public sealed class UpdateServerCommandHandler : ICommandHandler<UpdateServerCom
         }
 
         return server.Version;
-    }
-
-    //სახელით მითითებული ჩანაწერი. ცარიელი სახელი მითითება არ არის, არარსებული სახელი კი missing-ს ემატება
-    private static async Task<TEntity?> FindReferenced<TEntity>(string? name, string entityName,
-        Func<string, CancellationToken, Task<TEntity?>> getByName, List<(string EntityName, string Name)> missing,
-        CancellationToken cancellationToken) where TEntity : class
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            return null;
-        }
-
-        TEntity? entity = await getByName(name, cancellationToken);
-        if (entity is null)
-        {
-            missing.Add((entityName, name));
-        }
-
-        return entity;
     }
 }

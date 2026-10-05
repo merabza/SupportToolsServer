@@ -5,6 +5,7 @@ using Moq;
 using SupportToolsServer.Application.Servers.DeleteServer;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerCore.Domain.Servers;
+using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -13,13 +14,15 @@ namespace SupportToolsServer.Tests.Application.Servers;
 
 public sealed class DeleteServerCommandHandlerTests
 {
+    private readonly Mock<IProjectCreatorSettingsRepository> _projectCreatorSettings = new();
     private readonly Server _server = TestData.NewServer("dl360", version: 3);
     private readonly Mock<IServerRepository> _servers = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
-        var handler = new DeleteServerCommandHandler(_servers.Object, _unitOfWork.Object);
+        var handler = new DeleteServerCommandHandler(_servers.Object, _projectCreatorSettings.Object,
+            _unitOfWork.Object);
         return handler.Handle(new DeleteServerCommand(name, version), cancellationToken);
     }
 
@@ -42,17 +45,37 @@ public sealed class DeleteServerCommandHandlerTests
         VerifyNothingDeleted();
     }
 
+    //Project creator settings that name another server do not use it
     [Fact]
     public async Task Handle_DeletesTheRecord_WhenTheExpectedVersionIsStored()
     {
         _servers.Setup(r => r.GetByName("DL360", It.IsAny<CancellationToken>())).ReturnsAsync(_server);
+        _projectCreatorSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewProjectCreatorSettings(TestData.NewServer("PAZISI")));
         using var cancellation = new CancellationTokenSource();
 
         Result result = await Handle("DL360", 3, cancellation.Token);
 
         Assert.True(result.IsSuccess);
+        _projectCreatorSettings.Verify(r => r.Get(cancellation.Token), Times.Once);
         _servers.Verify(r => r.Delete(_server), Times.Once);
         _unitOfWork.Verify(u => u.SaveChangesAsync(cancellation.Token), Times.Once);
+    }
+
+    //The singleton has no name, so its field names the user
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheFieldOfTheProjectCreatorSettings()
+    {
+        _servers.Setup(r => r.GetByName("dl360", It.IsAny<CancellationToken>())).ReturnsAsync(_server);
+        _projectCreatorSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewProjectCreatorSettings(_server));
+
+        Result result = await Handle("dl360", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(ErrorType.Conflict, result.Error.Type);
+        Assert.Equal("Server dl360 Is Used By: ProjectCreatorSettings.ProductionServerName", result.Error.Description);
+        VerifyNothingDeleted();
     }
 
     [Theory]

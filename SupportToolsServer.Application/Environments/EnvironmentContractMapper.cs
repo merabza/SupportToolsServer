@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerCore.Domain.DeploymentEnvironments;
 
@@ -14,5 +16,13 @@ internal static class EnvironmentContractMapper
         {
             Name = environment.Name, Description = environment.Description, Version = environment.Version
         };
+    }
+
+    //სხვა აგრეგატები გარემოს Id-ით ინახავენ, კონტრაქტში კი მის სახელს გადასცემენ
+    //(ProjectCreatorSettings.ProductionEnvironmentName)
+    public static Dictionary<DeploymentEnvironmentId, string> ToNamesById(
+        this IEnumerable<DeploymentEnvironment> environments)
+    {
+        return environments.ToDictionary(x => x.Id, x => x.Name);
     }
 }

@@ -23,6 +23,9 @@ public static class SupportToolsServerApiDependencyInjection
         endpoints.UseApiClientsEndpoints(debugLogger);
         endpoints.UseDatabaseServerConnectionsEndpoints(debugLogger);
         endpoints.UseServersEndpoints(debugLogger);
+        endpoints.UseGlobalSettingsEndpoints(debugLogger);
+        endpoints.UseProjectCreatorSettingsEndpoints(debugLogger);
+        endpoints.UseProjectTemplatesEndpoints(debugLogger);
 
         debugLogger?.Information("{MethodName} Finished", nameof(UseSupportToolsServerApi));
 

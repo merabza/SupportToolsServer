@@ -1,8 +1,11 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using SupportToolsServer.Application.Registry;
+using SupportToolsServer.Application.Settings;
 using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
+using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
@@ -12,12 +15,15 @@ namespace SupportToolsServer.Application.DatabaseServerConnections.DeleteDatabas
 public sealed class DeleteDatabaseServerConnectionCommandHandler : ICommandHandler<DeleteDatabaseServerConnectionCommand>
 {
     private readonly IDatabaseServerConnectionRepository _databaseServerConnectionRepository;
+    private readonly IProjectCreatorSettingsRepository _projectCreatorSettingsRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteDatabaseServerConnectionCommandHandler(
-        IDatabaseServerConnectionRepository databaseServerConnectionRepository, IUnitOfWork unitOfWork)
+        IDatabaseServerConnectionRepository databaseServerConnectionRepository,
+        IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IUnitOfWork unitOfWork)
     {
         _databaseServerConnectionRepository = databaseServerConnectionRepository;
+        _projectCreatorSettingsRepository = projectCreatorSettingsRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -39,14 +45,30 @@ public sealed class DeleteDatabaseServerConnectionCommandHandler : ICommandHandl
                 connection.Version);
         }
 
-        //აქ მოწმდება, ხომ არ მიმართავს ჩანაწერს სხვა აგრეგატი (409 RecordIsInUse მომხმარებლების სიით).
-        //DatabaseServerConnection-ს ჯერ არავინ მიმართავს: B5 (ProjectCreatorSettings) და B6/B7 (ბაზის პარამეტრები) FK-ს
-        //Restrict-ით დაამატებენ და მომხმარებლების შემოწმებას აქ ჩასვამენ. folders set-ები კავშირთან ერთად იშლება
+        //DatabaseServerConnection-ს სხვა აგრეგატი მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409
+        //RecordIsInUse მომხმარებლების სიით. B6/B7 (ბაზის პარამეტრები) თავის მომხმარებლებს აქ დაამატებენ. folders
+        //set-ები კავშირთან ერთად იშლება
+        List<string> usages = await GetUsages(connection.Id, cancellationToken);
+        if (usages.Count > 0)
+        {
+            return SupportToolsServerApiClientErrors.RecordIsInUse(DatabaseServerConnectionContractMapper.EntityName,
+                command.Name, usages);
+        }
 
         _databaseServerConnectionRepository.Delete(connection);
         return await RecordVersions.SaveChanges(_unitOfWork, DatabaseServerConnectionContractMapper.EntityName,
             command.Name, connection.Version,
             async ct => (await _databaseServerConnectionRepository.GetByName(command.Name, ct))?.Version,
             cancellationToken);
+    }
+
+    //მომხმარებლები: პროექტის შემქმნელის პარამეტრების ველი ("ProjectCreatorSettings.<ველი>")
+    private async Task<List<string>> GetUsages(DatabaseServerConnectionId connectionId,
+        CancellationToken cancellationToken)
+    {
+        ProjectCreatorSettings? projectCreatorSettings =
+            await _projectCreatorSettingsRepository.Get(cancellationToken);
+
+        return [.. projectCreatorSettings.GetUsages(connectionId)];
     }
 }

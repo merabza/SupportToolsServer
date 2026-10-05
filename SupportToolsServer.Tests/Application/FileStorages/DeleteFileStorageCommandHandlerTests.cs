@@ -5,6 +5,7 @@ using Moq;
 using SupportToolsServer.Application.FileStorages.DeleteFileStorage;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerCore.Domain.FileStorages;
+using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -15,11 +16,14 @@ public sealed class DeleteFileStorageCommandHandlerTests
 {
     private readonly FileStorage _fileStorage = TestData.NewFileStorage("Exchange", version: 3);
     private readonly Mock<IFileStorageRepository> _fileStorages = new();
+    private readonly Mock<IGlobalSettingsRepository> _globalSettings = new();
+    private readonly Mock<IProjectCreatorSettingsRepository> _projectCreatorSettings = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
-        var handler = new DeleteFileStorageCommandHandler(_fileStorages.Object, _unitOfWork.Object);
+        var handler = new DeleteFileStorageCommandHandler(_fileStorages.Object, _globalSettings.Object,
+            _projectCreatorSettings.Object, _unitOfWork.Object);
         return handler.Handle(new DeleteFileStorageCommand(name, version), cancellationToken);
     }
 
@@ -43,17 +47,62 @@ public sealed class DeleteFileStorageCommandHandlerTests
         VerifyNothingDeleted();
     }
 
+    //Settings that name another file storage do not use it
     [Fact]
     public async Task Handle_DeletesTheRecord_WhenTheExpectedVersionIsStored()
     {
+        FileStorage other = TestData.NewFileStorage("Backups");
         _fileStorages.Setup(r => r.GetByName("EXCHANGE", It.IsAny<CancellationToken>())).ReturnsAsync(_fileStorage);
+        _globalSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewGlobalSettings(other, exchangeFileStorage: other));
+        _projectCreatorSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewProjectCreatorSettings(databaseExchangeFileStorage: other));
         using var cancellation = new CancellationTokenSource();
 
         Result result = await Handle("EXCHANGE", 3, cancellation.Token);
 
         Assert.True(result.IsSuccess);
+        _globalSettings.Verify(r => r.Get(cancellation.Token), Times.Once);
+        _projectCreatorSettings.Verify(r => r.Get(cancellation.Token), Times.Once);
         _fileStorages.Verify(r => r.Delete(_fileStorage), Times.Once);
         _unitOfWork.Verify(u => u.SaveChangesAsync(cancellation.Token), Times.Once);
+    }
+
+    //The singletons have no name, so their fields name the users: the global settings first, the exchange
+    //parameters after their own fields, then the project creator settings
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheFieldsOfTheSettingsThatUseIt()
+    {
+        _fileStorages.Setup(r => r.GetByName("Exchange", It.IsAny<CancellationToken>())).ReturnsAsync(_fileStorage);
+        _globalSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewGlobalSettings(_fileStorage, exchangeFileStorage: _fileStorage));
+        _projectCreatorSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewProjectCreatorSettings(databaseExchangeFileStorage: _fileStorage));
+
+        Result result = await Handle("Exchange", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(ErrorType.Conflict, result.Error.Type);
+        Assert.Equal(
+            "FileStorage Exchange Is Used By: GlobalSettings.FileStorageNameForExchange, " +
+            "GlobalSettings.DatabasesBackupFilesExchange.ExchangeFileStorageName, " +
+            "ProjectCreatorSettings.DatabaseExchangeFileStorageName", result.Error.Description);
+        VerifyNothingDeleted();
+    }
+
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUse_WhenOnlyTheExchangeParametersUseIt()
+    {
+        _fileStorages.Setup(r => r.GetByName("Exchange", It.IsAny<CancellationToken>())).ReturnsAsync(_fileStorage);
+        _globalSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewGlobalSettings(exchangeFileStorage: _fileStorage));
+
+        Result result = await Handle("Exchange", 3);
+
+        Assert.Equal(
+            "FileStorage Exchange Is Used By: GlobalSettings.DatabasesBackupFilesExchange.ExchangeFileStorageName",
+            result.Error.Description);
+        VerifyNothingDeleted();
     }
 
     [Theory]
