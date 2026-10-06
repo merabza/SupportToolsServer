@@ -6,28 +6,37 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SupportToolsServer.Infrastructure.Repositories;
 using SupportToolsServer.Tests.TestInfrastructure;
+using SupportToolsServerCore.Domain.ApiClients;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
+using SupportToolsServerCore.Domain.DeploymentEnvironments;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.Projects;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.SmartSchemas;
 using SupportToolsServerDbPart.Db;
 using Xunit;
 
 namespace SupportToolsServer.Tests.Infrastructure.Repositories;
 
-//An in-memory SQLite database with Foreign Keys=True: the references of the projects are real rows
+//An in-memory SQLite database with Foreign Keys=True: the references of the projects are real rows. AppA has two
+//server infos, PAZISI|Prod with its current database parameters and dl360|Test with its new ones
 public sealed class ProjectRepositoryTests : IAsyncLifetime
 {
     private readonly DatabaseServerConnection _connection = TestData.NewDatabaseServerConnection("Pc1.Sql");
+    private readonly Server _dl360 = TestData.NewServer("dl360");
     private readonly EditorConfigFileType _editorConfig = TestData.NewEditorConfigFileType("default");
     private readonly FileStorage _fileStorage = TestData.NewFileStorage("Backups");
     private readonly GitIgnoreFileType _gitIgnoreFileType = TestData.NewGitIgnoreFileType("CSharp");
+    private readonly Server _pazisi = TestData.NewServer("PAZISI");
+    private readonly DeploymentEnvironment _prod = TestData.NewEnvironment("Prod");
     private readonly NpmPackage _react = TestData.NewNpmPackage("react");
     private readonly SmartSchema _smartSchema = TestData.NewSmartSchema("Reduce");
+    private readonly DeploymentEnvironment _test = TestData.NewEnvironment("Test");
+    private readonly ApiClient _webAgent = TestData.NewApiClient("PAZISI.WebAgent");
     private Project _appA = null!;
     private SupportToolsServerSqliteDatabase _database = null!;
     private GitRepo _repoA = null!;
@@ -39,7 +48,13 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         _repoB = TestData.NewGitRepo("RepoB", _gitIgnoreFileType);
         _appA = TestData.NewProject("AppA", _editorConfig, TestData.NewDatabaseParameters(_connection),
             TestData.NewDatabaseParameters(_connection, _smartSchema, _fileStorage, "AppAProdCopy"), [_repoA],
-            [_repoB], [_react]);
+            [_repoB], [_react],
+            [
+                TestData.NewServerInfo(_pazisi, _prod, _webAgent,
+                    TestData.NewDatabaseParameters(_connection, _smartSchema, _fileStorage, "AppA")),
+                TestData.NewServerInfo(_dl360, _test, null, null, TestData.NewDatabaseParameters(databaseName: "New"),
+                    5050)
+            ]);
         _database = await SupportToolsServerSqliteDatabase.CreateAsync();
         await using SupportToolsServerDbContext context = _database.NewContext();
         context.EditorConfigFileTypes.Add(_editorConfig);
@@ -49,6 +64,9 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         context.DatabaseServerConnections.Add(_connection);
         context.SmartSchemas.Add(_smartSchema);
         context.FileStorages.Add(_fileStorage);
+        context.Servers.AddRange(_pazisi, _dl360);
+        context.Environments.AddRange(_prod, _test);
+        context.ApiClients.Add(_webAgent);
         context.Projects.AddRange(_appA, TestData.NewProject("AppB"));
         await context.SaveChangesAsync();
     }
@@ -76,7 +94,7 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         return await new ProjectRepository(check).GetByName(name, CancellationToken.None);
     }
 
-    //Every child row of the database, so that orphans would show
+    //Every child row of the database, the server infos and their tools included, so that orphans would show
     private async Task<List<string>> StoredChildRows()
     {
         await using SupportToolsServerDbContext check = _database.NewContext();
@@ -87,19 +105,24 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
             .. await check.Set<ProjectRedundantFile>().AsNoTracking().Select(x => "file " + x.FileName).ToListAsync(),
             .. await check.Set<ProjectAllowedTool>().AsNoTracking().Select(x => "tool " + x.ToolName).ToListAsync(),
             .. await check.Set<ProjectEndpoint>().AsNoTracking().Select(x => "endpoint " + x.Name).ToListAsync(),
-            .. await check.Set<ProjectRouteClass>().AsNoTracking().Select(x => "route " + x.Name).ToListAsync()
+            .. await check.Set<ProjectRouteClass>().AsNoTracking().Select(x => "route " + x.Name).ToListAsync(),
+            .. await check.Set<ServerInfo>().AsNoTracking().Select(x => "serverinfo " + x.ServerSidePort)
+                .ToListAsync(),
+            .. await check.Set<ServerInfoAllowedTool>().AsNoTracking().Select(x => "servertool " + x.ToolName)
+                .ToListAsync()
         ];
         return [.. rows.Order(StringComparer.Ordinal)];
     }
 
     private static void Update(Project project, DatabaseParameters? dev, DatabaseParameters? prodCopy,
         IEnumerable<ProjectGitRepo> gitRepos, IEnumerable<ProjectNpmPackage> npmPackages,
-        IEnumerable<ProjectRedundantFile> redundantFiles)
+        IEnumerable<ProjectRedundantFile> redundantFiles, IEnumerable<ServerInfo>? serverInfos = null)
     {
         project.Update(project.Name, project.ProjectType, null, null, 1, 0, false, null, null, null, null, null, null,
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
             null, null, null, null, null, dev, prodCopy, gitRepos, npmPackages, redundantFiles,
-            [ProjectAllowedTool.Create("SeedData")], [], [ProjectRouteClass.Create("Main", "api", "v2", "/main")]);
+            [ProjectAllowedTool.Create("SeedData")], [], [ProjectRouteClass.Create("Main", "api", "v2", "/main")],
+            serverInfos ?? []);
     }
 
     [Fact]
@@ -120,7 +143,10 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         Assert.Single(appA.AllowedTools);
         Assert.Single(appA.Endpoints);
         Assert.Single(appA.RouteClasses);
+        Assert.Equal([5022, 5050], appA.ServerInfos.Select(x => x.ServerSidePort).Order());
+        Assert.All(appA.ServerInfos, x => Assert.Equal("ProgramUpdater", Assert.Single(x.AllowedTools).ToolName));
         Assert.Null(all.Single(x => x.Name == "AppB").DevDatabaseParameters);
+        Assert.Empty(all.Single(x => x.Name == "AppB").ServerInfos);
         Assert.Empty(context.ChangeTracker.Entries());
     }
 
@@ -153,6 +179,22 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
             found.GitRepos.Select(x => (x.GitRepoId, x.Kind)).OrderBy(x => x.Kind));
         Assert.Equal("/upload", Assert.Single(found.Endpoints).EndpointRoute);
         Assert.Equal("v1", Assert.Single(found.RouteClasses).ApiVersion);
+        ServerInfo pazisi = found.ServerInfos.Single(x => x.ServerId == _pazisi.Id);
+        Assert.Equal((_prod.Id, _webAgent.Id, 5022), (pazisi.EnvironmentId, pazisi.WebAgentForCheckId,
+            pazisi.ServerSidePort));
+        Assert.Equal(("v1", @"D:\1WorkSecurity\App\PAZISI\appsettings.json",
+                @"D:\1WorkSecurity\App\PAZISI\appsettingsEncoded.json", "deployer"),
+            (pazisi.ApiVersionId, pazisi.AppSettingsJsonSourceFileName, pazisi.AppSettingsEncodedJsonFileName,
+                pazisi.ServiceUserName));
+        DatabaseParameters current = Assert.IsType<DatabaseParameters>(pazisi.CurrentDatabaseParameters);
+        Assert.Equal((_connection.Id, _smartSchema.Id, _fileStorage.Id, "AppA"),
+            (current.DbConnectionId, current.SmartSchemaId, current.FileStorageId, current.DatabaseName));
+        Assert.Null(pazisi.NewDatabaseParameters);
+        Assert.Equal("ProgramUpdater", Assert.Single(pazisi.AllowedTools).ToolName);
+        ServerInfo dl360 = found.ServerInfos.Single(x => x.ServerId == _dl360.Id);
+        Assert.Null(dl360.WebAgentForCheckId);
+        Assert.Null(dl360.CurrentDatabaseParameters);
+        Assert.Equal("New", dl360.NewDatabaseParameters!.DatabaseName);
         Assert.Equal(1, found.Version);
         Assert.Empty(context.ChangeTracker.Entries());
     }
@@ -165,7 +207,8 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         Assert.Null(await new ProjectRepository(context).GetByName("AppZ", CancellationToken.None));
     }
 
-    //Only the project that is updated, its database parameters and its children are tracked
+    //Only the project that is updated, its database parameters, its children and its server infos with their database
+    //parameters and tools are tracked
     [Theory]
     [InlineData("AppA")]
     [InlineData("APPA")]
@@ -177,8 +220,9 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
 
         Assert.Equal(_appA.Id, found.Id);
         Assert.Equal(2, found.GitRepos.Count);
+        Assert.Equal(2, found.ServerInfos.Count);
         Assert.Equal(EntityState.Unchanged, context.Entry(found).State);
-        Assert.Equal(1 + 2 + 7, context.ChangeTracker.Entries().Count());
+        Assert.Equal(1 + 2 + 7 + 2 + 2 + 2, context.ChangeTracker.Entries().Count());
     }
 
     [Fact]
@@ -240,7 +284,8 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
             stored.GitRepos.Select(x => x.Kind).Order());
     }
 
-    //The unique indexes of the children keep one child of a key per project
+    //The unique indexes of the children keep one child of a key per project: one server info of a server and an
+    //environment, and one tool per server info
     [Theory]
     [InlineData("git")]
     [InlineData("npm")]
@@ -248,6 +293,8 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
     [InlineData("tool")]
     [InlineData("endpoint")]
     [InlineData("route")]
+    [InlineData("serverinfo")]
+    [InlineData("servertool")]
     public async Task Add_IsRefusedOnSave_WhenAChildKeyRepeatsInTheProject(string child)
     {
         Project project = TestData.NewProject("AppC", gitRepos: child == "git" ? [_repoA, _repoA] : [],
@@ -266,11 +313,69 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
                 : [],
             child == "route"
                 ? [ProjectRouteClass.Create("a", null, null, null), ProjectRouteClass.Create("a", null, null, null)]
-                : []);
+                : [],
+            child switch
+            {
+                "serverinfo" =>
+                [
+                    TestData.NewServerInfo(_pazisi, _prod), TestData.NewServerInfo(_pazisi, _prod, serverSidePort: 0)
+                ],
+                "servertool" =>
+                [
+                    ServerInfo.Create(_pazisi.Id, _prod.Id, null, 0, null, null, null, null, null, null,
+                        [ServerInfoAllowedTool.Create("a"), ServerInfoAllowedTool.Create("a")])
+                ],
+                _ => []
+            });
         await using SupportToolsServerDbContext context = _database.NewContext();
         new ProjectRepository(context).Add(project);
 
         await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
+    }
+
+    //A server may be in a project once in each environment, and an environment once on each server
+    [Fact]
+    public async Task Add_StoresTheSameServerInSeveralEnvironmentsAndTheSameEnvironmentOnSeveralServers()
+    {
+        await using (SupportToolsServerDbContext context = _database.NewContext())
+        {
+            new ProjectRepository(context).Add(TestData.NewProject("AppC",
+                serverInfos:
+                [
+                    TestData.NewServerInfo(_pazisi, _prod), TestData.NewServerInfo(_pazisi, _test),
+                    TestData.NewServerInfo(_dl360, _prod)
+                ]));
+            await context.SaveChangesAsync();
+        }
+
+        Project? stored = await Stored("AppC");
+        Assert.NotNull(stored);
+        Assert.Equal(3, stored.ServerInfos.Count);
+    }
+
+    //A missing part of a server info stays missing, and a part whose texts are all missing still exists
+    [Fact]
+    public async Task Add_StoresAMissingAndAnEmptyDatabaseParametersPartOfAServerInfoApart()
+    {
+        await using (SupportToolsServerDbContext context = _database.NewContext())
+        {
+            new ProjectRepository(context).Add(TestData.NewProject("AppC",
+                serverInfos:
+                [
+                    TestData.NewServerInfo(_pazisi, _prod, null,
+                        new DatabaseParameters(null, null, null, null, null, null, 0, false, null, null, null, null,
+                            null, null, null))
+                ]));
+            await context.SaveChangesAsync();
+        }
+
+        Project? stored = await Stored("AppC");
+        Assert.NotNull(stored);
+        ServerInfo serverInfo = Assert.Single(stored.ServerInfos);
+        DatabaseParameters current = Assert.IsType<DatabaseParameters>(serverInfo.CurrentDatabaseParameters);
+        Assert.Null(current.DatabaseName);
+        Assert.Equal(0, current.CommandTimeOut);
+        Assert.Null(serverInfo.NewDatabaseParameters);
     }
 
     //The references of the children and the database parameters are foreign keys: a missing record is refused
@@ -280,6 +385,26 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         await using SupportToolsServerDbContext context = _database.NewContext();
         new ProjectRepository(context).Add(TestData.NewProject("AppC",
             devDatabaseParameters: TestData.NewDatabaseParameters(TestData.NewDatabaseServerConnection("Pc9.Sql"))));
+
+        await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
+    }
+
+    //The same for the references of a server info: its server, environment, web agent and database parameters
+    [Theory]
+    [InlineData("server")]
+    [InlineData("environment")]
+    [InlineData("webAgent")]
+    [InlineData("databaseParameters")]
+    public async Task Add_IsRefusedOnSave_WhenARecordThatAServerInfoReferencesDoesNotExist(string reference)
+    {
+        ServerInfo serverInfo = TestData.NewServerInfo(reference == "server" ? TestData.NewServer("srv9") : _pazisi,
+            reference == "environment" ? TestData.NewEnvironment("Stage") : _prod,
+            reference == "webAgent" ? TestData.NewApiClient("x.WebAgent") : null, null,
+            reference == "databaseParameters"
+                ? TestData.NewDatabaseParameters(fileStorage: TestData.NewFileStorage("Exchange"))
+                : null);
+        await using SupportToolsServerDbContext context = _database.NewContext();
+        new ProjectRepository(context).Add(TestData.NewProject("AppC", serverInfos: [serverInfo]));
 
         await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
     }
@@ -319,6 +444,46 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         ], await StoredChildRows());
     }
 
+    //The server infos are replaced with their tools and database parameters: the replaced rows are deleted and no
+    //orphan is left, even for the server info of PAZISI and Prod, whose old row goes before the new one is inserted
+    [Fact]
+    public async Task Update_ReplacesTheServerInfosOfTheReadProjectWithoutOrphans()
+    {
+        await using (SupportToolsServerDbContext context = _database.NewContext())
+        {
+            Project read = await ReadForUpdate(context, "AppA");
+            Update(read, read.DevDatabaseParameters, read.ProdCopyDatabaseParameters, read.GitRepos, read.NpmPackages,
+                read.RedundantFiles,
+                [
+                    ServerInfo.Create(_pazisi.Id, _prod.Id, null, 6000, null, null, null, null, null,
+                        TestData.NewDatabaseParameters(databaseName: "Next"),
+                        [
+                            ServerInfoAllowedTool.Create("ProgramUpdater"),
+                            ServerInfoAllowedTool.Create("ServiceStarter")
+                        ]),
+                    TestData.NewServerInfo(_pazisi, _test, serverSidePort: 6001)
+                ]);
+            new ProjectRepository(context).Update(read);
+            await context.SaveChangesAsync();
+        }
+
+        Project? stored = await Stored("AppA");
+        Assert.NotNull(stored);
+        Assert.Equal(_connection.Id, stored.DevDatabaseParameters!.DbConnectionId);
+        ServerInfo prod = stored.ServerInfos.Single(x => x.EnvironmentId == _prod.Id);
+        Assert.Equal((_pazisi.Id, null, 6000), (prod.ServerId, prod.WebAgentForCheckId, prod.ServerSidePort));
+        Assert.Null(prod.CurrentDatabaseParameters);
+        Assert.Equal("Next", prod.NewDatabaseParameters!.DatabaseName);
+        Assert.Equal(["ProgramUpdater", "ServiceStarter"], prod.AllowedTools.Select(x => x.ToolName).Order());
+        Assert.Equal(_pazisi.Id, stored.ServerInfos.Single(x => x.EnvironmentId == _test.Id).ServerId);
+        Assert.Equal(2, stored.Version);
+        Assert.Equal(
+        [
+            "serverinfo 6000", "serverinfo 6001", "servertool ProgramUpdater", "servertool ProgramUpdater",
+            "servertool ServiceStarter"
+        ], (await StoredChildRows()).Where(x => x.StartsWith("server", StringComparison.Ordinal)));
+    }
+
     //A missing part of the stored project gets its values
     [Fact]
     public async Task Update_AddsTheDatabaseParameters_WhenTheStoredProjectHasNone()
@@ -352,7 +517,8 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         Update(readFirst, null, null, [], [], [ProjectRedundantFile.Create("first")]);
         new ProjectRepository(first).Update(readFirst);
         await first.SaveChangesAsync();
-        Update(readSecond, TestData.NewDatabaseParameters(), null, [], [], [ProjectRedundantFile.Create("second")]);
+        Update(readSecond, TestData.NewDatabaseParameters(), null, [], [], [ProjectRedundantFile.Create("second")],
+            [TestData.NewServerInfo(_dl360, _prod, serverSidePort: 7000)]);
         new ProjectRepository(second).Update(readSecond);
 
         await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => second.SaveChangesAsync());
@@ -361,9 +527,12 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         Assert.NotNull(stored);
         Assert.Null(stored.DevDatabaseParameters);
         Assert.Equal(["first"], stored.RedundantFiles.Select(x => x.FileName));
+        Assert.Empty(stored.ServerInfos);
         Assert.Equal(2, stored.Version);
-        Assert.Contains("file first", await StoredChildRows());
-        Assert.DoesNotContain("file second", await StoredChildRows());
+        List<string> rows = await StoredChildRows();
+        Assert.Contains("file first", rows);
+        Assert.DoesNotContain("file second", rows);
+        Assert.DoesNotContain("serverinfo 7000", rows);
     }
 
     //Update relies on the one version increment of Project.Update: it expects the stored version to be one less than
@@ -413,7 +582,8 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         Assert.NotNull(await Stored("AppA"));
     }
 
-    //Every reference of a project is restricted: the database refuses to delete a record that a project uses
+    //Every reference of a project and of its server infos is restricted: the database refuses to delete a record that
+    //a project uses
     [Fact]
     public async Task TheDatabase_RefusesToDeleteTheRecordsThatAProjectUses()
     {
@@ -422,7 +592,10 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
                      c => c.EditorConfigFileTypes.Single(x => x.Name == "default"),
                      c => c.GitRepos.Single(x => x.Name == "RepoA"), c => c.GitRepos.Single(x => x.Name == "RepoB"),
                      c => c.NpmPackages.Single(), c => c.DatabaseServerConnections.Single(),
-                     c => c.SmartSchemas.Single(), c => c.FileStorages.Single()
+                     c => c.SmartSchemas.Single(), c => c.FileStorages.Single(),
+                     c => c.Servers.Single(x => x.Name == "PAZISI"), c => c.Servers.Single(x => x.Name == "dl360"),
+                     c => c.Environments.Single(x => x.Name == "Prod"),
+                     c => c.Environments.Single(x => x.Name == "Test"), c => c.ApiClients.Single()
                  })
         {
             await using SupportToolsServerDbContext context = _database.NewContext();

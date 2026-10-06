@@ -64,7 +64,8 @@ public sealed class GlobalSettingsHandlersOnSqliteTests : IAsyncLifetime
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteFileStorageCommandHandler(new FileStorageRepository(context),
             new GlobalSettingsRepository(context), new ProjectCreatorSettingsRepository(context),
-            new ProjectRepository(context), new SupportToolsServerUnitOfWork(context));
+            new ProjectRepository(context), new ServerRepository(context),
+            new DeploymentEnvironmentRepository(context), new SupportToolsServerUnitOfWork(context));
         return await handler.Handle(new DeleteFileStorageCommand(name, null), CancellationToken.None);
     }
 
@@ -73,7 +74,8 @@ public sealed class GlobalSettingsHandlersOnSqliteTests : IAsyncLifetime
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteSmartSchemaCommandHandler(new SmartSchemaRepository(context),
             new GlobalSettingsRepository(context), new ProjectCreatorSettingsRepository(context),
-            new ProjectRepository(context), new SupportToolsServerUnitOfWork(context));
+            new ProjectRepository(context), new ServerRepository(context),
+            new DeploymentEnvironmentRepository(context), new SupportToolsServerUnitOfWork(context));
         return await handler.Handle(new DeleteSmartSchemaCommand(name, null), CancellationToken.None);
     }
 
@@ -82,7 +84,8 @@ public sealed class GlobalSettingsHandlersOnSqliteTests : IAsyncLifetime
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteApiClientCommandHandler(new ApiClientRepository(context),
             new DatabaseServerConnectionRepository(context), new ServerRepository(context),
-            new GlobalSettingsRepository(context), new SupportToolsServerUnitOfWork(context));
+            new GlobalSettingsRepository(context), new ProjectRepository(context),
+            new DeploymentEnvironmentRepository(context), new SupportToolsServerUnitOfWork(context));
         return await handler.Handle(new DeleteApiClientCommand(name, null), CancellationToken.None);
     }
 

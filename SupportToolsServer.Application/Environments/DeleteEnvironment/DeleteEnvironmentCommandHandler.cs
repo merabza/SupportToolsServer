@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SupportToolsServer.Application.Projects;
 using SupportToolsServer.Application.Registry;
 using SupportToolsServer.Application.Settings;
 using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerCore.Domain.DeploymentEnvironments;
+using SupportToolsServerCore.Domain.Projects;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
@@ -16,13 +19,18 @@ public sealed class DeleteEnvironmentCommandHandler : ICommandHandler<DeleteEnvi
 {
     private readonly IDeploymentEnvironmentRepository _environmentRepository;
     private readonly IProjectCreatorSettingsRepository _projectCreatorSettingsRepository;
+    private readonly IProjectRepository _projectRepository;
+    private readonly IServerRepository _serverRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteEnvironmentCommandHandler(IDeploymentEnvironmentRepository environmentRepository,
-        IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IUnitOfWork unitOfWork)
+        IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IProjectRepository projectRepository,
+        IServerRepository serverRepository, IUnitOfWork unitOfWork)
     {
         _environmentRepository = environmentRepository;
         _projectCreatorSettingsRepository = projectCreatorSettingsRepository;
+        _projectRepository = projectRepository;
+        _serverRepository = serverRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -41,8 +49,8 @@ public sealed class DeleteEnvironmentCommandHandler : ICommandHandler<DeleteEnvi
                 command.Name, command.Version.Value, environment.Version);
         }
 
-        //Environment-ს სხვა აგრეგატი მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409 RecordIsInUse
-        //მომხმარებლების სიით. B7 (ServerInfo) თავის მომხმარებლებს აქ დაამატებს
+        //Environment-ს სხვა აგრეგატები მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409 RecordIsInUse
+        //მომხმარებლების სიით
         List<string> usages = await GetUsages(environment.Id, cancellationToken);
         if (usages.Count > 0)
         {
@@ -56,13 +64,17 @@ public sealed class DeleteEnvironmentCommandHandler : ICommandHandler<DeleteEnvi
             cancellationToken);
     }
 
-    //მომხმარებლები: პროექტის შემქმნელის პარამეტრების ველი ("ProjectCreatorSettings.<ველი>")
+    //მომხმარებლები: პროექტის შემქმნელის პარამეტრების ველი ("ProjectCreatorSettings.<ველი>"), მერე პროექტების
+    //ServerInfo-ები ("Project <სახელი> / <სერვერი>|<გარემო>")
     private async Task<List<string>> GetUsages(DeploymentEnvironmentId environmentId,
         CancellationToken cancellationToken)
     {
         ProjectCreatorSettings? projectCreatorSettings =
             await _projectCreatorSettingsRepository.Get(cancellationToken);
+        List<Project> projects = await _projectRepository.GetAll(cancellationToken);
+        ServerInfoKeyNames keyNames =
+            await ServerInfoKeyNames.Read(_serverRepository, _environmentRepository, cancellationToken);
 
-        return [.. projectCreatorSettings.GetUsages(environmentId)];
+        return [.. projectCreatorSettings.GetUsages(environmentId), .. projects.GetUsages(environmentId, keyNames)];
     }
 }

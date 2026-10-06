@@ -6,7 +6,9 @@ using SupportToolsServer.Application.Registry;
 using SupportToolsServer.Application.Settings;
 using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
+using SupportToolsServerCore.Domain.DeploymentEnvironments;
 using SupportToolsServerCore.Domain.Projects;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
@@ -17,18 +19,23 @@ namespace SupportToolsServer.Application.DatabaseServerConnections.DeleteDatabas
 public sealed class DeleteDatabaseServerConnectionCommandHandler : ICommandHandler<DeleteDatabaseServerConnectionCommand>
 {
     private readonly IDatabaseServerConnectionRepository _databaseServerConnectionRepository;
+    private readonly IDeploymentEnvironmentRepository _environmentRepository;
     private readonly IProjectCreatorSettingsRepository _projectCreatorSettingsRepository;
     private readonly IProjectRepository _projectRepository;
+    private readonly IServerRepository _serverRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteDatabaseServerConnectionCommandHandler(
         IDatabaseServerConnectionRepository databaseServerConnectionRepository,
         IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IProjectRepository projectRepository,
+        IServerRepository serverRepository, IDeploymentEnvironmentRepository environmentRepository,
         IUnitOfWork unitOfWork)
     {
         _databaseServerConnectionRepository = databaseServerConnectionRepository;
         _projectCreatorSettingsRepository = projectCreatorSettingsRepository;
         _projectRepository = projectRepository;
+        _serverRepository = serverRepository;
+        _environmentRepository = environmentRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -51,8 +58,7 @@ public sealed class DeleteDatabaseServerConnectionCommandHandler : ICommandHandl
         }
 
         //DatabaseServerConnection-ს სხვა აგრეგატები მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409
-        //RecordIsInUse მომხმარებლების სიით. B7 (ServerInfo-ს ბაზის პარამეტრები) თავის მომხმარებლებს აქ დაამატებს.
-        //folders set-ები კავშირთან ერთად იშლება
+        //RecordIsInUse მომხმარებლების სიით. folders set-ები კავშირთან ერთად იშლება
         List<string> usages = await GetUsages(connection.Id, cancellationToken);
         if (usages.Count > 0)
         {
@@ -68,14 +74,17 @@ public sealed class DeleteDatabaseServerConnectionCommandHandler : ICommandHandl
     }
 
     //მომხმარებლები: პროექტის შემქმნელის პარამეტრების ველი ("ProjectCreatorSettings.<ველი>"), მერე პროექტები, რომელთა
-    //ბაზის პარამეტრებიც კავშირს იყენებს ("Project <სახელი>")
+    //ბაზის პარამეტრებიც კავშირს იყენებს ("Project <სახელი>"), თითოეული თავისი ServerInfo-ებით, რომელთა ბაზის
+    //პარამეტრებიც კავშირს იყენებს ("Project <სახელი> / <სერვერი>|<გარემო>")
     private async Task<List<string>> GetUsages(DatabaseServerConnectionId connectionId,
         CancellationToken cancellationToken)
     {
         ProjectCreatorSettings? projectCreatorSettings =
             await _projectCreatorSettingsRepository.Get(cancellationToken);
         List<Project> projects = await _projectRepository.GetAll(cancellationToken);
+        ServerInfoKeyNames keyNames =
+            await ServerInfoKeyNames.Read(_serverRepository, _environmentRepository, cancellationToken);
 
-        return [.. projectCreatorSettings.GetUsages(connectionId), .. projects.GetUsages(connectionId)];
+        return [.. projectCreatorSettings.GetUsages(connectionId), .. projects.GetUsages(connectionId, keyNames)];
     }
 }

@@ -6,12 +6,15 @@ using Moq;
 using SupportToolsServer.Application.Projects.UpdateProject;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerApiContracts.Models;
+using SupportToolsServerCore.Domain.ApiClients;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
+using SupportToolsServerCore.Domain.DeploymentEnvironments;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.Projects;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.SmartSchemas;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
@@ -21,10 +24,13 @@ namespace SupportToolsServer.Tests.Application.Projects;
 
 public sealed class UpdateProjectCommandHandlerTests
 {
+    private readonly Mock<IApiClientRepository> _apiClients = new();
     private readonly DatabaseServerConnection _connection = TestData.NewDatabaseServerConnection("Pc1.Sql");
     private readonly Mock<IDatabaseServerConnectionRepository> _connections = new();
+    private readonly Server _dl360 = TestData.NewServer("dl360");
     private readonly EditorConfigFileType _editorConfig = TestData.NewEditorConfigFileType("default");
     private readonly Mock<IEditorConfigFileTypeRepository> _editorConfigs = new();
+    private readonly Mock<IDeploymentEnvironmentRepository> _environments = new();
     private readonly FileStorage _fileStorage = TestData.NewFileStorage("Backups");
     private readonly Mock<IFileStorageRepository> _fileStorages = new();
     private readonly GitRepo _repoA;
@@ -32,10 +38,15 @@ public sealed class UpdateProjectCommandHandlerTests
     private readonly Mock<IGitRepoRepository> _gitRepos = new();
     private readonly NpmPackage _react = TestData.NewNpmPackage("react");
     private readonly Mock<INpmPackageRepository> _npmPackages = new();
+    private readonly Server _pazisi = TestData.NewServer("PAZISI");
+    private readonly DeploymentEnvironment _prod = TestData.NewEnvironment("Prod");
     private readonly Mock<IProjectRepository> _projects = new();
+    private readonly Mock<IServerRepository> _servers = new();
     private readonly SmartSchema _smartSchema = TestData.NewSmartSchema("Reduce");
     private readonly Mock<ISmartSchemaRepository> _smartSchemas = new();
+    private readonly DeploymentEnvironment _test = TestData.NewEnvironment("Test");
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
+    private readonly ApiClient _webAgent = TestData.NewApiClient("PAZISI.WebAgent");
 
     public UpdateProjectCommandHandlerTests()
     {
@@ -49,6 +60,10 @@ public sealed class UpdateProjectCommandHandlerTests
         _gitRepos.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => [_repoA, _repoB]);
         _npmPackages.Setup(r => r.GetAll(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => [_react, TestData.NewNpmPackage("yup")]);
+        _servers.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => [_pazisi, _dl360]);
+        _environments.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => [_prod, _test]);
+        _apiClients.Setup(r => r.GetAll(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => [TestData.NewApiClient("dl360.WebAgent"), _webAgent]);
     }
 
     //The handler reads the project with tracking, so that the save deletes the replaced children
@@ -60,7 +75,8 @@ public sealed class UpdateProjectCommandHandlerTests
     private Task<Result<int>> Handle(StsProjectDataModel model, CancellationToken cancellationToken = default)
     {
         var handler = new UpdateProjectCommandHandler(_projects.Object, _editorConfigs.Object, _connections.Object,
-            _smartSchemas.Object, _fileStorages.Object, _gitRepos.Object, _npmPackages.Object, _unitOfWork.Object);
+            _smartSchemas.Object, _fileStorages.Object, _gitRepos.Object, _npmPackages.Object, _servers.Object,
+            _environments.Object, _apiClients.Object, _unitOfWork.Object);
         return handler.Handle(new UpdateProjectCommand(model), cancellationToken);
     }
 
@@ -155,6 +171,24 @@ public sealed class UpdateProjectCommandHandlerTests
                 {
                     Name = "RouteKey", Root = "Root", ApiVersion = "ApiVersion", Base = "Base"
                 }
+            ],
+            ServerInfos =
+            [
+                new StsServerInfoDataModel
+                {
+                    ServerName = "pazisi",
+                    EnvironmentName = "PROD",
+                    WebAgentNameForCheck = "pazisi.webagent",
+                    ServerSidePort = 5022,
+                    ApiVersionId = "ApiVersionId",
+                    AppSettingsJsonSourceFileName = "AppSettingsSource",
+                    AppSettingsEncodedJsonFileName = "AppSettingsEncoded",
+                    ServiceUserName = "ServiceUser",
+                    AllowToolsList = ["ProgramUpdater", "ServiceStarter"],
+                    CurrentDatabaseParameters =
+                        TestData.DatabaseParametersModel("Pc1.Sql", "Reduce", "Backups", "CurrentDb"),
+                    NewDatabaseParameters = TestData.DatabaseParametersModel(databaseName: "NewDb")
+                }
             ]
         };
     }
@@ -240,11 +274,24 @@ public sealed class UpdateProjectCommandHandlerTests
         ProjectRouteClass routeClass = Assert.Single(added.RouteClasses);
         Assert.Equal(("RouteKey", "Root", "ApiVersion", "Base"),
             (routeClass.Name, routeClass.Root, routeClass.ApiVersion, routeClass.Base));
+        ServerInfo serverInfo = Assert.Single(added.ServerInfos);
+        Assert.Equal((_pazisi.Id, _prod.Id, _webAgent.Id),
+            (serverInfo.ServerId, serverInfo.EnvironmentId, serverInfo.WebAgentForCheckId));
+        Assert.Equal((5022, "ApiVersionId", "AppSettingsSource", "AppSettingsEncoded", "ServiceUser"),
+            (serverInfo.ServerSidePort, serverInfo.ApiVersionId, serverInfo.AppSettingsJsonSourceFileName,
+                serverInfo.AppSettingsEncodedJsonFileName, serverInfo.ServiceUserName));
+        Assert.Equal(["ProgramUpdater", "ServiceStarter"], serverInfo.AllowedTools.Select(x => x.ToolName));
+        DatabaseParameters current = Assert.IsType<DatabaseParameters>(serverInfo.CurrentDatabaseParameters);
+        Assert.Equal((_connection.Id, _smartSchema.Id, _fileStorage.Id, "CurrentDb"),
+            (current.DbConnectionId, current.SmartSchemaId, current.FileStorageId, current.DatabaseName));
+        DatabaseParameters next = Assert.IsType<DatabaseParameters>(serverInfo.NewDatabaseParameters);
+        Assert.Equal((null, null, null, "NewDb"),
+            (next.DbConnectionId, next.SmartSchemaId, next.FileStorageId, next.DatabaseName));
         Assert.Equal(1, added.Version);
         _unitOfWork.Verify(u => u.SaveChangesAsync(cancellation.Token), Times.Once);
     }
 
-    //No name is no reference, and a project without gits or packages reads neither
+    //No name is no reference, and a project without gits, packages or server infos reads none of their types
     [Fact]
     public async Task Handle_ReadsNoReference_WhenTheBodyNamesNone()
     {
@@ -261,9 +308,48 @@ public sealed class UpdateProjectCommandHandlerTests
         _fileStorages.Verify(r => r.GetByName(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         _gitRepos.Verify(r => r.GetAll(It.IsAny<CancellationToken>()), Times.Never);
         _npmPackages.Verify(r => r.GetAll(It.IsAny<CancellationToken>()), Times.Never);
+        _servers.Verify(r => r.GetAll(It.IsAny<CancellationToken>()), Times.Never);
+        _environments.Verify(r => r.GetAll(It.IsAny<CancellationToken>()), Times.Never);
+        _apiClients.Verify(r => r.GetAll(It.IsAny<CancellationToken>()), Times.Never);
     }
 
-    //Every missing name is in one error, grouped by type in the order of the contract and each name once
+    //The servers, the environments and the web agents are read once for all server infos and matched by name
+    //ignoring case. A server info without a web agent and database parameters references nothing else
+    [Fact]
+    public async Task Handle_ReadsTheReferencesOfTheServerInfosOnce_AndMatchesTheNamesIgnoringCase()
+    {
+        GivenStored("AppA", null);
+        Project? added = null;
+        _projects.Setup(r => r.Add(It.IsAny<Project>())).Callback<Project>(x => added = x);
+        using var cancellation = new CancellationTokenSource();
+        StsProjectDataModel model = TestData.ProjectModel("AppA",
+            serverInfos:
+            [
+                TestData.ServerInfoModel("PAZISI", "Prod", "PAZISI.WEBAGENT"),
+                TestData.ServerInfoModel("dl360", "test"), TestData.ServerInfoModel("Dl360", "PROD", "dl360.WebAgent")
+            ]);
+
+        Result<int> result = await Handle(model, cancellation.Token);
+
+        Assert.Equal(1, result.Value);
+        Assert.NotNull(added);
+        Assert.Equal(
+            [(_pazisi.Id, _prod.Id, true), (_dl360.Id, _test.Id, false), (_dl360.Id, _prod.Id, true)],
+            added.ServerInfos.Select(x => (x.ServerId, x.EnvironmentId, x.WebAgentForCheckId is not null)));
+        Assert.Equal(_webAgent.Id, added.ServerInfos[0].WebAgentForCheckId);
+        Assert.All(added.ServerInfos, x =>
+        {
+            Assert.Null(x.CurrentDatabaseParameters);
+            Assert.Null(x.NewDatabaseParameters);
+        });
+        _servers.Verify(r => r.GetAll(cancellation.Token), Times.Once);
+        _environments.Verify(r => r.GetAll(cancellation.Token), Times.Once);
+        _apiClients.Verify(r => r.GetAll(cancellation.Token), Times.Once);
+        _connections.Verify(r => r.GetByName(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    //Every missing name is in one error, grouped by type in the order of the contract and each name once. The server
+    //infos come last: their servers, environments and web agents, then their database parameters
     [Fact]
     public async Task Handle_ReturnsEveryMissingReferenceInOneError_WhenReferencedRecordsDoNotExist()
     {
@@ -271,7 +357,12 @@ public sealed class UpdateProjectCommandHandlerTests
         StsProjectDataModel model = TestData.ProjectModel("AppA", "strict",
             TestData.DatabaseParametersModel("Pc9.Sql", "Hourly", "Backups"),
             TestData.DatabaseParametersModel("Pc8.Sql", "Reduce", "Exchange"), ["RepoA", "RepoX"], ["RepoX", "RepoY"],
-            ["react", "left-pad"], 2);
+            ["react", "left-pad"],
+            [
+                TestData.ServerInfoModel("bee", "Stage", "bee.WebAgent", TestData.DatabaseParametersModel("Pc7.Sql")),
+                TestData.ServerInfoModel("PAZISI", "Stage", "PAZISI.WebAgent", null,
+                    TestData.DatabaseParametersModel("Pc9.Sql", "Daily"))
+            ], 2);
 
         Result<int> result = await Handle(model);
 
@@ -279,10 +370,12 @@ public sealed class UpdateProjectCommandHandlerTests
         Assert.Equal(ErrorType.NotFound, result.Error.Type);
         Assert.Equal(
             "Referenced EditorConfigFileType Records Not Found: strict; " +
-            "Referenced DatabaseServerConnection Records Not Found: Pc9.Sql, Pc8.Sql; " +
-            "Referenced SmartSchema Records Not Found: Hourly; Referenced FileStorage Records Not Found: Exchange; " +
-            "Referenced GitRepo Records Not Found: RepoX, RepoY; Referenced NpmPackage Records Not Found: left-pad",
-            result.Error.Description);
+            "Referenced DatabaseServerConnection Records Not Found: Pc9.Sql, Pc8.Sql, Pc7.Sql; " +
+            "Referenced SmartSchema Records Not Found: Hourly, Daily; " +
+            "Referenced FileStorage Records Not Found: Exchange; " +
+            "Referenced GitRepo Records Not Found: RepoX, RepoY; Referenced NpmPackage Records Not Found: left-pad; " +
+            "Referenced Server Records Not Found: bee; Referenced Environment Records Not Found: Stage; " +
+            "Referenced ApiClient Records Not Found: bee.WebAgent", result.Error.Description);
         VerifyNothingSaved();
     }
 
@@ -300,16 +393,17 @@ public sealed class UpdateProjectCommandHandlerTests
         _gitRepos.Verify(r => r.GetAll(It.IsAny<CancellationToken>()), Times.Never);
     }
 
-    //The update replaces the whole aggregate: the stored children and database parameters are gone, those of the body
-    //are the only ones
+    //The update replaces the whole aggregate: the stored children, server infos and database parameters are gone,
+    //those of the body are the only ones
     [Fact]
     public async Task Handle_ReplacesTheStoredProjectWithItsChildrenAndReturnsItsNextVersion()
     {
         Project stored = TestData.NewProject("AppA", _editorConfig, TestData.NewDatabaseParameters(_connection),
-            null, [_repoA], [_repoB], [_react], 3);
+            null, [_repoA], [_repoB], [_react], [TestData.NewServerInfo(_pazisi, _prod, _webAgent)], 3);
         GivenStored("APPA", stored);
         StsProjectDataModel model = TestData.ProjectModel("APPA", null, null,
-            TestData.DatabaseParametersModel("Pc1.Sql", "Reduce", null, "AppAProdCopy"), ["RepoB"], [], [], 3);
+            TestData.DatabaseParametersModel("Pc1.Sql", "Reduce", null, "AppAProdCopy"), ["RepoB"], [], [],
+            [TestData.ServerInfoModel("dl360", "Test", serverSidePort: 5050)], 3);
         model.RedundantFileNames = [];
         model.Endpoints = [];
 
@@ -331,6 +425,9 @@ public sealed class UpdateProjectCommandHandlerTests
         Assert.Equal(["SeedData"], stored.AllowedTools.Select(x => x.ToolName));
         Assert.Empty(stored.Endpoints);
         Assert.Equal(["Main"], stored.RouteClasses.Select(x => x.Name));
+        ServerInfo serverInfo = Assert.Single(stored.ServerInfos);
+        Assert.Equal((_dl360.Id, _test.Id, null, 5050),
+            (serverInfo.ServerId, serverInfo.EnvironmentId, serverInfo.WebAgentForCheckId, serverInfo.ServerSidePort));
         Assert.Equal(4, stored.Version);
         _projects.Verify(r => r.Add(It.IsAny<Project>()), Times.Never);
         _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);

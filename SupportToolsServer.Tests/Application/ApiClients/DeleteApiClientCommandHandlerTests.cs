@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,8 @@ using SupportToolsServer.Application.ApiClients.DeleteApiClient;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerCore.Domain.ApiClients;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
+using SupportToolsServerCore.Domain.DeploymentEnvironments;
+using SupportToolsServerCore.Domain.Projects;
 using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Domain.Abstractions;
@@ -19,20 +22,27 @@ public sealed class DeleteApiClientCommandHandlerTests
     private readonly ApiClient _apiClient = TestData.NewApiClient("Pc1.WebAgent", version: 3);
     private readonly Mock<IApiClientRepository> _apiClients = new();
     private readonly Mock<IDatabaseServerConnectionRepository> _connections = new();
+    private readonly Mock<IDeploymentEnvironmentRepository> _environments = new();
     private readonly Mock<IGlobalSettingsRepository> _globalSettings = new();
+    private readonly DeploymentEnvironment _prod = TestData.NewEnvironment("Prod");
+    private readonly List<Project> _projectList = [];
+    private readonly Mock<IProjectRepository> _projects = new();
     private readonly Mock<IServerRepository> _servers = new();
+    private readonly DeploymentEnvironment _test = TestData.NewEnvironment("Test");
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     public DeleteApiClientCommandHandlerTests()
     {
         _connections.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync([]);
         _servers.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        _projects.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => _projectList);
+        _environments.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => [_prod, _test]);
     }
 
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
         var handler = new DeleteApiClientCommandHandler(_apiClients.Object, _connections.Object, _servers.Object,
-            _globalSettings.Object, _unitOfWork.Object);
+            _globalSettings.Object, _projects.Object, _environments.Object, _unitOfWork.Object);
         return handler.Handle(new DeleteApiClientCommand(name, version), cancellationToken);
     }
 
@@ -56,17 +66,20 @@ public sealed class DeleteApiClientCommandHandlerTests
         VerifyNothingDeleted();
     }
 
-    //A connection or a server without a web agent and those with another web agent do not use it
+    //A connection, a server or a server info without a web agent and those with another web agent do not use it
     [Fact]
     public async Task Handle_DeletesTheRecord_WhenTheExpectedVersionIsStoredAndNoConnectionOrServerUsesIt()
     {
         ApiClient other = TestData.NewApiClient("Pc2.WebAgent");
+        Server pazisi = TestData.NewServer("PAZISI");
         _apiClients.Setup(r => r.GetByName("PC1.WEBAGENT", It.IsAny<CancellationToken>())).ReturnsAsync(_apiClient);
         _connections.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync([
             TestData.NewDatabaseServerConnection("Pc1.Sql"), TestData.NewDatabaseServerConnection("Pc2.Sql", other)
         ]);
         _servers.Setup(r => r.GetAll(It.IsAny<CancellationToken>()))
-            .ReturnsAsync([TestData.NewServer("PAZISI"), TestData.NewServer("dl360", other, other)]);
+            .ReturnsAsync([pazisi, TestData.NewServer("dl360", other, other)]);
+        _projectList.Add(TestData.NewProject("AppA",
+            serverInfos: [TestData.NewServerInfo(pazisi, _prod), TestData.NewServerInfo(pazisi, _test, other)]));
         using var cancellation = new CancellationTokenSource();
 
         Result result = await Handle("PC1.WEBAGENT", 3, cancellation.Token);
@@ -75,7 +88,43 @@ public sealed class DeleteApiClientCommandHandlerTests
         _apiClients.Verify(r => r.Delete(_apiClient), Times.Once);
         _connections.Verify(r => r.GetAll(cancellation.Token), Times.Once);
         _servers.Verify(r => r.GetAll(cancellation.Token), Times.Once);
+        _projects.Verify(r => r.GetAll(cancellation.Token), Times.Once);
+        _environments.Verify(r => r.GetAll(cancellation.Token), Times.Once);
         _unitOfWork.Verify(u => u.SaveChangesAsync(cancellation.Token), Times.Once);
+    }
+
+    //A server info that checks the versions through the ApiClient is named by its project, its server and its
+    //environment, after the field of the global settings: the projects in name order, the server infos of a project by
+    //the server and the environment
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheServerInfosThatUseItAfterTheOtherUsers()
+    {
+        Server pazisi = TestData.NewServer("PAZISI", _apiClient);
+        Server dl360 = TestData.NewServer("dl360");
+        _apiClients.Setup(r => r.GetByName("Pc1.WebAgent", It.IsAny<CancellationToken>())).ReturnsAsync(_apiClient);
+        _servers.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync([pazisi, dl360]);
+        _globalSettings.Setup(r => r.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(TestData.NewGlobalSettings(localPackageManagerWebApiClient: _apiClient));
+        _projectList.AddRange(
+            TestData.NewProject("AppB",
+                serverInfos:
+                [
+                    TestData.NewServerInfo(pazisi, _test, _apiClient), TestData.NewServerInfo(dl360, _prod, _apiClient)
+                ]),
+            TestData.NewProject("appA",
+                serverInfos:
+                [
+                    TestData.NewServerInfo(pazisi, _prod, _apiClient), TestData.NewServerInfo(dl360, _test)
+                ]));
+
+        Result result = await Handle("Pc1.WebAgent", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(
+            "ApiClient Pc1.WebAgent Is Used By: Server PAZISI, GlobalSettings.LocalPackageManagerWebApiClientName, " +
+            "Project appA / PAZISI|Prod, Project AppB / dl360|Prod, Project AppB / PAZISI|Test",
+            result.Error.Description);
+        VerifyNothingDeleted();
     }
 
     //A server uses the ApiClient as its web agent, as the installer of the applications or as both, and is named once

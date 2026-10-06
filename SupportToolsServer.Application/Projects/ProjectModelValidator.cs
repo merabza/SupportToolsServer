@@ -16,8 +16,9 @@ namespace SupportToolsServer.Application.Projects;
 //პროექტის ველების წესები. სიგრძეები ProjectConfiguration-ის HasMaxLength-ს ემთხვევა, მითითებული ჩანაწერების
 //სახელებისა კი EditorConfigFileType-ის, GitRepo-სა და NpmPackage-ის სახელების სიგრძეს. მათ არსებობას handler-ი
 //ამოწმებს (404 ReferencedRecordsNotFound). სერვერი კლიენტის enum-ებს არ იცნობს, ამიტომ ProjectType და AllowToolsList
-//მხოლოდ სიგრძით მოწმდება. გზები კანონიკური ფორმითაა (README G3) და მხოლოდ სიგრძით მოწმდება. შეტყობინებები ველს
-//ასახელებს და არასოდეს მის მნიშვნელობას, რადგან KeyGuidPart საიდუმლოა.
+//მხოლოდ სიგრძით მოწმდება. გზები კანონიკური ფორმითაა (README G3) და მხოლოდ სიგრძით მოწმდება. ServerInfo-ების ველებს
+//ServerInfoModelValidator ამოწმებს. შეტყობინებები ველს ასახელებს და არასოდეს მის მნიშვნელობას, რადგან KeyGuidPart
+//საიდუმლოა.
 //Version-ს წესი არ სჭირდება: უარყოფითი ვერსია არც ერთ ჩანაწერს არ ემთხვევა (404 ან 409)
 public sealed class ProjectModelValidator : AbstractValidator<StsProjectDataModel>
 {
@@ -107,9 +108,18 @@ public sealed class ProjectModelValidator : AbstractValidator<StsProjectDataMode
 
         //key-ები კლიენტის dictionary-ის key-ებია, ამიტომ პროექტში ერთხელ უნდა შეგვხვდეს
         RecordList(x => x.Endpoints, nameof(StsProjectDataModel.Endpoints), new ProjectEndpointModelValidator(),
-            x => x.Name);
+            nameof(StsProjectEndpointDataModel.Name), x => x.Name);
         RecordList(x => x.RouteClasses, nameof(StsProjectDataModel.RouteClasses),
-            new ProjectRouteClassModelValidator(), x => x.Name);
+            new ProjectRouteClassModelValidator(), nameof(StsProjectRouteClassDataModel.Name), x => x.Name);
+
+        //ServerInfo-ს key სერვერისა და გარემოს სახელების წყვილია (კლიენტის dictionary-ის key სერვერზე არ მოდის).
+        //წყვილი, რომლის რომელიმე სახელიც ცარიელია, ServerInfo-ს საკუთარი წესით იჭერება
+        RecordList(x => x.ServerInfos, nameof(StsProjectDataModel.ServerInfos), new ServerInfoModelValidator(),
+            ServerInfoContractMapper.Key(nameof(StsServerInfoDataModel.ServerName),
+                nameof(StsServerInfoDataModel.EnvironmentName)),
+            x => string.IsNullOrWhiteSpace(x.ServerName) || string.IsNullOrWhiteSpace(x.EnvironmentName)
+                ? null
+                : ServerInfoContractMapper.Key(x.ServerName, x.EnvironmentName));
     }
 
     private static string ValueName(StsProjectDataModel project, string propertyName)
@@ -137,9 +147,11 @@ public sealed class ProjectModelValidator : AbstractValidator<StsProjectDataMode
                 SupportToolsServerApiClientErrors.ValuesNotUnique(ValueName(x, listName)).Description);
     }
 
-    //ჩანაწერების სია (კლიენტის dictionary): ჩანაწერი null ვერ იქნება, key კი სიაში ერთხელ გვხვდება, რეგისტრის გარეშე
+    //ჩანაწერების სია (კლიენტის dictionary): ჩანაწერი null ვერ იქნება, key კი სიაში ერთხელ გვხვდება, რეგისტრის გარეშე.
+    //keyName შეტყობინებაში key-ს ასახელებს
     private void RecordList<TRecord>(Expression<Func<StsProjectDataModel, IEnumerable<TRecord>>> list,
-        string listName, IValidator<TRecord> recordValidator, Func<TRecord, string> keyOf) where TRecord : class
+        string listName, IValidator<TRecord> recordValidator, string keyName, Func<TRecord, string?> keyOf)
+        where TRecord : class
     {
         ListRequired(list, listName);
 
@@ -149,7 +161,7 @@ public sealed class ProjectModelValidator : AbstractValidator<StsProjectDataMode
 
         RuleFor(list).Must(x => x is null || UniqueValues.AreUnique(x.Select(y => y is null ? null : keyOf(y))))
             .WithErrorCode(nameof(SupportToolsServerApiClientErrors.ValuesNotUnique)).WithMessage(x =>
-                SupportToolsServerApiClientErrors.ValuesNotUnique(ValueName(x, $"{listName}.Name")).Description);
+                SupportToolsServerApiClientErrors.ValuesNotUnique(ValueName(x, $"{listName}.{keyName}")).Description);
     }
 
     private void ListRequired<TItem>(Expression<Func<StsProjectDataModel, IEnumerable<TItem>>> list,

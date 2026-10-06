@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SupportToolsServer.Application.ApiClients;
 using SupportToolsServer.Application.EditorConfigFileTypes;
+using SupportToolsServer.Application.Environments;
 using SupportToolsServer.Application.GitRepos;
 using SupportToolsServer.Application.NpmPackages;
 using SupportToolsServer.Application.Registry;
+using SupportToolsServer.Application.Servers;
 using SupportToolsServerApiContracts.Models;
+using SupportToolsServerCore.Domain.ApiClients;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
+using SupportToolsServerCore.Domain.DeploymentEnvironments;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.Projects;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.SmartSchemas;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
@@ -23,12 +29,15 @@ namespace SupportToolsServer.Application.Projects.UpdateProject;
 
 public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectCommand, int>
 {
+    private readonly IApiClientRepository _apiClientRepository;
     private readonly IDatabaseServerConnectionRepository _databaseServerConnectionRepository;
     private readonly IEditorConfigFileTypeRepository _editorConfigFileTypeRepository;
+    private readonly IDeploymentEnvironmentRepository _environmentRepository;
     private readonly IFileStorageRepository _fileStorageRepository;
     private readonly IGitRepoRepository _gitRepoRepository;
     private readonly INpmPackageRepository _npmPackageRepository;
     private readonly IProjectRepository _projectRepository;
+    private readonly IServerRepository _serverRepository;
     private readonly ISmartSchemaRepository _smartSchemaRepository;
     private readonly IUnitOfWork _unitOfWork;
 
@@ -36,7 +45,9 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
         IEditorConfigFileTypeRepository editorConfigFileTypeRepository,
         IDatabaseServerConnectionRepository databaseServerConnectionRepository,
         ISmartSchemaRepository smartSchemaRepository, IFileStorageRepository fileStorageRepository,
-        IGitRepoRepository gitRepoRepository, INpmPackageRepository npmPackageRepository, IUnitOfWork unitOfWork)
+        IGitRepoRepository gitRepoRepository, INpmPackageRepository npmPackageRepository,
+        IServerRepository serverRepository, IDeploymentEnvironmentRepository environmentRepository,
+        IApiClientRepository apiClientRepository, IUnitOfWork unitOfWork)
     {
         _projectRepository = projectRepository;
         _editorConfigFileTypeRepository = editorConfigFileTypeRepository;
@@ -45,6 +56,9 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
         _fileStorageRepository = fileStorageRepository;
         _gitRepoRepository = gitRepoRepository;
         _npmPackageRepository = npmPackageRepository;
+        _serverRepository = serverRepository;
+        _environmentRepository = environmentRepository;
+        _apiClientRepository = apiClientRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -76,6 +90,7 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
             _fileStorageRepository, cancellationToken);
         List<ProjectGitRepo> gitRepos = await FindGitRepos(model, references, cancellationToken);
         List<ProjectNpmPackage> npmPackages = await FindNpmPackages(model, references, cancellationToken);
+        List<ServerInfo> serverInfos = await FindServerInfos(model, references, cancellationToken);
         if (!references.AreAllFound)
         {
             return references.MissingError();
@@ -109,7 +124,7 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
                 model.PrepareProdCopyDatabaseProjectFilePath, model.PrepareProdCopyDatabaseProjectParametersFilePath,
                 model.PairedDbObjectsResultFileName, model.KeyGuidPart, devDatabaseParameters,
                 prodCopyDatabaseParameters, gitRepos, npmPackages, redundantFiles, allowedTools, endpoints,
-                routeClasses);
+                routeClasses, serverInfos);
             _projectRepository.Add(project);
         }
         else
@@ -127,7 +142,7 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
                 model.PrepareProdCopyDatabaseProjectFilePath, model.PrepareProdCopyDatabaseProjectParametersFilePath,
                 model.PairedDbObjectsResultFileName, model.KeyGuidPart, devDatabaseParameters,
                 prodCopyDatabaseParameters, gitRepos, npmPackages, redundantFiles, allowedTools, endpoints,
-                routeClasses);
+                routeClasses, serverInfos);
             _projectRepository.Update(stored);
             project = stored;
         }
@@ -201,6 +216,51 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
         }
 
         return npmPackages;
+    }
+
+    //ServerInfo-ების სერვერები, გარემოები და ვებაგენტები ერთხელ იკითხება (თუ პროექტს ServerInfo-ები აქვს) და სახელით
+    //რეგისტრის გარეშე ედრება. ბაზის პარამეტრების მითითებები პროექტის ბაზის პარამეტრებივით იძებნება. ServerInfo
+    //იქმნება მხოლოდ მაშინ, როცა მისი სერვერიც და გარემოც ნაპოვნია; სხვა შემთხვევაში handler-ი შეცდომას აბრუნებს
+    private async Task<List<ServerInfo>> FindServerInfos(StsProjectDataModel model, ReferencedRecords references,
+        CancellationToken cancellationToken)
+    {
+        List<ServerInfo> serverInfos = [];
+        if (model.ServerInfos.Count == 0)
+        {
+            return serverInfos;
+        }
+
+        List<Server> allServers = await _serverRepository.GetAll(cancellationToken);
+        List<DeploymentEnvironment> allEnvironments = await _environmentRepository.GetAll(cancellationToken);
+        List<ApiClient> allApiClients = await _apiClientRepository.GetAll(cancellationToken);
+
+        foreach (StsServerInfoDataModel serverInfoModel in model.ServerInfos)
+        {
+            Server? server = references.Find(serverInfoModel.ServerName, ServerContractMapper.EntityName,
+                x => allServers.Find(y => SameName(y.Name, x)));
+            DeploymentEnvironment? environment = references.Find(serverInfoModel.EnvironmentName,
+                EnvironmentContractMapper.EntityName, x => allEnvironments.Find(y => SameName(y.Name, x)));
+            ApiClient? webAgentForCheck = references.Find(serverInfoModel.WebAgentNameForCheck,
+                ApiClientContractMapper.EntityName, x => allApiClients.Find(y => SameName(y.Name, x)));
+            DatabaseParameters? currentDatabaseParameters = await references.FindDatabaseParameters(
+                serverInfoModel.CurrentDatabaseParameters, _databaseServerConnectionRepository,
+                _smartSchemaRepository, _fileStorageRepository, cancellationToken);
+            DatabaseParameters? newDatabaseParameters = await references.FindDatabaseParameters(
+                serverInfoModel.NewDatabaseParameters, _databaseServerConnectionRepository, _smartSchemaRepository,
+                _fileStorageRepository, cancellationToken);
+            if (server is null || environment is null)
+            {
+                continue;
+            }
+
+            serverInfos.Add(ServerInfo.Create(server.Id, environment.Id, webAgentForCheck?.Id,
+                serverInfoModel.ServerSidePort, serverInfoModel.ApiVersionId,
+                serverInfoModel.AppSettingsJsonSourceFileName, serverInfoModel.AppSettingsEncodedJsonFileName,
+                serverInfoModel.ServiceUserName, currentDatabaseParameters, newDatabaseParameters,
+                serverInfoModel.AllowToolsList.Select(ServerInfoAllowedTool.Create)));
+        }
+
+        return serverInfos;
     }
 
     private static bool SameName(string name, string otherName)

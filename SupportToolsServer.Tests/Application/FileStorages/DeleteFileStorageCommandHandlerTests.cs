@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using SupportToolsServer.Application.FileStorages.DeleteFileStorage;
 using SupportToolsServer.Tests.TestInfrastructure;
+using SupportToolsServerCore.Domain.DeploymentEnvironments;
 using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.Projects;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
@@ -16,24 +18,53 @@ namespace SupportToolsServer.Tests.Application.FileStorages;
 
 public sealed class DeleteFileStorageCommandHandlerTests
 {
+    private readonly Server _dl360 = TestData.NewServer("dl360");
+    private readonly Mock<IDeploymentEnvironmentRepository> _environments = new();
     private readonly FileStorage _fileStorage = TestData.NewFileStorage("Exchange", version: 3);
     private readonly Mock<IFileStorageRepository> _fileStorages = new();
     private readonly Mock<IGlobalSettingsRepository> _globalSettings = new();
+    private readonly DeploymentEnvironment _prod = TestData.NewEnvironment("Prod");
     private readonly Mock<IProjectCreatorSettingsRepository> _projectCreatorSettings = new();
     private readonly List<Project> _projectList = [];
     private readonly Mock<IProjectRepository> _projects = new();
+    private readonly Mock<IServerRepository> _servers = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     public DeleteFileStorageCommandHandlerTests()
     {
         _projects.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => _projectList);
+        _servers.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => [_dl360]);
+        _environments.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => [_prod]);
     }
 
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
         var handler = new DeleteFileStorageCommandHandler(_fileStorages.Object, _globalSettings.Object,
-            _projectCreatorSettings.Object, _projects.Object, _unitOfWork.Object);
+            _projectCreatorSettings.Object, _projects.Object, _servers.Object, _environments.Object,
+            _unitOfWork.Object);
         return handler.Handle(new DeleteFileStorageCommand(name, version), cancellationToken);
+    }
+
+    //A server info whose current or new database parameters use the file storage is named after its project, which
+    //is named only when its own database parameters use the file storage
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheServerInfosThatUseTheFileStorage()
+    {
+        _fileStorages.Setup(r => r.GetByName("Exchange", It.IsAny<CancellationToken>())).ReturnsAsync(_fileStorage);
+        _projectList.AddRange(
+            TestData.NewProject("AppB",
+                serverInfos:
+                [
+                    TestData.NewServerInfo(_dl360, _prod, null, null,
+                        TestData.NewDatabaseParameters(fileStorage: _fileStorage))
+                ]),
+            TestData.NewProject("AppA", serverInfos: [TestData.NewServerInfo(_dl360, _prod)]));
+
+        Result result = await Handle("Exchange", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal("FileStorage Exchange Is Used By: Project AppB / dl360|Prod", result.Error.Description);
+        VerifyNothingDeleted();
     }
 
     //The fields of the singletons come first, then the projects whose database parameters use the file storage, in

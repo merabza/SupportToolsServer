@@ -219,6 +219,7 @@ public sealed class ProjectValidatorsTests
     [InlineData(nameof(StsProjectDataModel.AllowToolsList))]
     [InlineData(nameof(StsProjectDataModel.Endpoints))]
     [InlineData(nameof(StsProjectDataModel.RouteClasses))]
+    [InlineData(nameof(StsProjectDataModel.ServerInfos))]
     public void ModelValidator_RejectsAMissingListNamingTheProject(string propertyName)
     {
         StsProjectDataModel model = TestData.ProjectModel("AppA");

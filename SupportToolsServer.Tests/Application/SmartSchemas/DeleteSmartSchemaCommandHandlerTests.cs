@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using SupportToolsServer.Application.SmartSchemas.DeleteSmartSchema;
 using SupportToolsServer.Tests.TestInfrastructure;
+using SupportToolsServerCore.Domain.DeploymentEnvironments;
 using SupportToolsServerCore.Domain.Projects;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.Settings;
 using SupportToolsServerCore.Domain.SmartSchemas;
 using SystemTools.Domain.Abstractions;
@@ -16,24 +18,62 @@ namespace SupportToolsServer.Tests.Application.SmartSchemas;
 
 public sealed class DeleteSmartSchemaCommandHandlerTests
 {
+    private readonly Mock<IDeploymentEnvironmentRepository> _environments = new();
     private readonly Mock<IGlobalSettingsRepository> _globalSettings = new();
+    private readonly Server _pazisi = TestData.NewServer("PAZISI");
+    private readonly DeploymentEnvironment _prod = TestData.NewEnvironment("Prod");
     private readonly Mock<IProjectCreatorSettingsRepository> _projectCreatorSettings = new();
     private readonly List<Project> _projectList = [];
     private readonly Mock<IProjectRepository> _projects = new();
+    private readonly Mock<IServerRepository> _servers = new();
     private readonly SmartSchema _smartSchema = TestData.NewSmartSchema("Reduce", 1, [("Day", 3)], 3);
     private readonly Mock<ISmartSchemaRepository> _smartSchemas = new();
+    private readonly DeploymentEnvironment _test = TestData.NewEnvironment("Test");
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     public DeleteSmartSchemaCommandHandlerTests()
     {
         _projects.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => _projectList);
+        _servers.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => [_pazisi]);
+        _environments.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => [_prod, _test]);
     }
 
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
         var handler = new DeleteSmartSchemaCommandHandler(_smartSchemas.Object, _globalSettings.Object,
-            _projectCreatorSettings.Object, _projects.Object, _unitOfWork.Object);
+            _projectCreatorSettings.Object, _projects.Object, _servers.Object, _environments.Object,
+            _unitOfWork.Object);
         return handler.Handle(new DeleteSmartSchemaCommand(name, version), cancellationToken);
+    }
+
+    //A server info whose current or new database parameters use the schema is named after its project, which is
+    //named only when its own database parameters use the schema
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheServerInfosThatUseTheSchema()
+    {
+        _smartSchemas.Setup(r => r.GetByName("Reduce", It.IsAny<CancellationToken>())).ReturnsAsync(_smartSchema);
+        _projectList.AddRange(
+            TestData.NewProject("AppB",
+                serverInfos:
+                [
+                    TestData.NewServerInfo(_pazisi, _test, null, null,
+                        TestData.NewDatabaseParameters(smartSchema: _smartSchema))
+                ]),
+            TestData.NewProject("AppA",
+                devDatabaseParameters: TestData.NewDatabaseParameters(smartSchema: _smartSchema),
+                serverInfos:
+                [
+                    TestData.NewServerInfo(_pazisi, _prod, null,
+                        TestData.NewDatabaseParameters(smartSchema: _smartSchema))
+                ]));
+
+        Result result = await Handle("Reduce", 3);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(
+            "SmartSchema Reduce Is Used By: Project AppA, Project AppA / PAZISI|Prod, Project AppB / PAZISI|Test",
+            result.Error.Description);
+        VerifyNothingDeleted();
     }
 
     //The fields of the singletons come first, then the projects whose database parameters use the schema, in name

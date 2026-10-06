@@ -48,7 +48,8 @@ public sealed class ApiClientHandlersOnSqliteTests : IAsyncLifetime
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteApiClientCommandHandler(new ApiClientRepository(context),
             new DatabaseServerConnectionRepository(context), new ServerRepository(context),
-            new GlobalSettingsRepository(context), UnitOfWork(context, concurrentChange));
+            new GlobalSettingsRepository(context), new ProjectRepository(context),
+            new DeploymentEnvironmentRepository(context), UnitOfWork(context, concurrentChange));
         return await handler.Handle(new DeleteApiClientCommand(name, version), CancellationToken.None);
     }
 

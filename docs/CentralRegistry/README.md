@@ -110,7 +110,7 @@ FK-ების წესი: მითითება სხვა აგრე
 | ProjectCreatorSettings (singleton) | `ProjectCreatorSettings` | Server, Environment, DatabaseServerConnection, FileStorage, SmartSchema | B5 |
 | ProjectTemplate | `ProjectTemplates` | ReactTemplateName → ReactAppTemplate | B5 |
 | Project | `Projects`, `ProjectGitRepos`, `ProjectNpmPackages`, `ProjectRedundantFiles`, `ProjectAllowedTools`, `ProjectEndpoints`, `ProjectRouteClasses`, Dev/ProdCopy DatabaseParameters (owned, `Projects`-ის სტრიქონში, table splitting) | GitRepo, NpmPackage, EditorConfigFileType, DatabaseServerConnection, SmartSchema, FileStorage | B6 |
-| ServerInfo (Project-ის შვილი) | `ServerInfos`, `ServerInfoAllowedTools`, Current/New DatabaseParameters (owned) | Server, Environment, ApiClient (WebAgentNameForCheck) | B7 |
+| ServerInfo (Project-ის შვილი) | `ServerInfos`, `ServerInfoAllowedTools`, Current/New DatabaseParameters (owned, `ServerInfos`-ის სტრიქონში) | Server, Environment, ApiClient (WebAgentNameForCheck); ბაზის პარამეტრებით DatabaseServerConnection, SmartSchema, FileStorage | B7 |
 | StoredFile | `StoredFiles` | — | B8 |
 | GitRepo, GitIgnoreFileType, EditorConfigFileType | არსებული ცხრილები | GitRepo → GitIgnoreFileType | B1 (`Version`) |
 
@@ -188,7 +188,7 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [B4](tasks/B4-servers.md) | Servers | SupportToolsServer | B2, B3 | M | ✅ |
 | [B5](tasks/B5-settings-and-templates.md) | გლობალური პარამეტრები, პროექტის შემქმნელის პარამეტრები, შაბლონები | SupportToolsServer | B4 | M | ✅ |
 | [B6](tasks/B6-projects.md) | Projects-ის აგრეგატი | SupportToolsServer | B2, B3 | XL | ✅ |
-| [B7](tasks/B7-server-infos.md) | ServerInfo-ები Project-ის აგრეგატში | SupportToolsServer | B4, B6 | L | ⬜ |
+| [B7](tasks/B7-server-infos.md) | ServerInfo-ები Project-ის აგრეგატში | SupportToolsServer | B4, B6 | L | ✅ |
 | [B8](tasks/B8-stored-files.md) | საიდუმლო ფაილების საცავი | SupportToolsServer | B1 | M | ⬜ |
 | [B9](tasks/B9-server-git-projects.md) | (სურვილისამებრ) `GitProjects`-ის გამოთვლა სერვერზე | SupportToolsServer | B1, C5 | L | ⬜ |
 | [C1](tasks/C1-machine-profile-path-mapping.md) | კომპიუტერის პროფილი და გზების გარდაქმნა | SupportTools | A4 | M | ✅ |

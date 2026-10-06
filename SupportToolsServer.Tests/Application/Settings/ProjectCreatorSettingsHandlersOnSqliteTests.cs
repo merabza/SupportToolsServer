@@ -80,7 +80,8 @@ public sealed class ProjectCreatorSettingsHandlersOnSqliteTests : IAsyncLifetime
     {
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteServerCommandHandler(new ServerRepository(context),
-            new ProjectCreatorSettingsRepository(context), new SupportToolsServerUnitOfWork(context));
+            new ProjectCreatorSettingsRepository(context), new ProjectRepository(context),
+            new DeploymentEnvironmentRepository(context), new SupportToolsServerUnitOfWork(context));
         return await handler.Handle(new DeleteServerCommand(name, null), CancellationToken.None);
     }
 
@@ -88,7 +89,8 @@ public sealed class ProjectCreatorSettingsHandlersOnSqliteTests : IAsyncLifetime
     {
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteEnvironmentCommandHandler(new DeploymentEnvironmentRepository(context),
-            new ProjectCreatorSettingsRepository(context), new SupportToolsServerUnitOfWork(context));
+            new ProjectCreatorSettingsRepository(context), new ProjectRepository(context),
+            new ServerRepository(context), new SupportToolsServerUnitOfWork(context));
         return await handler.Handle(new DeleteEnvironmentCommand(name, null), CancellationToken.None);
     }
 
@@ -97,6 +99,7 @@ public sealed class ProjectCreatorSettingsHandlersOnSqliteTests : IAsyncLifetime
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteDatabaseServerConnectionCommandHandler(new DatabaseServerConnectionRepository(context),
             new ProjectCreatorSettingsRepository(context), new ProjectRepository(context),
+            new ServerRepository(context), new DeploymentEnvironmentRepository(context),
             new SupportToolsServerUnitOfWork(context));
         return await handler.Handle(new DeleteDatabaseServerConnectionCommand(name, null), CancellationToken.None);
     }
@@ -106,7 +109,8 @@ public sealed class ProjectCreatorSettingsHandlersOnSqliteTests : IAsyncLifetime
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteFileStorageCommandHandler(new FileStorageRepository(context),
             new GlobalSettingsRepository(context), new ProjectCreatorSettingsRepository(context),
-            new ProjectRepository(context), new SupportToolsServerUnitOfWork(context));
+            new ProjectRepository(context), new ServerRepository(context),
+            new DeploymentEnvironmentRepository(context), new SupportToolsServerUnitOfWork(context));
         return await handler.Handle(new DeleteFileStorageCommand(name, null), CancellationToken.None);
     }
 
@@ -115,7 +119,8 @@ public sealed class ProjectCreatorSettingsHandlersOnSqliteTests : IAsyncLifetime
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteSmartSchemaCommandHandler(new SmartSchemaRepository(context),
             new GlobalSettingsRepository(context), new ProjectCreatorSettingsRepository(context),
-            new ProjectRepository(context), new SupportToolsServerUnitOfWork(context));
+            new ProjectRepository(context), new ServerRepository(context),
+            new DeploymentEnvironmentRepository(context), new SupportToolsServerUnitOfWork(context));
         return await handler.Handle(new DeleteSmartSchemaCommand(name, null), CancellationToken.None);
     }
 

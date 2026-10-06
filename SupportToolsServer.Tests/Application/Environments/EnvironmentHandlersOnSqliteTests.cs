@@ -45,7 +45,8 @@ public sealed class EnvironmentHandlersOnSqliteTests : IAsyncLifetime
     {
         await using SupportToolsServerDbContext context = _database.NewContext();
         var handler = new DeleteEnvironmentCommandHandler(new DeploymentEnvironmentRepository(context),
-            new ProjectCreatorSettingsRepository(context), UnitOfWork(context, concurrentChange));
+            new ProjectCreatorSettingsRepository(context), new ProjectRepository(context),
+            new ServerRepository(context), UnitOfWork(context, concurrentChange));
         return await handler.Handle(new DeleteEnvironmentCommand(name, version), CancellationToken.None);
     }
 

@@ -36,7 +36,8 @@ internal static class TestData
     public static Project NewProject(string name, EditorConfigFileType? editorConfigFileType = null,
         DatabaseParameters? devDatabaseParameters = null, DatabaseParameters? prodCopyDatabaseParameters = null,
         IEnumerable<GitRepo>? gitRepos = null, IEnumerable<GitRepo>? scaffoldSeederGitRepos = null,
-        IEnumerable<NpmPackage>? npmPackages = null, int version = EntityVersion.Initial)
+        IEnumerable<NpmPackage>? npmPackages = null, IEnumerable<ServerInfo>? serverInfos = null,
+        int version = EntityVersion.Initial)
     {
         var project = new Project(ProjectId.CreateUnique(), name, "Standard", null, null, 1, 0, false, null, null,
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
@@ -54,8 +55,40 @@ internal static class TestData
             ], (npmPackages ?? []).Select(x => ProjectNpmPackage.Create(x.Id)), [ProjectRedundantFile.Create("*.pdb")],
             [ProjectAllowedTool.Create("SeedData")],
             [ProjectEndpoint.Create("Upload", "Upload", "/upload", true, "Post", "Command", null, false)],
-            [ProjectRouteClass.Create("Main", "api", "v1", "/main")]);
+            [ProjectRouteClass.Create("Main", "api", "v1", "/main")], serverInfos ?? []);
         return project;
+    }
+
+    //The references are the records given. Every server info has one allowed tool
+    public static ServerInfo NewServerInfo(Server server, DeploymentEnvironment environment,
+        ApiClient? webAgentForCheck = null, DatabaseParameters? currentDatabaseParameters = null,
+        DatabaseParameters? newDatabaseParameters = null, int serverSidePort = 5022)
+    {
+        return ServerInfo.Create(server.Id, environment.Id, webAgentForCheck?.Id, serverSidePort, "v1",
+            $@"D:\1WorkSecurity\App\{server.Name}\appsettings.json",
+            $@"D:\1WorkSecurity\App\{server.Name}\appsettingsEncoded.json", "deployer", currentDatabaseParameters,
+            newDatabaseParameters, [ServerInfoAllowedTool.Create("ProgramUpdater")]);
+    }
+
+    //The values of NewServerInfo
+    public static StsServerInfoDataModel ServerInfoModel(string serverName, string environmentName,
+        string? webAgentNameForCheck = null, StsDatabaseParametersDataModel? currentDatabaseParameters = null,
+        StsDatabaseParametersDataModel? newDatabaseParameters = null, int serverSidePort = 5022)
+    {
+        return new StsServerInfoDataModel
+        {
+            ServerName = serverName,
+            EnvironmentName = environmentName,
+            WebAgentNameForCheck = webAgentNameForCheck,
+            ServerSidePort = serverSidePort,
+            ApiVersionId = "v1",
+            AppSettingsJsonSourceFileName = $@"D:\1WorkSecurity\App\{serverName}\appsettings.json",
+            AppSettingsEncodedJsonFileName = $@"D:\1WorkSecurity\App\{serverName}\appsettingsEncoded.json",
+            ServiceUserName = "deployer",
+            AllowToolsList = ["ProgramUpdater"],
+            CurrentDatabaseParameters = currentDatabaseParameters,
+            NewDatabaseParameters = newDatabaseParameters
+        };
     }
 
     public static DatabaseParameters NewDatabaseParameters(DatabaseServerConnection? connection = null,
@@ -70,7 +103,7 @@ internal static class TestData
         StsDatabaseParametersDataModel? devDatabaseParameters = null,
         StsDatabaseParametersDataModel? prodCopyDatabaseParameters = null, List<string>? gitProjectNames = null,
         List<string>? scaffoldSeederGitProjectNames = null, List<string>? frontNpmPackageNames = null,
-        int version = 0)
+        List<StsServerInfoDataModel>? serverInfos = null, int version = 0)
     {
         return new StsProjectDataModel
         {
@@ -119,6 +152,7 @@ internal static class TestData
             [
                 new StsProjectRouteClassDataModel { Name = "Main", Root = "api", ApiVersion = "v1", Base = "/main" }
             ],
+            ServerInfos = serverInfos ?? [],
             Version = version
         };
     }

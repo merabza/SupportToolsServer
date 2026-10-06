@@ -6,7 +6,9 @@ using Moq;
 using SupportToolsServer.Application.DatabaseServerConnections.DeleteDatabaseServerConnection;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
+using SupportToolsServerCore.Domain.DeploymentEnvironments;
 using SupportToolsServerCore.Domain.Projects;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
@@ -20,21 +22,66 @@ public sealed class DeleteDatabaseServerConnectionCommandHandlerTests
         TestData.NewDatabaseServerConnection("Pc1.Sql", foldersSetNames: ["Default"], version: 3);
 
     private readonly Mock<IDatabaseServerConnectionRepository> _connections = new();
+    private readonly Server _dl360 = TestData.NewServer("dl360");
+    private readonly Mock<IDeploymentEnvironmentRepository> _environments = new();
+    private readonly Server _pazisi = TestData.NewServer("PAZISI");
+    private readonly DeploymentEnvironment _prod = TestData.NewEnvironment("Prod");
     private readonly Mock<IProjectCreatorSettingsRepository> _projectCreatorSettings = new();
     private readonly List<Project> _projectList = [];
     private readonly Mock<IProjectRepository> _projects = new();
+    private readonly Mock<IServerRepository> _servers = new();
+    private readonly DeploymentEnvironment _test = TestData.NewEnvironment("Test");
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     public DeleteDatabaseServerConnectionCommandHandlerTests()
     {
         _projects.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => _projectList);
+        _servers.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => [_pazisi, _dl360]);
+        _environments.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync(() => [_prod, _test]);
     }
 
     private Task<Result> Handle(string name, int? version, CancellationToken cancellationToken = default)
     {
         var handler = new DeleteDatabaseServerConnectionCommandHandler(_connections.Object,
-            _projectCreatorSettings.Object, _projects.Object, _unitOfWork.Object);
+            _projectCreatorSettings.Object, _projects.Object, _servers.Object, _environments.Object,
+            _unitOfWork.Object);
         return handler.Handle(new DeleteDatabaseServerConnectionCommand(name, version), cancellationToken);
+    }
+
+    //A project is named for its own database parameters, and each of its server infos for theirs: the projects in name
+    //order, each before its server infos
+    [Fact]
+    public async Task Handle_ReturnsRecordIsInUseWithTheProjectsAndTheServerInfosThatUseTheConnection()
+    {
+        _connections.Setup(r => r.GetByName("Pc1.Sql", It.IsAny<CancellationToken>())).ReturnsAsync(_connection);
+        DatabaseServerConnection other = TestData.NewDatabaseServerConnection("Pc2.Sql");
+        _projectList.AddRange(
+            TestData.NewProject("AppC",
+                serverInfos: [TestData.NewServerInfo(_pazisi, _prod, null, TestData.NewDatabaseParameters(other))]),
+            TestData.NewProject("AppB",
+                serverInfos:
+                [
+                    TestData.NewServerInfo(_dl360, _test, null, null, TestData.NewDatabaseParameters(_connection)),
+                    TestData.NewServerInfo(_pazisi, _test)
+                ]),
+            TestData.NewProject("AppA", devDatabaseParameters: TestData.NewDatabaseParameters(_connection),
+                serverInfos:
+                [
+                    TestData.NewServerInfo(_pazisi, _prod, null, TestData.NewDatabaseParameters(_connection),
+                        TestData.NewDatabaseParameters(_connection)),
+                    TestData.NewServerInfo(_dl360, _prod, null, TestData.NewDatabaseParameters(_connection))
+                ]));
+        using var cancellation = new CancellationTokenSource();
+
+        Result result = await Handle("Pc1.Sql", 3, cancellation.Token);
+
+        Assert.Equal("RecordIsInUse", result.Error.Code);
+        Assert.Equal(
+            "DatabaseServerConnection Pc1.Sql Is Used By: Project AppA, Project AppA / dl360|Prod, " +
+            "Project AppA / PAZISI|Prod, Project AppB / dl360|Test", result.Error.Description);
+        _servers.Verify(r => r.GetAll(cancellation.Token), Times.Once);
+        _environments.Verify(r => r.GetAll(cancellation.Token), Times.Once);
+        VerifyNothingDeleted();
     }
 
     //The field of the singleton comes first, then the projects whose dev or prod copy database parameters use the

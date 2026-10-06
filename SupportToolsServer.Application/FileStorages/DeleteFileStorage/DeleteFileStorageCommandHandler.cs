@@ -5,8 +5,10 @@ using SupportToolsServer.Application.Projects;
 using SupportToolsServer.Application.Registry;
 using SupportToolsServer.Application.Settings;
 using SupportToolsServerApiContracts.Errors;
+using SupportToolsServerCore.Domain.DeploymentEnvironments;
 using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.Projects;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.Settings;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.Domain.Abstractions;
@@ -16,21 +18,26 @@ namespace SupportToolsServer.Application.FileStorages.DeleteFileStorage;
 
 public sealed class DeleteFileStorageCommandHandler : ICommandHandler<DeleteFileStorageCommand>
 {
+    private readonly IDeploymentEnvironmentRepository _environmentRepository;
     private readonly IFileStorageRepository _fileStorageRepository;
     private readonly IGlobalSettingsRepository _globalSettingsRepository;
     private readonly IProjectCreatorSettingsRepository _projectCreatorSettingsRepository;
     private readonly IProjectRepository _projectRepository;
+    private readonly IServerRepository _serverRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteFileStorageCommandHandler(IFileStorageRepository fileStorageRepository,
         IGlobalSettingsRepository globalSettingsRepository,
         IProjectCreatorSettingsRepository projectCreatorSettingsRepository, IProjectRepository projectRepository,
+        IServerRepository serverRepository, IDeploymentEnvironmentRepository environmentRepository,
         IUnitOfWork unitOfWork)
     {
         _fileStorageRepository = fileStorageRepository;
         _globalSettingsRepository = globalSettingsRepository;
         _projectCreatorSettingsRepository = projectCreatorSettingsRepository;
         _projectRepository = projectRepository;
+        _serverRepository = serverRepository;
+        _environmentRepository = environmentRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -50,7 +57,7 @@ public sealed class DeleteFileStorageCommandHandler : ICommandHandler<DeleteFile
         }
 
         //FileStorage-ს სხვა აგრეგატები მიმართავს (FK, Restrict), ამიტომ გამოყენებულს არ ვშლით: 409 RecordIsInUse
-        //მომხმარებლების სიით. B7 (ServerInfo-ს ბაზის პარამეტრები) თავის მომხმარებლებს აქ დაამატებს
+        //მომხმარებლების სიით
         List<string> usages = await GetUsages(fileStorage.Id, cancellationToken);
         if (usages.Count > 0)
         {
@@ -65,18 +72,21 @@ public sealed class DeleteFileStorageCommandHandler : ICommandHandler<DeleteFile
     }
 
     //მომხმარებლები: ჯერ გლობალური პარამეტრების, მერე პროექტის შემქმნელის პარამეტრების ველები, კონტრაქტის რიგით, და
-    //ბოლოს პროექტები, რომელთა ბაზის პარამეტრებიც ფაილსაცავს იყენებს
+    //ბოლოს პროექტები, რომელთა ბაზის პარამეტრებიც ფაილსაცავს იყენებს, თითოეული თავისი ServerInfo-ებით, რომელთა ბაზის
+    //პარამეტრებიც ფაილსაცავს იყენებს
     private async Task<List<string>> GetUsages(FileStorageId fileStorageId, CancellationToken cancellationToken)
     {
         GlobalSettings? globalSettings = await _globalSettingsRepository.Get(cancellationToken);
         ProjectCreatorSettings? projectCreatorSettings =
             await _projectCreatorSettingsRepository.Get(cancellationToken);
         List<Project> projects = await _projectRepository.GetAll(cancellationToken);
+        ServerInfoKeyNames keyNames =
+            await ServerInfoKeyNames.Read(_serverRepository, _environmentRepository, cancellationToken);
 
         return
         [
             .. globalSettings.GetUsages(fileStorageId), .. projectCreatorSettings.GetUsages(fileStorageId),
-            .. projects.GetUsages(fileStorageId)
+            .. projects.GetUsages(fileStorageId, keyNames)
         ];
     }
 }

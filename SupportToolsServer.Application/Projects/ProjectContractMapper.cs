@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using SupportToolsServer.Application.Registry;
 using SupportToolsServerApiContracts.Models;
+using SupportToolsServerCore.Domain.ApiClients;
 using SupportToolsServerCore.Domain.DatabaseServerConnections;
+using SupportToolsServerCore.Domain.DeploymentEnvironments;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.Projects;
+using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.SmartSchemas;
 
 namespace SupportToolsServer.Application.Projects;
@@ -19,7 +22,8 @@ internal static class ProjectContractMapper
     public const string EntityName = "Project";
 
     //მითითებები ბაზაში Id-ებით ინახება, კონტრაქტში კი სახელებით გადაიცემა. სიები სიმრავლეებია, ამიტომ სახელით ლაგდება,
-    //endpoint-ები და route კლასები კი Name-ით: კლიენტის ჰეში რიგზე არ უნდა იყოს დამოკიდებული
+    //endpoint-ები და route კლასები Name-ით, ServerInfo-ები კი სერვერისა და გარემოს სახელებით: კლიენტის ჰეში რიგზე არ
+    //უნდა იყოს დამოკიდებული
     public static StsProjectDataModel ToContractModel(this Project project, ProjectReferenceNames names)
     {
         return new StsProjectDataModel
@@ -92,6 +96,7 @@ internal static class ProjectContractMapper
                         Name = x.Name, Root = x.Root, ApiVersion = x.ApiVersion, Base = x.Base
                     })
             ],
+            ServerInfos = project.ServerInfos.ToContractModels(names),
             Version = project.Version
         };
     }
@@ -114,30 +119,78 @@ internal static class ProjectContractMapper
         return projects.Usages(x => editorConfigFileTypeId.Equals(x.EditorConfigFileTypeId));
     }
 
-    //ბაზის კავშირს, ჭკვიან სქემასა და ფაილსაცავს ორივე ბაზის პარამეტრი მიმართავს
+    //ServerInfo-ები, რომლებიც მითითებულ ჩანაწერს იყენებს, "Project <სახელი> / <სერვერი>|<გარემო>" ფორმით: პროექტები
+    //სახელის რიგით, თითო პროექტში ServerInfo-ები სერვერისა და გარემოს სახელების რიგით
+    public static IEnumerable<string> GetUsages(this IEnumerable<Project> projects, ServerId serverId,
+        ServerInfoKeyNames keyNames)
+    {
+        return projects.Usages(_ => false, x => serverId.Equals(x.ServerId), keyNames);
+    }
+
     public static IEnumerable<string> GetUsages(this IEnumerable<Project> projects,
-        DatabaseServerConnectionId connectionId)
+        DeploymentEnvironmentId environmentId, ServerInfoKeyNames keyNames)
     {
-        return projects.Usages(x =>
-            x.DevDatabaseParameters.Uses(connectionId) || x.ProdCopyDatabaseParameters.Uses(connectionId));
+        return projects.Usages(_ => false, x => environmentId.Equals(x.EnvironmentId), keyNames);
     }
 
-    public static IEnumerable<string> GetUsages(this IEnumerable<Project> projects, SmartSchemaId smartSchemaId)
+    public static IEnumerable<string> GetUsages(this IEnumerable<Project> projects, ApiClientId apiClientId,
+        ServerInfoKeyNames keyNames)
     {
-        return projects.Usages(x =>
-            x.DevDatabaseParameters.Uses(smartSchemaId) || x.ProdCopyDatabaseParameters.Uses(smartSchemaId));
+        return projects.Usages(_ => false, x => apiClientId.Equals(x.WebAgentForCheckId), keyNames);
     }
 
-    public static IEnumerable<string> GetUsages(this IEnumerable<Project> projects, FileStorageId fileStorageId)
+    //ბაზის კავშირს, ჭკვიან სქემასა და ფაილსაცავს პროექტის ორივე ბაზის პარამეტრი მიმართავს ("Project <სახელი>") და
+    //ServerInfo-ების ორივე ბაზის პარამეტრიც ("Project <სახელი> / <სერვერი>|<გარემო>")
+    public static IEnumerable<string> GetUsages(this IEnumerable<Project> projects,
+        DatabaseServerConnectionId connectionId, ServerInfoKeyNames keyNames)
     {
-        return projects.Usages(x =>
-            x.DevDatabaseParameters.Uses(fileStorageId) || x.ProdCopyDatabaseParameters.Uses(fileStorageId));
+        return projects.Usages(
+            x => x.DevDatabaseParameters.Uses(connectionId) || x.ProdCopyDatabaseParameters.Uses(connectionId),
+            x => x.CurrentDatabaseParameters.Uses(connectionId) || x.NewDatabaseParameters.Uses(connectionId),
+            keyNames);
+    }
+
+    public static IEnumerable<string> GetUsages(this IEnumerable<Project> projects, SmartSchemaId smartSchemaId,
+        ServerInfoKeyNames keyNames)
+    {
+        return projects.Usages(
+            x => x.DevDatabaseParameters.Uses(smartSchemaId) || x.ProdCopyDatabaseParameters.Uses(smartSchemaId),
+            x => x.CurrentDatabaseParameters.Uses(smartSchemaId) || x.NewDatabaseParameters.Uses(smartSchemaId),
+            keyNames);
+    }
+
+    public static IEnumerable<string> GetUsages(this IEnumerable<Project> projects, FileStorageId fileStorageId,
+        ServerInfoKeyNames keyNames)
+    {
+        return projects.Usages(
+            x => x.DevDatabaseParameters.Uses(fileStorageId) || x.ProdCopyDatabaseParameters.Uses(fileStorageId),
+            x => x.CurrentDatabaseParameters.Uses(fileStorageId) || x.NewDatabaseParameters.Uses(fileStorageId),
+            keyNames);
     }
 
     private static IEnumerable<string> Usages(this IEnumerable<Project> projects, Func<Project, bool> usesRecord)
     {
         return projects.Where(usesRecord).Select(x => x.Name).Order(StringComparer.OrdinalIgnoreCase)
             .Select(x => $"{EntityName} {x}");
+    }
+
+    //პროექტის სახელის რიგით: ჯერ თვითონ პროექტი, თუ მისი ველები ჩანაწერს იყენებს, მერე მისი ServerInfo-ები, რომლებიც
+    //ჩანაწერს იყენებს
+    private static IEnumerable<string> Usages(this IEnumerable<Project> projects, Func<Project, bool> projectUsesRecord,
+        Func<ServerInfo, bool> serverInfoUsesRecord, ServerInfoKeyNames keyNames)
+    {
+        foreach (Project project in projects.OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase))
+        {
+            if (projectUsesRecord(project))
+            {
+                yield return $"{EntityName} {project.Name}";
+            }
+
+            foreach (string key in keyNames.SortedKeys(project.ServerInfos.Where(serverInfoUsesRecord)))
+            {
+                yield return $"{EntityName} {project.Name} / {key}";
+            }
+        }
     }
 
     private static List<string> GitNames(Project project, EProjectGitRepoKind kind, ProjectReferenceNames names)

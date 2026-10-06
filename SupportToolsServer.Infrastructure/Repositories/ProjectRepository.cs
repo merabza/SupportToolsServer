@@ -78,11 +78,13 @@ public sealed class ProjectRepository : IProjectRepository
         return names.SingleOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))?.Id;
     }
 
-    //შვილების ექვსი სია ცალკე მოთხოვნებით იკითხება (AsSplitQuery), რომ JOIN-ებმა სტრიქონები არ გაამრავლოს. ბაზის
-    //პარამეტრები პროექტის სტრიქონშია და ავტომატურად იკითხება
+    //შვილების ექვსი სია და ServerInfo-ები თავიანთი ინსტრუმენტებით ცალკე მოთხოვნებით იკითხება (AsSplitQuery), რომ
+    //JOIN-ებმა სტრიქონები არ გაამრავლოს. ბაზის პარამეტრები პროექტისა და ServerInfo-ს სტრიქონებშია და ავტომატურად
+    //იკითხება
     private static IQueryable<Project> WithChildren(IQueryable<Project> projects)
     {
         return projects.Include(x => x.GitRepos).Include(x => x.NpmPackages).Include(x => x.RedundantFiles)
-            .Include(x => x.AllowedTools).Include(x => x.Endpoints).Include(x => x.RouteClasses).AsSplitQuery();
+            .Include(x => x.AllowedTools).Include(x => x.Endpoints).Include(x => x.RouteClasses)
+            .Include(x => x.ServerInfos).ThenInclude(x => x.AllowedTools).AsSplitQuery();
     }
 }
