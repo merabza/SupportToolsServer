@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Serilog;
@@ -19,6 +20,7 @@ using SupportToolsServerCore.Domain.Runtimes;
 using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.Settings;
 using SupportToolsServerCore.Domain.SmartSchemas;
+using SupportToolsServerCore.Domain.StoredFiles;
 using Xunit;
 
 namespace SupportToolsServer.Tests.Infrastructure.DependencyInjection;
@@ -88,6 +90,36 @@ public sealed class SupportToolsServerRepositoriesDependencyInjectionTests
         Assert.Contains(services,
             d => d.ServiceType == typeof(IProjectRepository) && d.ImplementationType == typeof(ProjectRepository) &&
                  d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IStoredFileRepository) &&
+                 d.ImplementationType == typeof(StoredFileRepository) && d.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    //UpdateStoredFile takes the time of the change from it
+    [Fact]
+    public void AddSupportToolsServerRepositories_RegistersTheSystemClock()
+    {
+        var services = new ServiceCollection();
+
+        services.AddSupportToolsServerRepositories(null);
+
+        ServiceDescriptor clock = Assert.Single(services, d => d.ServiceType == typeof(TimeProvider));
+        Assert.Same(TimeProvider.System, clock.ImplementationInstance);
+        Assert.Equal(ServiceLifetime.Singleton, clock.Lifetime);
+    }
+
+    //The authentication of the host registers the clock as well, and the one registered first is kept
+    [Fact]
+    public void AddSupportToolsServerRepositories_KeepsAClockThatIsAlreadyRegistered()
+    {
+        var services = new ServiceCollection();
+        var clock = new Mock<TimeProvider>();
+        services.AddSingleton(clock.Object);
+
+        services.AddSupportToolsServerRepositories(null);
+
+        Assert.Same(clock.Object, Assert.Single(services, d => d.ServiceType == typeof(TimeProvider))
+            .ImplementationInstance);
     }
 
     [Fact]

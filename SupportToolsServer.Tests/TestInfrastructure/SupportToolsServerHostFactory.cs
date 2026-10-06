@@ -12,6 +12,7 @@ using SupportToolsServer.Application.ApiClients.GetApiClientByName;
 using SupportToolsServer.Application.Environments.GetEnvironmentByName;
 using SupportToolsServer.Application.GitRepos.GetGitRepos;
 using SupportToolsServer.Application.NpmPackages.GetNpmPackageByName;
+using SupportToolsServer.Application.StoredFiles.GetStoredFileByPath;
 using SupportToolsServerApiContracts.Models;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.SharedKernel;
@@ -25,8 +26,9 @@ namespace SupportToolsServer.Tests.TestInfrastructure;
 //The factory passes the parent keys of a setting as well, with empty values: Serilog takes the empty
 //Serilog:WriteTo:1 for a sink without a name and skips it, so the test hosts write no log file (only to the console).
 //The connection string is valid only in format: the handlers of GET gitrepos, GET environments/{key},
-//GET npmpackages/{key} and GET apiclients/{key} are stubs, so no database is opened. The last three return the name
-//they received, which shows how the route key was decoded
+//GET npmpackages/{key}, GET apiclients/{key} and GET files/content are stubs, so no database is opened. The last four
+//return the name or the path they received, which shows how the route key or the query was decoded; the file comes
+//with the made-up content of TestData
 public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Program>
 {
     public const string ValidApiKey = "valid-test-key";
@@ -63,7 +65,17 @@ public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Progra
             services.AddScoped(_ => EnvironmentNameEchoHandler());
             services.AddScoped(_ => NpmPackageNameEchoHandler());
             services.AddScoped(_ => ApiClientNameEchoHandler());
+            services.AddScoped(_ => StoredFilePathEchoHandler());
         });
+    }
+
+    private static IQueryHandler<GetStoredFileByPathQuery, StsStoredFileDataModel> StoredFilePathEchoHandler()
+    {
+        var handler = new Mock<IQueryHandler<GetStoredFileByPathQuery, StsStoredFileDataModel>>();
+        handler.Setup(h => h.Handle(It.IsAny<GetStoredFileByPathQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GetStoredFileByPathQuery query, CancellationToken _) => Result.Success(
+                new StsStoredFileDataModel { Path = query.Path, Content = TestData.MadeUpFileContent, Version = 1 }));
+        return handler.Object;
     }
 
     private static IQueryHandler<GetApiClientByNameQuery, StsApiClientDataModel> ApiClientNameEchoHandler()

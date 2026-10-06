@@ -189,12 +189,12 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [B5](tasks/B5-settings-and-templates.md) | გლობალური პარამეტრები, პროექტის შემქმნელის პარამეტრები, შაბლონები | SupportToolsServer | B4 | M | ✅ |
 | [B6](tasks/B6-projects.md) | Projects-ის აგრეგატი | SupportToolsServer | B2, B3 | XL | ✅ |
 | [B7](tasks/B7-server-infos.md) | ServerInfo-ები Project-ის აგრეგატში | SupportToolsServer | B4, B6 | L | ✅ |
-| [B8](tasks/B8-stored-files.md) | საიდუმლო ფაილების საცავი | SupportToolsServer | B1 | M | ⬜ |
+| [B8](tasks/B8-stored-files.md) | საიდუმლო ფაილების საცავი | SupportToolsServer | B1 | M | ✅ |
 | [B9](tasks/B9-server-git-projects.md) | (სურვილისამებრ) `GitProjects`-ის გამოთვლა სერვერზე | SupportToolsServer | B1, C5 | L | ⬜ |
 | [C1](tasks/C1-machine-profile-path-mapping.md) | კომპიუტერის პროფილი და გზების გარდაქმნა | SupportTools | A4 | M | ✅ |
 | [C2](tasks/C2-sync-engine-core.md) | სინქრონიზაციის ძრავის ბირთვი | SupportTools | A4 | L | ✅ |
 | [C3](tasks/C3-adapters-reference-data.md) | ადაპტერები: ცნობარები, რესურსები, სერვერები, პარამეტრები, გიტები, შაბლონები | SupportTools | C1, C2, B1–B5 | L | ✅ |
-| [C4](tasks/C4-adapter-projects.md) | ადაპტერი: Projects და ServerInfo-ები | SupportTools | C3, B6, B7 | L | ⬜ |
+| [C4](tasks/C4-adapter-projects.md) | ადაპტერი: Projects და ServerInfo-ები | SupportTools | C3, B6, B7 | L | ✅ |
 | [C5](tasks/C5-sync-command-seed.md) | სინქრონიზაციის ბრძანება და საწყისი ატვირთვა (seed) | SupportTools | C4, A3 | L | ⬜ |
 | [C6](tasks/C6-stored-files-sync.md) | საიდუმლო ფაილების სინქრონიზაცია | SupportTools | C5, B8 | M | ⬜ |
 | [D1](tasks/D1-deployment.md) | ცენტრალური სერვერის დეპლოი | SupportToolsServer | A3 | M | ⬜ |

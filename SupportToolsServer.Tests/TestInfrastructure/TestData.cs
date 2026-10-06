@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SupportToolsServerApiContracts.Models;
@@ -18,18 +19,23 @@ using SupportToolsServerCore.Domain.Runtimes;
 using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.Settings;
 using SupportToolsServerCore.Domain.SmartSchemas;
+using SupportToolsServerCore.Domain.StoredFiles;
 
 namespace SupportToolsServer.Tests.TestInfrastructure;
 
-//The secrets of the resources (passwords, API keys, users, the MediatR license key, the key part of a project) are
-//made up
+//The secrets of the resources (passwords, API keys, users, the MediatR license key, the key part of a project, the
+//content of a stored file) are made up
 internal static class TestData
 {
+    public const string MadeUpFileContent = """{"ConnectionString":"made-up-connection-string"}""";
     public const string MadeUpApiKey = "made-up-api-key";
     public const string MadeUpUser = "made-up-user";
     public const string MadeUpPassword = "made-up-password";
     public const string MadeUpLicenseKey = "made-up-license-key";
     public const string MadeUpKeyGuidPart = "made-up-key-guid-part";
+
+    //The time of the change of NewStoredFile
+    public static readonly DateTime StoredFileTime = new(2026, 10, 6, 8, 15, 30, DateTimeKind.Utc);
 
     //The references are the records given. Every project has one redundant file, one allowed tool, one endpoint and
     //one route class. The children come with the update that gives the stored version, as the constructor takes none
@@ -517,5 +523,20 @@ internal static class TestData
     public static string AddressOf(string gitName)
     {
         return $"git@github.com:test/{gitName}.git";
+    }
+
+    //The hash and the length come from the content, as in StoredFile.Create
+    public static StoredFile NewStoredFile(string path, string content = MadeUpFileContent,
+        int version = EntityVersion.Initial)
+    {
+        StoredFile created = StoredFile.Create(path, content, StoredFileTime);
+        return new StoredFile(created.Id, path, content, created.Sha256, created.Length, StoredFileTime, version);
+    }
+
+    //version is the expected version of an upsert: 0 creates the file
+    public static StsStoredFileDataModel StoredFileModel(string path, string content = MadeUpFileContent,
+        int version = 0)
+    {
+        return new StsStoredFileDataModel { Path = path, Content = content, Version = version };
     }
 }

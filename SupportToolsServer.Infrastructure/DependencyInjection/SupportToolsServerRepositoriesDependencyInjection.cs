@@ -1,4 +1,6 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
 using SupportToolsServer.Infrastructure.Repositories;
 using SupportToolsServerCore.Domain.ApiClients;
@@ -17,6 +19,7 @@ using SupportToolsServerCore.Domain.Runtimes;
 using SupportToolsServerCore.Domain.Servers;
 using SupportToolsServerCore.Domain.Settings;
 using SupportToolsServerCore.Domain.SmartSchemas;
+using SupportToolsServerCore.Domain.StoredFiles;
 
 namespace SupportToolsServer.Infrastructure.DependencyInjection;
 
@@ -45,6 +48,10 @@ public static class SupportToolsServerRepositoriesDependencyInjection
         services.AddScoped<IProjectCreatorSettingsRepository, ProjectCreatorSettingsRepository>();
         services.AddScoped<IProjectTemplateRepository, ProjectTemplateRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
+        services.AddScoped<IStoredFileRepository, StoredFileRepository>();
+
+        //საიდუმლო ფაილის UpdatedAtUtc-ის საათი (UpdateStoredFile). ჰოსტში მას ავთენტიფიკაციაც ამატებს, ამიტომ TryAdd
+        services.TryAddSingleton(TimeProvider.System);
 
         debugLogger?.Information("{MethodName} Finished", nameof(AddSupportToolsServerRepositories));
 

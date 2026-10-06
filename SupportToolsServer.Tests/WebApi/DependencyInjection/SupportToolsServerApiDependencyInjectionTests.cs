@@ -19,7 +19,8 @@ public sealed class SupportToolsServerApiDependencyInjectionTests
         Assert.Equal([
             "DELETE api/v1/apiclients/delete/{key}", "DELETE api/v1/databaseserverconnections/delete/{key}",
             "DELETE api/v1/dotnettools/delete/{key}", "DELETE api/v1/environments/delete/{key}",
-            "DELETE api/v1/filestorages/delete/{key}", "DELETE api/v1/git/deleteeditorconfigfiletype/{key}",
+            "DELETE api/v1/files/delete", "DELETE api/v1/filestorages/delete/{key}",
+            "DELETE api/v1/git/deleteeditorconfigfiletype/{key}",
             "DELETE api/v1/git/deletegitignorefiletype/{key}", "DELETE api/v1/git/deletegitrepo/{key}",
             "DELETE api/v1/npmpackages/delete/{key}", "DELETE api/v1/projects/delete/{key}",
             "DELETE api/v1/projecttemplates/delete/{key}",
@@ -27,7 +28,8 @@ public sealed class SupportToolsServerApiDependencyInjectionTests
             "DELETE api/v1/servers/delete/{key}", "DELETE api/v1/smartschemas/delete/{key}",
             "GET api/v1/apiclients", "GET api/v1/apiclients/{key}", "GET api/v1/databaseserverconnections",
             "GET api/v1/databaseserverconnections/{key}", "GET api/v1/dotnettools", "GET api/v1/dotnettools/{key}",
-            "GET api/v1/environments", "GET api/v1/environments/{key}", "GET api/v1/filestorages",
+            "GET api/v1/environments", "GET api/v1/environments/{key}", "GET api/v1/files",
+            "GET api/v1/files/content", "GET api/v1/filestorages",
             "GET api/v1/filestorages/{key}", "GET api/v1/git/editorconfigfiletypeslist",
             "GET api/v1/git/gitignorefiletypeslist", "GET api/v1/git/gitrepo/{key}", "GET api/v1/git/gitrepos",
             "GET api/v1/npmpackages", "GET api/v1/npmpackages/{key}", "GET api/v1/projects",
@@ -37,7 +39,8 @@ public sealed class SupportToolsServerApiDependencyInjectionTests
             "GET api/v1/settings/global", "GET api/v1/settings/projectcreator", "GET api/v1/smartschemas",
             "GET api/v1/smartschemas/{key}", "POST api/v1/apiclients/update/{key}",
             "POST api/v1/databaseserverconnections/update/{key}", "POST api/v1/dotnettools/update/{key}",
-            "POST api/v1/environments/update/{key}", "POST api/v1/filestorages/update/{key}",
+            "POST api/v1/environments/update/{key}", "POST api/v1/files/update",
+            "POST api/v1/filestorages/update/{key}",
             "POST api/v1/git/syncupeditorconfigfiletypes/{merge?}",
             "POST api/v1/git/syncupgitignorefiletypes/{merge?}", "POST api/v1/git/updategitignorefiletype/{key}",
             "POST api/v1/git/updategitrepo/{key}", "POST api/v1/git/uploadgitrepos",
@@ -76,5 +79,6 @@ public sealed class SupportToolsServerApiDependencyInjectionTests
         logger.Verify(l => l.Information("{MethodName} Started", "UseProjectCreatorSettingsEndpoints"), Times.Once);
         logger.Verify(l => l.Information("{MethodName} Started", "UseProjectTemplatesEndpoints"), Times.Once);
         logger.Verify(l => l.Information("{MethodName} Started", "UseProjectsEndpoints"), Times.Once);
+        logger.Verify(l => l.Information("{MethodName} Started", "UseStoredFilesEndpoints"), Times.Once);
     }
 }

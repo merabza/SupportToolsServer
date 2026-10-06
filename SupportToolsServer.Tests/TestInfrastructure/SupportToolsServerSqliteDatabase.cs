@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using SupportToolsServerDbPart.Db;
 using SystemTools.SharedKernel;
@@ -41,6 +42,14 @@ internal sealed class SupportToolsServerSqliteDatabase : IAsyncDisposable
     {
         //A dispatcher without registered handlers: domain events raised by the tests go nowhere
         return new SupportToolsServerDbContext(_options,
+            new DomainEventsDispatcher(new ServiceCollection().BuildServiceProvider()));
+    }
+
+    //A context whose commands also go through the interceptor, for example to see the SQL of a query
+    public SupportToolsServerDbContext NewContextWithInterceptor(IInterceptor interceptor)
+    {
+        return new SupportToolsServerDbContext(
+            new DbContextOptionsBuilder<SupportToolsServerDbContext>(_options).AddInterceptors(interceptor).Options,
             new DomainEventsDispatcher(new ServiceCollection().BuildServiceProvider()));
     }
 }
