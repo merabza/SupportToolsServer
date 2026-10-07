@@ -196,7 +196,7 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [C3](tasks/C3-adapters-reference-data.md) | ადაპტერები: ცნობარები, რესურსები, სერვერები, პარამეტრები, გიტები, შაბლონები | SupportTools | C1, C2, B1–B5 | L | ✅ |
 | [C4](tasks/C4-adapter-projects.md) | ადაპტერი: Projects და ServerInfo-ები | SupportTools | C3, B6, B7 | L | ✅ |
 | [C5](tasks/C5-sync-command-seed.md) | სინქრონიზაციის ბრძანება და საწყისი ატვირთვა (seed) | SupportTools | C4, A3 | L | ✅ |
-| [C6](tasks/C6-stored-files-sync.md) | საიდუმლო ფაილების სინქრონიზაცია | SupportTools | C5, B8 | M | ⬜ |
+| [C6](tasks/C6-stored-files-sync.md) | საიდუმლო ფაილების სინქრონიზაცია | SupportTools | C5, B8 | M | ✅ |
 | [D1](tasks/D1-deployment.md) | ცენტრალური სერვერის დეპლოი | SupportToolsServer | A3 | M | ⬜ |
 | [D2](tasks/D2-auto-sync.md) | ავტომატური სინქრონიზაცია | SupportTools | C5, D1 | M | ⬜ |
 | [D3](tasks/D3-machine-presence.md) | „ამ კომპიუტერზეა“ და „ჩამოიტანე პროექტი აქ“ | SupportTools | C5 | M | ⬜ |
