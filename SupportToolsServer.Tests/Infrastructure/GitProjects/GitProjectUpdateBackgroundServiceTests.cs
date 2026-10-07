@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using SupportToolsServer.Application.GitRepos.UpdateGitProject;
 using SupportToolsServer.Infrastructure.GitProjects;
 using SupportToolsServer.Tests.TestInfrastructure;
+using SupportToolsServerCore.Domain.GitRepos;
 using SystemTools.Application.Abstractions.Messaging;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -40,9 +41,13 @@ public sealed class GitProjectUpdateBackgroundServiceTests : IAsyncDisposable
         await _provider.DisposeAsync();
     }
 
+    //One id per name, so that a command made again for a name equals the handled one
+    private static readonly ConcurrentDictionary<string, GitRepoId> GitRepoIds = new();
+
     private static UpdateGitProjectCommand Command(string name)
     {
-        return new UpdateGitProjectCommand(name, $"address{name}", $"Folder{name}");
+        return new UpdateGitProjectCommand(GitRepoIds.GetOrAdd(name, _ => GitRepoId.CreateUnique()), name,
+            $"address{name}", $"Folder{name}");
     }
 
     [Fact]

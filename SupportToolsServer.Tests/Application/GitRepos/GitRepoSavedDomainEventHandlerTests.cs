@@ -19,29 +19,32 @@ public sealed class GitRepoSavedDomainEventHandlerTests
         _sut = new GitRepoSavedDomainEventHandler(_queue.Object);
     }
 
+    //The id of the git goes with the command: the projects found by the scan are stored for it
     [Fact]
     public async Task Handle_EnqueuesTheUpdateOfAnAddedGit()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
+        var gitRepoId = GitRepoId.CreateUnique();
 
-        await _sut.Handle(new GitRepoAddedDomainEvent(GitRepoId.CreateUnique(), "RepoA", "addressA", "FolderA"),
+        await _sut.Handle(new GitRepoAddedDomainEvent(gitRepoId, "RepoA", "addressA", "FolderA"),
             cancellationTokenSource.Token);
 
         _queue.Verify(
-            q => q.Enqueue(new UpdateGitProjectCommand("RepoA", "addressA", "FolderA"), cancellationTokenSource.Token),
-            Times.Once);
+            q => q.Enqueue(new UpdateGitProjectCommand(new GitRepoId(gitRepoId.Value), "RepoA", "addressA", "FolderA"),
+                cancellationTokenSource.Token), Times.Once);
     }
 
     [Fact]
     public async Task Handle_EnqueuesTheUpdateOfAnUpdatedGit()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
+        var gitRepoId = GitRepoId.CreateUnique();
 
-        await _sut.Handle(new GitRepoUpdatedDomainEvent(GitRepoId.CreateUnique(), "RepoB", "addressB", "FolderB"),
+        await _sut.Handle(new GitRepoUpdatedDomainEvent(gitRepoId, "RepoB", "addressB", "FolderB"),
             cancellationTokenSource.Token);
 
         _queue.Verify(
-            q => q.Enqueue(new UpdateGitProjectCommand("RepoB", "addressB", "FolderB"), cancellationTokenSource.Token),
-            Times.Once);
+            q => q.Enqueue(new UpdateGitProjectCommand(new GitRepoId(gitRepoId.Value), "RepoB", "addressB", "FolderB"),
+                cancellationTokenSource.Token), Times.Once);
     }
 }

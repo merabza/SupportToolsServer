@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Serilog;
 using SupportToolsServer.Application.GitRepos.DeleteGitRepo;
+using SupportToolsServer.Application.GitRepos.GetGitProjects;
 using SupportToolsServer.Application.GitRepos.GetGitRepoByKey;
 using SupportToolsServer.Application.GitRepos.GetGitRepos;
 using SupportToolsServer.Application.GitRepos.UpdateGitRepo;
@@ -38,6 +39,7 @@ public static class GitReposEndpoints
         group.MapGet(SupportToolsServerApiRoutes.Git.GitRepo, GetGitRepoByKey);
         group.MapPost(SupportToolsServerApiRoutes.Git.UpdateGitRepo, UpdateGitRepo);
         group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitRepo, DeleteGitRepo);
+        group.MapGet(SupportToolsServerApiRoutes.Git.GitProjects, GetGitProjects);
 
         debugLogger?.Information("{MethodName} Finished", nameof(UseGitReposEndpoints));
 
@@ -107,5 +109,19 @@ public static class GitReposEndpoints
 
         return result.Match<Results<Ok, ProblemHttpResult>>(() => TypedResults.Ok(),
             errors => (ProblemHttpResult)CustomResults.Problem(errors));
+    }
+
+    // GET api/v1/git/gitprojects
+    public static async Task<Results<Ok<List<StsGitProjectDataModel>>, ProblemHttpResult>> GetGitProjects(
+        IQueryHandler<GetGitProjectsQuery, List<StsGitProjectDataModel>> handler,
+        CancellationToken cancellationToken = default)
+    {
+        Debug.WriteLine($"Call {nameof(GetGitProjectsQueryHandler)} from {nameof(GetGitProjects)}");
+
+        Result<List<StsGitProjectDataModel>> result =
+            await handler.Handle(new GetGitProjectsQuery(), cancellationToken);
+
+        return result.Match<List<StsGitProjectDataModel>, Results<Ok<List<StsGitProjectDataModel>>, ProblemHttpResult>>(
+            gitProjects => TypedResults.Ok(gitProjects), errors => (ProblemHttpResult)CustomResults.Problem(errors));
     }
 }

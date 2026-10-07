@@ -18,17 +18,20 @@ public sealed class GitRepoSavedDomainEventHandler : IDomainEventHandler<GitRepo
 
     public Task Handle(GitRepoAddedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        return Enqueue(domainEvent.Name, domainEvent.Address, domainEvent.FolderName, cancellationToken);
+        return Enqueue(domainEvent.GitRepoId, domainEvent.Name, domainEvent.Address, domainEvent.FolderName,
+            cancellationToken);
     }
 
     public Task Handle(GitRepoUpdatedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        return Enqueue(domainEvent.Name, domainEvent.Address, domainEvent.FolderName, cancellationToken);
+        return Enqueue(domainEvent.GitRepoId, domainEvent.Name, domainEvent.Address, domainEvent.FolderName,
+            cancellationToken);
     }
 
-    private Task Enqueue(string name, string address, string folderName, CancellationToken cancellationToken)
+    private Task Enqueue(GitRepoId gitRepoId, string name, string address, string folderName,
+        CancellationToken cancellationToken)
     {
-        return _gitProjectUpdateQueue.Enqueue(new UpdateGitProjectCommand(name, address, folderName), cancellationToken)
-            .AsTask();
+        return _gitProjectUpdateQueue
+            .Enqueue(new UpdateGitProjectCommand(gitRepoId, name, address, folderName), cancellationToken).AsTask();
     }
 }

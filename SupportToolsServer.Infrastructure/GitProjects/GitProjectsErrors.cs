@@ -16,4 +16,16 @@ public static class GitProjectsErrors
     {
         return Error.Problem(nameof(FolderIsOutsideGitsFolder), $"Folder {folderName} is not inside the Gits folder");
     }
+
+    //კლონის ფოლდერის ჩამონათვალი ვერ წაიკითხა (წვდომა, IO)
+    public static Error FolderCannotBeScanned(string folderPath, string message)
+    {
+        return Error.Problem(nameof(FolderCannotBeScanned), $"Folder {folderPath} cannot be scanned: {message}");
+    }
+
+    //პროექტის ფაილი ვერ წაიკითხა ან ის სწორი XML არ არის (DTD-ის შემცველი ფაილიც)
+    public static Error ProjectFileCannotBeRead(string filePath, string message)
+    {
+        return Error.Problem(nameof(ProjectFileCannotBeRead), $"Project file {filePath} cannot be read: {message}");
+    }
 }

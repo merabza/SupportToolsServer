@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,17 +16,22 @@ namespace SupportToolsServer.Tests.Infrastructure.DependencyInjection;
 
 public sealed class SupportToolsServerGitProjectsDependencyInjectionTests
 {
-    private static IConfiguration CreateConfiguration(string? workFolder)
+    private static IConfiguration CreateConfiguration(string? workFolder, string? gitProjectsRefreshHours = null)
     {
-        return new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { ["AppOptions:WorkFolder"] = workFolder }).Build();
+        var settings = new Dictionary<string, string?> { ["AppOptions:WorkFolder"] = workFolder };
+        if (gitProjectsRefreshHours is not null)
+        {
+            settings["AppOptions:GitProjectsRefreshHours"] = gitProjectsRefreshHours;
+        }
+
+        return new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
     }
 
-    private static ServiceProvider BuildProvider(string? workFolder)
+    private static ServiceProvider BuildProvider(string? workFolder, string? gitProjectsRefreshHours = null)
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddSupportToolsServerGitProjects(null, CreateConfiguration(workFolder));
+        services.AddSupportToolsServerGitProjects(null, CreateConfiguration(workFolder, gitProjectsRefreshHours));
         return services.BuildServiceProvider();
     }
 
@@ -48,6 +54,38 @@ public sealed class SupportToolsServerGitProjectsDependencyInjectionTests
         Assert.Contains(services,
             d => d.ServiceType == typeof(IGitClient) && d.ImplementationType == typeof(GitClient) &&
                  d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IGitProjectFilesScanner) &&
+                 d.ImplementationType == typeof(GitProjectFilesScanner) && d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IHostedService) &&
+                 d.ImplementationType == typeof(GitProjectsRefreshBackgroundService));
+    }
+
+    //The clock of the periodic refresh is the system clock, unless the host registered one before (the authentication
+    //registers it as well)
+    [Fact]
+    public void AddSupportToolsServerGitProjects_RegistersTheSystemClockOnlyOnce()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(TimeProvider.System);
+
+        services.AddSupportToolsServerGitProjects(null, CreateConfiguration("Work"));
+
+        Assert.Single(services, d => d.ServiceType == typeof(TimeProvider));
+        using ServiceProvider provider = BuildProvider("Work");
+        Assert.Same(TimeProvider.System, provider.GetRequiredService<TimeProvider>());
+    }
+
+    //The scanner and the refresh service resolve with the services that the module registers
+    [Fact]
+    public void AddSupportToolsServerGitProjects_ResolvesTheScannerAndTheRefreshService()
+    {
+        using ServiceProvider provider = BuildProvider("Work");
+        using IServiceScope scope = provider.CreateScope();
+
+        Assert.IsType<GitProjectFilesScanner>(scope.ServiceProvider.GetRequiredService<IGitProjectFilesScanner>());
+        Assert.Contains(provider.GetServices<IHostedService>(), x => x is GitProjectsRefreshBackgroundService);
     }
 
     [Fact]
@@ -69,6 +107,41 @@ public sealed class SupportToolsServerGitProjectsDependencyInjectionTests
         AppOptions options = provider.GetRequiredService<IOptions<AppOptions>>().Value;
 
         Assert.Equal(@"C:\Work", options.WorkFolder);
+        Assert.Equal(24, options.GitProjectsRefreshHours);
+    }
+
+    [Fact]
+    public void AddSupportToolsServerGitProjects_BindsTheRefreshPeriod()
+    {
+        using ServiceProvider provider = BuildProvider("Work", "6");
+
+        Assert.Equal(6, provider.GetRequiredService<IOptions<AppOptions>>().Value.GitProjectsRefreshHours);
+    }
+
+    //A period longer than a month would not fit the timer, a negative one means nothing
+    [Theory]
+    [InlineData("-1")]
+    [InlineData("721")]
+    public void AddSupportToolsServerGitProjects_FailsTheStartupValidation_WhenTheRefreshPeriodIsOutOfRange(
+        string gitProjectsRefreshHours)
+    {
+        using ServiceProvider provider = BuildProvider("Work", gitProjectsRefreshHours);
+
+        var exception = Assert.Throws<OptionsValidationException>(() =>
+            provider.GetRequiredService<IStartupValidator>().Validate());
+
+        Assert.Equal("AppOptions:GitProjectsRefreshHours must be between 0 and 720", Assert.Single(exception.Failures));
+    }
+
+    [Theory]
+    [InlineData("0")]
+    [InlineData("720")]
+    public void AddSupportToolsServerGitProjects_PassesTheStartupValidation_WhenTheRefreshPeriodIsInRange(
+        string gitProjectsRefreshHours)
+    {
+        using ServiceProvider provider = BuildProvider("Work", gitProjectsRefreshHours);
+
+        provider.GetRequiredService<IStartupValidator>().Validate();
     }
 
     [Theory]

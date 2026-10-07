@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using Serilog;
 using SupportToolsServer.Application.GitRepos.DeleteGitRepo;
+using SupportToolsServer.Application.GitRepos.GetGitProjects;
 using SupportToolsServer.Application.GitRepos.GetGitRepoByKey;
 using SupportToolsServer.Application.GitRepos.GetGitRepos;
 using SupportToolsServer.Application.GitRepos.UpdateGitRepo;
@@ -25,14 +26,14 @@ public sealed class GitReposEndpointsTests
     private static readonly Error DbFailure = Error.Failure("Db", "Database failure");
 
     [Fact]
-    public async Task UseGitReposEndpoints_MapsTheFiveGitRepoRoutes()
+    public async Task UseGitReposEndpoints_MapsTheFiveGitRepoRoutesAndTheGitProjects()
     {
         (bool mapped, List<string> routes) = await MappedRoutes.Of(app => app.UseGitReposEndpoints(null));
 
         Assert.True(mapped);
         Assert.Equal([
-            "DELETE api/v1/git/deletegitrepo/{key}", "GET api/v1/git/gitrepo/{key}", "GET api/v1/git/gitrepos",
-            "POST api/v1/git/updategitrepo/{key}", "POST api/v1/git/uploadgitrepos"
+            "DELETE api/v1/git/deletegitrepo/{key}", "GET api/v1/git/gitprojects", "GET api/v1/git/gitrepo/{key}",
+            "GET api/v1/git/gitrepos", "POST api/v1/git/updategitrepo/{key}", "POST api/v1/git/uploadgitrepos"
         ], routes);
     }
 
@@ -194,6 +195,42 @@ public sealed class GitReposEndpointsTests
         Assert.Equal(StatusCodes.Status404NotFound, Assert.IsType<ProblemHttpResult>(result.Result).StatusCode);
     }
 
+    [Fact]
+    public async Task GetGitProjects_ReturnsTheListOfTheHandler()
+    {
+        List<StsGitProjectDataModel> gitProjects =
+        [
+            new()
+            {
+                GitName = "RepoA",
+                ProjectRelativePath = @"RepoA\AppA",
+                ProjectFileName = "AppA.csproj",
+                DependsOnProjectNames = ["LibA"]
+            }
+        ];
+        using var cancellation = new CancellationTokenSource();
+        var handler = HandlerMocks.Query<GetGitProjectsQuery, List<StsGitProjectDataModel>>(gitProjects);
+
+        Results<Ok<List<StsGitProjectDataModel>>, ProblemHttpResult> result =
+            await GitReposEndpoints.GetGitProjects(handler.Object, cancellation.Token);
+
+        Assert.Same(gitProjects, Assert.IsType<Ok<List<StsGitProjectDataModel>>>(result.Result).Value);
+        handler.Verify(h => h.Handle(It.IsAny<GetGitProjectsQuery>(), cancellation.Token), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetGitProjects_ReturnsTheErrorAsAProblem()
+    {
+        var handler = HandlerMocks.Query<GetGitProjectsQuery, List<StsGitProjectDataModel>>(
+            Result.Failure<List<StsGitProjectDataModel>>(DbFailure));
+
+        Results<Ok<List<StsGitProjectDataModel>>, ProblemHttpResult> result =
+            await GitReposEndpoints.GetGitProjects(handler.Object);
+
+        Assert.Equal(StatusCodes.Status500InternalServerError,
+            Assert.IsType<ProblemHttpResult>(result.Result).StatusCode);
+    }
+
     //Debug.WriteLine goes to the Trace listeners and Release builds leave it out, so there the lines must be missing.
     //Other tests trace in parallel, so only these lines are looked for
     [Fact]
@@ -215,6 +252,9 @@ public sealed class GitReposEndpointsTests
                 HandlerMocks.Command<UpdateGitRepoCommand>(DbFailure).Object);
             await GitReposEndpoints.DeleteGitRepo("RepoA",
                 HandlerMocks.Command<DeleteGitRepoCommand>(DbFailure).Object);
+            await GitReposEndpoints.GetGitProjects(HandlerMocks
+                .Query<GetGitProjectsQuery, List<StsGitProjectDataModel>>(
+                    Result.Failure<List<StsGitProjectDataModel>>(DbFailure)).Object);
         }
         finally
         {
@@ -226,7 +266,8 @@ public sealed class GitReposEndpointsTests
             "Call UploadGitReposCommandHandler from UploadGitRepos", "Call GetGitReposQueryHandler from GetGitRepos",
             "Call GetGitRepoByKeyQueryHandler for key RepoA from GetGitRepoByKey",
             "Call UpdateGitRepoCommandHandler for key RepoA from UpdateGitRepo",
-            "Call DeleteGitRepoCommandHandler for key RepoA from DeleteGitRepo"
+            "Call DeleteGitRepoCommandHandler for key RepoA from DeleteGitRepo",
+            "Call GetGitProjectsQueryHandler from GetGitProjects"
         ];
 #if DEBUG
         Assert.All(expectedLines, line => Assert.Contains(line, trace.Lines));

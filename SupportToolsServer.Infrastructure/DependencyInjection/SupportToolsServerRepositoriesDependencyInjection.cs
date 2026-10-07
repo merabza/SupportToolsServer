@@ -10,6 +10,7 @@ using SupportToolsServerCore.Domain.DotnetTools;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
+using SupportToolsServerCore.Domain.GitRepoProjects;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.Projects;
@@ -49,6 +50,7 @@ public static class SupportToolsServerRepositoriesDependencyInjection
         services.AddScoped<IProjectTemplateRepository, ProjectTemplateRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<IStoredFileRepository, StoredFileRepository>();
+        services.AddScoped<IGitRepoProjectRepository, GitRepoProjectRepository>();
 
         //საიდუმლო ფაილის UpdatedAtUtc-ის საათი (UpdateStoredFile). ჰოსტში მას ავთენტიფიკაციაც ამატებს, ამიტომ TryAdd
         services.TryAddSingleton(TimeProvider.System);

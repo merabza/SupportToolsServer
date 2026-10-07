@@ -119,6 +119,7 @@ public sealed class ApiKeyAuthenticationTests : IClassFixture<SupportToolsServer
     //One route of every group and method; the authorization refuses the request before the handler runs
     [Theory]
     [InlineData("GET", "api/v1/git/gitrepo/RepoA")]
+    [InlineData("GET", "api/v1/git/gitprojects")]
     [InlineData("POST", "api/v1/git/uploadgitrepos")]
     [InlineData("POST", "api/v1/git/updategitrepo/RepoA")]
     [InlineData("DELETE", "api/v1/git/deletegitrepo/RepoA")]

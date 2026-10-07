@@ -1,31 +1,41 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SupportToolsServer.Application.Validation;
+using SupportToolsServerApiContracts.Errors;
+using SupportToolsServerCore.Domain.GitRepoProjects;
 using SystemTools.Application.Abstractions.Messaging;
+using SystemTools.Domain.Abstractions;
 using SystemTools.SharedKernel;
 
 namespace SupportToolsServer.Application.GitRepos.UpdateGitProject;
 
-//SupportTools-ის GitOneProjectUpdater.UpdateOneGitProject-ის ანალოგი. კლიენტისგან განსხვავებით სერვერი
-//ლოკალური ცვლილებების გაუქმებაზე თანხმობას არ ითხოვს: სამუშაო ფოლდერი ყოველთვის სერვერის ვერსიას უბრუნდება
+//SupportTools-ის GitOneProjectUpdater.UpdateOneGitProject-ისა და GitProjectsUpdater.ProcessFolder-ის ანალოგი.
+//კლიენტისგან განსხვავებით სერვერი ლოკალური ცვლილებების გაუქმებაზე თანხმობას არ ითხოვს: სამუშაო ფოლდერი ყოველთვის
+//სერვერის ვერსიას უბრუნდება. წარმატებული განახლების შემდეგ კლონის პროექტები სკანირდება და რეპოზიტორიის შენახულ
+//პროექტებს ანაცვლებს (B9). git-ის ან სკანირების შეცდომისას შენახული პროექტები უცვლელი რჩება
 public sealed class UpdateGitProjectCommandHandler : ICommandHandler<UpdateGitProjectCommand>
 {
     private readonly IGitClient _gitClient;
+    private readonly IGitProjectFilesScanner _gitProjectFilesScanner;
+    private readonly IGitRepoProjectRepository _gitRepoProjectRepository;
     private readonly IGitsWorkFolder _gitsWorkFolder;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateGitProjectCommandHandler(IGitsWorkFolder gitsWorkFolder, IGitClient gitClient)
+    public UpdateGitProjectCommandHandler(IGitsWorkFolder gitsWorkFolder, IGitClient gitClient,
+        IGitProjectFilesScanner gitProjectFilesScanner, IGitRepoProjectRepository gitRepoProjectRepository,
+        IUnitOfWork unitOfWork)
     {
         _gitsWorkFolder = gitsWorkFolder;
         _gitClient = gitClient;
+        _gitProjectFilesScanner = gitProjectFilesScanner;
+        _gitRepoProjectRepository = gitRepoProjectRepository;
+        _unitOfWork = unitOfWork;
     }
 
-    public Task<Result> Handle(UpdateGitProjectCommand command, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(UpdateGitProject(command));
-    }
-
-    private Result UpdateGitProject(UpdateGitProjectCommand command)
+    public async Task<Result> Handle(UpdateGitProjectCommand command, CancellationToken cancellationToken)
     {
         //Gits ფოლდერის გარეთ გასული გზა შეცდომაა, ამიტომ ასეთი ფოლდერი არც იშლება და არც იკლონება
         Result<string> projectFolderPathResult = _gitsWorkFolder.GetProjectFolderPath(GitsFolderName(command));
@@ -36,6 +46,33 @@ public sealed class UpdateGitProjectCommandHandler : ICommandHandler<UpdateGitPr
 
         string projectFolderPath = projectFolderPathResult.Value;
 
+        Result updateResult = UpdateGitProject(command, projectFolderPath);
+        if (updateResult.IsFailure)
+        {
+            return updateResult;
+        }
+
+        Result<List<ScannedGitProject>> scanResult = _gitProjectFilesScanner.Scan(projectFolderPath);
+        if (scanResult.IsFailure)
+        {
+            return scanResult.Error;
+        }
+
+        Result lengthsResult = CheckLengths(scanResult.Value);
+        if (lengthsResult.IsFailure)
+        {
+            return lengthsResult;
+        }
+
+        await _gitRepoProjectRepository.Replace(command.GitRepoId,
+            scanResult.Value.Select(x => GitRepoProject.Create(command.GitRepoId, x.ProjectRelativePath,
+                x.ProjectFileName, x.DependsOnProjectNames)), cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return Result.Success();
+    }
+
+    private Result UpdateGitProject(UpdateGitProjectCommand command, string projectFolderPath)
+    {
         //თუ ფოლდერი არსებობს, მაგრამ სხვა მისამართიდანაა დაკლონილი, წაიშალოს თავისი შიგთავსით
         if (_gitsWorkFolder.Exists(projectFolderPath))
         {
@@ -92,5 +129,36 @@ public sealed class UpdateGitProjectCommandHandler : ICommandHandler<UpdateGitPr
             StringComparison.Ordinal)
             ? command.GitProjectName
             : command.GitProjectFolderName;
+    }
+
+    //სკანირების შედეგი ბაზის სვეტებში უნდა ჩაეტიოს. შეცდომა ფაილს ასახელებს, შენახული პროექტები კი უცვლელი რჩება
+    private static Result CheckLengths(List<ScannedGitProject> scannedGitProjects)
+    {
+        foreach (ScannedGitProject scannedGitProject in scannedGitProjects)
+        {
+            string filePath = $@"{scannedGitProject.ProjectRelativePath}\{scannedGitProject.ProjectFileName}";
+            if (scannedGitProject.ProjectRelativePath.Length > GitRepoProject.ProjectRelativePathMaxLength)
+            {
+                return SupportToolsServerApiClientErrors.ValueTooLong(
+                    $"{filePath}.{nameof(ScannedGitProject.ProjectRelativePath)}",
+                    GitRepoProject.ProjectRelativePathMaxLength);
+            }
+
+            if (scannedGitProject.ProjectFileName.Length > GitRepoProject.ProjectFileNameMaxLength)
+            {
+                return SupportToolsServerApiClientErrors.ValueTooLong(
+                    $"{filePath}.{nameof(ScannedGitProject.ProjectFileName)}", GitRepoProject.ProjectFileNameMaxLength);
+            }
+
+            if (scannedGitProject.DependsOnProjectNames.Any(x =>
+                    x.Length > GitRepoProjectDependency.ProjectNameMaxLength))
+            {
+                return SupportToolsServerApiClientErrors.ValueTooLong(
+                    $"{filePath}.{nameof(ScannedGitProject.DependsOnProjectNames)}",
+                    GitRepoProjectDependency.ProjectNameMaxLength);
+            }
+        }
+
+        return Result.Success();
     }
 }

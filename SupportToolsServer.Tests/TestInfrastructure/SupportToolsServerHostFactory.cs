@@ -28,7 +28,8 @@ namespace SupportToolsServer.Tests.TestInfrastructure;
 //The connection string is valid only in format: the handlers of GET gitrepos, GET environments/{key},
 //GET npmpackages/{key}, GET apiclients/{key} and GET files/content are stubs, so no database is opened. The last four
 //return the name or the path they received, which shows how the route key or the query was decoded; the file comes
-//with the made-up content of TestData
+//with the made-up content of TestData. The periodic refresh of the git projects is turned off, as it reads the
+//database at the start
 public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Program>
 {
     public const string ValidApiKey = "valid-test-key";
@@ -49,6 +50,7 @@ public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Progra
             new Dictionary<string, string?>
             {
                 ["AppOptions:WorkFolder"] = _tempFolder.Combine("Work"),
+                ["AppOptions:GitProjectsRefreshHours"] = "0",
                 ["ApiKeys:AppSettingsByApiKey:0:ApiKey"] = ValidApiKey,
                 ["ApiKeys:AppSettingsByApiKey:0:RemoteIpAddress"] = ClientAddressStartupFilter.DefaultClientAddress,
                 ["ApiKeys:AppSettingsByApiKey:1:ApiKey"] = AnyAddressApiKey,

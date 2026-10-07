@@ -11,6 +11,7 @@ using SupportToolsServerCore.Domain.DotnetTools;
 using SupportToolsServerCore.Domain.EditorConfigFileTypes;
 using SupportToolsServerCore.Domain.FileStorages;
 using SupportToolsServerCore.Domain.GitIgnoreFileTypes;
+using SupportToolsServerCore.Domain.GitRepoProjects;
 using SupportToolsServerCore.Domain.GitRepos;
 using SupportToolsServerCore.Domain.NpmPackages;
 using SupportToolsServerCore.Domain.Projects;
@@ -93,6 +94,9 @@ public sealed class SupportToolsServerRepositoriesDependencyInjectionTests
         Assert.Contains(services,
             d => d.ServiceType == typeof(IStoredFileRepository) &&
                  d.ImplementationType == typeof(StoredFileRepository) && d.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IGitRepoProjectRepository) &&
+                 d.ImplementationType == typeof(GitRepoProjectRepository) && d.Lifetime == ServiceLifetime.Scoped);
     }
 
     //UpdateStoredFile takes the time of the change from it

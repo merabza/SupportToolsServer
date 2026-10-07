@@ -90,7 +90,7 @@ SupportTools რამდენიმე კომპიუტერზე მ�
 | `AppProjectCreatorAllParameters` და მისი `Templates` | დიახ | B5, C3 | `ProjectsFolderPathReal`, `SecretsFolderPathReal` კანონიკური გზებია |
 | გლობალური საერთო ველები | დიახ | B5, C3 | `ServiceDescriptionSignature`, `UploadTempExtension`, ოთხი ნიღაბი/გაფართოება, `MediatRLicenseKey`, `FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `SmartSchemaNameForLocal`, `LocalPackageManagerWebApiClientName`, `DatabasesBackupFilesExchangeParameters` (`LocalPath`-ის გარდა) |
 | 1WorkSecurity-ის ფაილები, რომლებზეც რეესტრი მიუთითებს | დიახ, ღიად | B8, C6 | `ServerInfo.AppSettingsJsonSourceFileName` და სხვა |
-| `GitProjects` | არა (გამოთვლადია) | B9 (სურვილისამებრ) | |
+| `GitProjects` | არა (გამოთვლადია) | B9 | არ სინქრონიზდება. სერვერი მათ თავისი კლონებიდან ითვლის (`GET git/gitprojects`), კლიენტი კი „Update Git Projects From SupportToolsServer“-ით ჩამოტვირთავს |
 | `Archivers` | არა | — | კომპიუტერის exe გზებია; runtime-ში არავინ კითხულობს |
 | კომპიუტერის ველები | არა | C1 | `SupportToolsServerWebApiClientName`, `LogFolder`, `LogGitWork`, `GitExecutablePath`, `WorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `TempFolder`, `CodeGenerateTestFolder`, `SecurityFolder`, `ScaffoldSeedersWorkFolder`, `PublisherWorkFolder`, `LocalInstallerSettings`, `RecentCommands*`. ახალი ველები: `MachineName`, `CurrentMachineServerName`, `PathMappings`, `RegistrySyncState` და ავტოსინქრონიზაციის ალამი |
 
@@ -190,7 +190,7 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [B6](tasks/B6-projects.md) | Projects-ის აგრეგატი | SupportToolsServer | B2, B3 | XL | ✅ |
 | [B7](tasks/B7-server-infos.md) | ServerInfo-ები Project-ის აგრეგატში | SupportToolsServer | B4, B6 | L | ✅ |
 | [B8](tasks/B8-stored-files.md) | საიდუმლო ფაილების საცავი | SupportToolsServer | B1 | M | ✅ |
-| [B9](tasks/B9-server-git-projects.md) | (სურვილისამებრ) `GitProjects`-ის გამოთვლა სერვერზე | SupportToolsServer | B1, C5 | L | ⬜ |
+| [B9](tasks/B9-server-git-projects.md) | (სურვილისამებრ) `GitProjects`-ის გამოთვლა სერვერზე | SupportToolsServer | B1, C5 | L | ✅ |
 | [C1](tasks/C1-machine-profile-path-mapping.md) | კომპიუტერის პროფილი და გზების გარდაქმნა | SupportTools | A4 | M | ✅ |
 | [C2](tasks/C2-sync-engine-core.md) | სინქრონიზაციის ძრავის ბირთვი | SupportTools | A4 | L | ✅ |
 | [C3](tasks/C3-adapters-reference-data.md) | ადაპტერები: ცნობარები, რესურსები, სერვერები, პარამეტრები, გიტები, შაბლონები | SupportTools | C1, C2, B1–B5 | L | ✅ |
@@ -333,7 +333,7 @@ flowchart LR
 2. `SyncMultipleProjectsGitsToolActionV2.RunAction` ყოველთვის წარმატებას აბრუნებს (113).
 3. `LibGitWork\GitOneProjectUpdater.cs:49-52`: `Directory.Delete` read-only ატრიბუტების მოხსნის გარეშე, ამიტომ `.git`-ზე Windows-ში ჩავარდება.
 4. `GitFolderCountHelper.cs:23-24` ქეშში `A\B`-ს `A.B`-დ აბრტყელებს, რის გამოც `ProjectModel.ProjectFileName` ჩადგმული ფოლდერის სახელისას არასწორ გზას ითვლის.
-5. `GitProjectsUpdater.cs:261`: `GitProjects`-ის გასაღები csproj-ის სახელია გლობალურად, ამიტომ ორ რეპოში ერთნაირი სახელი ერთმანეთს გადაეწერება.
+5. `GitProjectsUpdater.cs:261`: `GitProjects`-ის გასაღები csproj-ის სახელია გლობალურად, ამიტომ ორ რეპოში ერთნაირი სახელი ერთმანეთს გადაეწერება. B9: სერვერი ორივე პროექტს ინახავს, კლიენტის ოფცია კი ლოკალური სკანირების წესით ირჩევს და გაფრთხილებას ბეჭდავს (მომხმარებლის არჩევანი). 2026-10-07-ს ასეთი სახელი ერთია: `SystemTools.DependencyInjection` (CrawlerConsole და SystemTools).
 6. `LoadGitsFromCloneFileCommand` (107-117) git-ებს `GitIgnorePatternName`-ის გარეშე ქმნის; `Gits.Add` და `Single()` exception-ს ისვრის.
 7. `CloneInfoFileCliMenuCommand.GetDefCloneFileName` ცარიელი `GitProjects`-ისას exception-ს ისვრის (20, 26).
 8. Export/Import: scaffold seeder-ის git-ები არ ექსპორტდება; Import არსებულ git-ებს არ გადაწერს, დოკუმენტაცია კი სხვას ამბობს.

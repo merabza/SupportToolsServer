@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SupportToolsServer.Application.GitRepos.UpdateGitProject;
 using SupportToolsServer.Infrastructure.GitProjects;
+using SupportToolsServerCore.Domain.GitRepos;
 using Xunit;
 
 namespace SupportToolsServer.Tests.Infrastructure.GitProjects;
@@ -15,8 +16,8 @@ public sealed class GitProjectUpdateQueueTests
     [Fact]
     public async Task ReadAll_ReturnsTheEnqueuedCommandsInOrder()
     {
-        var first = new UpdateGitProjectCommand("RepoA", "addressA", "FolderA");
-        var second = new UpdateGitProjectCommand("RepoB", "addressB", "FolderB");
+        var first = new UpdateGitProjectCommand(GitRepoId.CreateUnique(), "RepoA", "addressA", "FolderA");
+        var second = new UpdateGitProjectCommand(GitRepoId.CreateUnique(), "RepoB", "addressB", "FolderB");
         await _sut.Enqueue(first, CancellationToken.None);
         await _sut.Enqueue(second, CancellationToken.None);
 
@@ -58,7 +59,7 @@ public sealed class GitProjectUpdateQueueTests
         await cancellationTokenSource.CancelAsync();
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            await _sut.Enqueue(new UpdateGitProjectCommand("RepoA", "addressA", "FolderA"),
+            await _sut.Enqueue(new UpdateGitProjectCommand(GitRepoId.CreateUnique(), "RepoA", "addressA", "FolderA"),
                 cancellationTokenSource.Token));
     }
 }
