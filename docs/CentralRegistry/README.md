@@ -195,7 +195,7 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [C2](tasks/C2-sync-engine-core.md) | სინქრონიზაციის ძრავის ბირთვი | SupportTools | A4 | L | ✅ |
 | [C3](tasks/C3-adapters-reference-data.md) | ადაპტერები: ცნობარები, რესურსები, სერვერები, პარამეტრები, გიტები, შაბლონები | SupportTools | C1, C2, B1–B5 | L | ✅ |
 | [C4](tasks/C4-adapter-projects.md) | ადაპტერი: Projects და ServerInfo-ები | SupportTools | C3, B6, B7 | L | ✅ |
-| [C5](tasks/C5-sync-command-seed.md) | სინქრონიზაციის ბრძანება და საწყისი ატვირთვა (seed) | SupportTools | C4, A3 | L | ⬜ |
+| [C5](tasks/C5-sync-command-seed.md) | სინქრონიზაციის ბრძანება და საწყისი ატვირთვა (seed) | SupportTools | C4, A3 | L | ✅ |
 | [C6](tasks/C6-stored-files-sync.md) | საიდუმლო ფაილების სინქრონიზაცია | SupportTools | C5, B8 | M | ⬜ |
 | [D1](tasks/D1-deployment.md) | ცენტრალური სერვერის დეპლოი | SupportToolsServer | A3 | M | ⬜ |
 | [D2](tasks/D2-auto-sync.md) | ავტომატური სინქრონიზაცია | SupportTools | C5, D1 | M | ⬜ |
@@ -324,6 +324,8 @@ flowchart LR
 - **D4**
   - `SupportToolsServerApiClient.GetGitIgnoreFileNames` გაუმართავია და არავინ იძახებს; მისი ტესტი შეცდომას მალავს.
   - მკვდარი კოდი: `SupportToolsServerWork.GetGitRepos`, `CheckAndGenerateGuidKeysGitignoreFilesCliMenuCommand` და კომენტარში მოქცეული ფაილები.
+  - „Sync Registry“-ის „Exclude record from sync“ ჩანაწერს გამორიცხავს, მაგრამ უკან დაბრუნება UI-ში არ შეუძლია. ახლა ეს მხოლოდ JSON-ის ხელით რედაქტირებით ხდება (`RegistrySyncState.ExcludedKeys`). დაემატოს გამორიცხულების სია და დაბრუნება (C5-ის შემდეგ მომხმარებლის გადაწყვეტილება).
+  - ძველი სინქრონიზაციის ბრძანებები და Sts რედაქტორები `GetSupportToolsServerApiClient`-ის კლიენტს იყენებს (`useConsole: true`). შეცდომისას `ApiClient` მოთხოვნის ტანს ბეჭდავს, `.gitignore` და `.editorconfig` შაბლონების შიგთავსის ჩათვლით. „Sync Registry“ კლიენტს `useConsole: false`-ით ქმნის.
 
 **გეგმის გარეთაა (ცალკე გასასწორებელი)**
 
