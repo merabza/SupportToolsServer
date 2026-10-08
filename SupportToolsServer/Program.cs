@@ -17,6 +17,7 @@ using WebSystemTools.SignalRMessages.Endpoints.V1;
 using WebSystemTools.StaticFilesTools.DependencyInjection;
 using WebSystemTools.SwaggerTools;
 using WebSystemTools.SwaggerTools.DependencyInjection;
+using WebSystemTools.TestToolsApi.DependencyInjection;
 using WebSystemTools.TestToolsApi.Endpoints.V1;
 using WebSystemTools.ValidationTools.DependencyInjection;
 using WebSystemTools.WindowsServiceTools;
@@ -68,7 +69,7 @@ try
     app.UseApiExceptionHandler(debugLogger); //+
     app.UseApiKeysAuthorization(debugLogger);
     app.UseSignalRMessagesHub(debugLogger); //+
-    app.UseTestEndpoints(debugLogger); //+
+    app.UseTestToolsApiEndpoints(debugLogger);
     app.UseDefaultAndStaticFiles(debugLogger); //+
 
     await app.RunAsync();
