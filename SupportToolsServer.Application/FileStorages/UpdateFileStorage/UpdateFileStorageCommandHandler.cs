@@ -37,13 +37,16 @@ public sealed class UpdateFileStorageCommandHandler : ICommandHandler<UpdateFile
         if (stored is null)
         {
             fileStorage = FileStorage.Create(model.Name, model.FileStoragePath, model.UserName, model.Password,
-                model.FileNameMaxLength, model.FileSizeSplitPositionInRow, model.FtpSiteLsFileOffset);
+                //model.FileNameMaxLength, model.FileSizeSplitPositionInRow, 
+                model.FtpSiteLsFileOffset);
             _fileStorageRepository.Add(fileStorage);
         }
         else
         {
-            stored.Update(model.Name, model.FileStoragePath, model.UserName, model.Password, model.FileNameMaxLength,
-                model.FileSizeSplitPositionInRow, model.FtpSiteLsFileOffset);
+            stored.Update(model.Name, model.FileStoragePath, model.UserName, model.Password, 
+                //model.FileNameMaxLength,
+                //model.FileSizeSplitPositionInRow, 
+                model.FtpSiteLsFileOffset);
             _fileStorageRepository.Update(stored);
             fileStorage = stored;
         }

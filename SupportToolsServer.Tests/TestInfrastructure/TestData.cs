@@ -320,7 +320,9 @@ internal static class TestData
     public static FileStorage NewFileStorage(string name, string? fileStoragePath = "ftp://ftp.example.com/x/",
         string? userName = MadeUpUser, string? password = MadeUpPassword, int version = EntityVersion.Initial)
     {
-        return new FileStorage(FileStorageId.CreateUnique(), name, fileStoragePath, userName, password, 255, 4, 1,
+        return new FileStorage(FileStorageId.CreateUnique(), name, fileStoragePath, userName, password, 
+            //255, 4, 
+            1,
             version);
     }
 
@@ -334,8 +336,8 @@ internal static class TestData
             FileStoragePath = fileStoragePath,
             UserName = userName,
             Password = password,
-            FileNameMaxLength = 255,
-            FileSizeSplitPositionInRow = 4,
+            //FileNameMaxLength = 255,
+            //FileSizeSplitPositionInRow = 4,
             FtpSiteLsFileOffset = 1,
             Version = version
         };

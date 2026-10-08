@@ -18,8 +18,8 @@ internal static class FileStorageContractMapper
             FileStoragePath = fileStorage.FileStoragePath,
             UserName = fileStorage.UserName,
             Password = fileStorage.Password,
-            FileNameMaxLength = fileStorage.FileNameMaxLength,
-            FileSizeSplitPositionInRow = fileStorage.FileSizeSplitPositionInRow,
+            //FileNameMaxLength = fileStorage.FileNameMaxLength,
+            //FileSizeSplitPositionInRow = fileStorage.FileSizeSplitPositionInRow,
             FtpSiteLsFileOffset = fileStorage.FtpSiteLsFileOffset,
             Version = fileStorage.Version
         };
