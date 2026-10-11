@@ -199,7 +199,7 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [C6](tasks/C6-stored-files-sync.md) | საიდუმლო ფაილების სინქრონიზაცია | SupportTools | C5, B8 | M | ✅ |
 | [D1](tasks/D1-deployment.md) | ცენტრალური სერვერის დეპლოი ([runbook](Deployment.md)) | SupportToolsServer | A3 | M | 🔄 |
 | [D2](tasks/D2-auto-sync.md) | ავტომატური სინქრონიზაცია | SupportTools | C5, D1 | M | ✅ |
-| [D3](tasks/D3-machine-presence.md) | „ამ კომპიუტერზეა“ და „ჩამოიტანე პროექტი აქ“ | SupportTools | C5 | M | ⬜ |
+| [D3](tasks/D3-machine-presence.md) | „ამ კომპიუტერზეა“ და „ჩამოიტანე პროექტი აქ“ | SupportTools | C5 | M | ✅ |
 | [D4](tasks/D4-cleanup-docs.md) | ძველი ბრძანებების მოწესრიგება, მკვდარი კოდი, დოკუმენტაცია | SupportTools | C6, D2, D3 | M | ⬜ |
 
 ## 6. დამოკიდებულებები და რიგითობა
