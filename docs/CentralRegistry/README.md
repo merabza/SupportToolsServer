@@ -198,7 +198,7 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [C5](tasks/C5-sync-command-seed.md) | სინქრონიზაციის ბრძანება და საწყისი ატვირთვა (seed) | SupportTools | C4, A3 | L | ✅ |
 | [C6](tasks/C6-stored-files-sync.md) | საიდუმლო ფაილების სინქრონიზაცია | SupportTools | C5, B8 | M | ✅ |
 | [D1](tasks/D1-deployment.md) | ცენტრალური სერვერის დეპლოი ([runbook](Deployment.md)) | SupportToolsServer | A3 | M | 🔄 |
-| [D2](tasks/D2-auto-sync.md) | ავტომატური სინქრონიზაცია | SupportTools | C5, D1 | M | ⬜ |
+| [D2](tasks/D2-auto-sync.md) | ავტომატური სინქრონიზაცია | SupportTools | C5, D1 | M | ✅ |
 | [D3](tasks/D3-machine-presence.md) | „ამ კომპიუტერზეა“ და „ჩამოიტანე პროექტი აქ“ | SupportTools | C5 | M | ⬜ |
 | [D4](tasks/D4-cleanup-docs.md) | ძველი ბრძანებების მოწესრიგება, მკვდარი კოდი, დოკუმენტაცია | SupportTools | C6, D2, D3 | M | ⬜ |
 
@@ -326,6 +326,7 @@ flowchart LR
   - მკვდარი კოდი: `SupportToolsServerWork.GetGitRepos`, `CheckAndGenerateGuidKeysGitignoreFilesCliMenuCommand` და კომენტარში მოქცეული ფაილები.
   - „Sync Registry“-ის „Exclude record from sync“ ჩანაწერს გამორიცხავს, მაგრამ უკან დაბრუნება UI-ში არ შეუძლია. ახლა ეს მხოლოდ JSON-ის ხელით რედაქტირებით ხდება (`RegistrySyncState.ExcludedKeys`). დაემატოს გამორიცხულების სია და დაბრუნება (C5-ის შემდეგ მომხმარებლის გადაწყვეტილება).
   - ძველი სინქრონიზაციის ბრძანებები და Sts რედაქტორები `GetSupportToolsServerApiClient`-ის კლიენტს იყენებს (`useConsole: true`). შეცდომისას `ApiClient` მოთხოვნის ტანს ბეჭდავს, `.gitignore` და `.editorconfig` შაბლონების შიგთავსის ჩათვლით. „Sync Registry“ კლიენტს `useConsole: false`-ით ქმნის.
+  - SupportTools-ის მომხმარებლის დოკუმენტაცია (`docs/en|ka/configuration.md`) რეესტრის სინქრონიზაციას საერთოდ არ აღწერს: `SupportToolsServerWebApiClientName`, „Sync Registry“ და D2-ის ავტოსინქრონიზაცია (`AutoSyncWithSupportToolsServer`, `SupportToolsServerSyncTimeoutSeconds`) მხოლოდ CLAUDE.md-შია.
 
 **გეგმის გარეთაა (ცალკე გასასწორებელი)**
 
