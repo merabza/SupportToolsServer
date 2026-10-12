@@ -60,6 +60,31 @@ SupportTools რამდენიმე კომპიუტერზე მ�
 4. უსაფრთხოება: ავთენტიფიკაცია, შეყვანის ვალიდაცია და TLS, თუ სერვერი ინტერნეტიდან მისაწვდომია.
 5. ცნება „პროექტი ამ კომპიუტერზეა / არ არის“ და ბრძანება „ჩამოიტანე პროექტი აქ“.
 
+### 2.4 შედეგი (D4, 2026-10-11)
+
+ზემოთ აღწერილი მდგომარეობა გეგმის დაწყებამდელია. გეგმის ამოცანების (§5) შემდეგ:
+
+**რა გაკეთდა**
+- **სერვერი** (A1–A3, B1–B9): ყველა საერთო კოლექცია ცალკე აგრეგატი და ცხრილია (§4.2), `Version`-ით (optimistic concurrency), 409/404-ის ერთიანი წესებით და მითითებების `Restrict` FK-ებით. საიდუმლო ფაილები `StoredFiles`-შია. სერვერი git-ებს თვითონ აკლონირებს და მათგან `GitProjects`-ს ითვლის (B9). ყველა route API key-ით არის დაცული, გარდა `test`-ისა. git-ის ფოლდერი და მისამართი მოწმდება, git უსაფრთხოდ გამოიძახება. API key ლოგში არ ხვდება.
+- **კლიენტი** (A4, C1–C6): კომპიუტერის პროფილი და გზების გარდაქმნა (`PathMappings`, `CurrentMachineServerName`, `MachineLocalFields`). 3-მხრივი სინქრონიზაციის ძრავა, 18 ადაპტერით. ბრძანება „Sync Registry With SupportToolsServer...“: seed, კონფლიქტები, Dry run, ჩანაწერის გამორიცხვა და დაბრუნება. საიდუმლო ფაილების სინქრონიზაცია.
+- **ავტომატიზაცია** (D2, D3): ავტომატური Pull გაშვებისას და Push ყოველი შენახვის შემდეგ; სერვერის მისამართის დაცვა (`RegistrySyncState.ServerAddress`) და offline რეჟიმი. ნიშნები `local`/`remote`, ბრძანება „Clone Project To This Computer“ და „Update Git Projects From SupportToolsServer“.
+- **დეპლოი** (D1): runbook ([Deployment.md](Deployment.md)) guria-სთვის.
+- **მოწესრიგება** (D4):
+  - ძველი „Sync Git Projects With SupportToolsServer...“, „Sync .gitignore files...“ და „Sync .editorconfig files...“ (Merge/Sync Up/Down) წაიშალა. მათ ადგილას სიების მენიუებშია „Sync Gits / GitIgnorePatterns / EditorConfigPatterns With SupportToolsServer...“: იგივე „Sync Registry“, ერთ კოლექციაზე გაფილტრული. ამიტომ სინქრონიზაციის სემანტიკა ერთია.
+  - „Support Tools Server Editor“ დარჩა სერვერის პირდაპირ დასათვალიერებლად და გასასწორებლად. ახლა ყოველ ჩაწერამდე სერვერის `Version`-ს ამოწმებს, ჩაწერას `await`-ით ასრულებს და მისი კლიენტი შეცდომისას მოთხოვნის ტანს აღარ ბეჭდავს.
+  - „Sync Registry“-ს დაემატა „Include excluded record again“.
+  - წაიშალა მკვდარი კოდი: `SupportToolsServerWork.GetGitRepos`, `SupportToolsServerApiClient.GetGitIgnoreFileNames` და `GetGitRepoByKey` (თავიანთი ტესტებით), `CheckAndGenerateGuidKeysGitignoreFilesCliMenuCommand`, ოთხი მთლიანად კომენტარში მოქცეული ფაილი და ოთხი npm ბრძანება.
+  - SupportTools-ის დოკუმენტაცია (`docs/en`, `docs/ka`) და სამივე CLAUDE.md საბოლოო სურათს აღწერს.
+
+**ახალი კომპიუტერი** (§1-ის კრიტერიუმი): ფოლდერები, `PathMappings`, bootstrap ApiClient (`SupportToolsServerWebApiClientName`), შემდეგ „Sync Registry“ (Pull only) და საჭირო პროექტებზე „Clone Project To This Computer“. დეტალები SupportTools-ის `docs/en/getting-started.md`-შია („A new computer“).
+
+**რა დარჩა ღიად**
+- D1 (🔄): დეპლოის runbook-ს მომხმარებელი ასრულებს. შემდეგ: მთავარ კომპიუტერზე ხელით სინქრონიზაცია guria-სთან (ის `ServerAddress`-ს ჩაწერს), მეორე კომპიუტერზე კი §1-ის შემოწმება.
+- ძველი git-ის endpoint-ები სერვერზე ვერსიას ისევ არ ამოწმებს. კლიენტი (ადაპტერები და რედაქტორები) ვერსიას ჩაწერამდე თვითონ ადარებს, ამიტომ შემოწმებასა და ჩაწერას შორის მცირე ფანჯარა რჩება. `uploadgitrepos`-ს, `GET gitrepo/{key}`-სა და `syncup…/false`-ს კლიენტი აღარ იძახებს: მათი წაშლა ან ვერსიიანებად გადაკეთება სერვერის ცალკე ამოცანაა.
+- სიების წაკითხვა „Support Tools Server Editor“-ში და `GitCruder.Create`-ში sync-over-async (`.Result`) რჩება, რადგან AppCliTools-ის Cruder-ის API (`GetCrudersDictionary`, `ContainsRecordWithKey`) სინქრონულია.
+- `FileStorage`-ის `FileNameMaxLength` და `FileSizeSplitPositionInRow` 2026-10-08-ს კომენტარში მოექცა (entity, კონტრაქტი, mapper-ები), ანუ ეს ველები ლოკალური რჩება. D4-მა SupportToolsServerShared-ის ტესტები ამას მიუსადაგა. `SupportToolsServerDbPart.Tests` (`SupportToolsServerDbContextTests`, FileStorage-ის სვეტების სია) ჯერ კიდევ ძველ ველებს ასახელებს და არ კომპილირდება.
+- §9-ის „გეგმის გარეთ“ სია ამ ამოცანაში არ გადამოწმებულა.
+
 ## 3. გადაწყვეტილებები
 
 | # | გადაწყვეტილება | წყარო |
@@ -200,7 +225,7 @@ G1-ის შედეგად ეს ნაბიჯები ყოველ 
 | [D1](tasks/D1-deployment.md) | ცენტრალური სერვერის დეპლოი ([runbook](Deployment.md)) | SupportToolsServer | A3 | M | 🔄 |
 | [D2](tasks/D2-auto-sync.md) | ავტომატური სინქრონიზაცია | SupportTools | C5, D1 | M | ✅ |
 | [D3](tasks/D3-machine-presence.md) | „ამ კომპიუტერზეა“ და „ჩამოიტანე პროექტი აქ“ | SupportTools | C5 | M | ✅ |
-| [D4](tasks/D4-cleanup-docs.md) | ძველი ბრძანებების მოწესრიგება, მკვდარი კოდი, დოკუმენტაცია | SupportTools | C6, D2, D3 | M | ⬜ |
+| [D4](tasks/D4-cleanup-docs.md) | ძველი ბრძანებების მოწესრიგება, მკვდარი კოდი, დოკუმენტაცია | SupportTools | C6, D2, D3 | M | ✅ |
 
 ## 6. დამოკიდებულებები და რიგითობა
 
@@ -321,12 +346,12 @@ flowchart LR
   - ApiKey ეკრანზე ჩანს (`ApiClientSettings.GetItemKey`, `ApiClientCruder`).
   - `GitApi.IsGitRemoteAddressValid` მისამართს ბრჭყალებს არ უკეთებს.
 - **D3**: `SpaProjectName`-ის მქონე პროექტზე, რომლის `GitProjects` ჩანაწერი აკლია, V2 სინქრონიზაცია ჩერდება (`GitSyncParameters.cs:58-59`).
-- **D4**
-  - `SupportToolsServerApiClient.GetGitIgnoreFileNames` გაუმართავია და არავინ იძახებს; მისი ტესტი შეცდომას მალავს.
-  - მკვდარი კოდი: `SupportToolsServerWork.GetGitRepos`, `CheckAndGenerateGuidKeysGitignoreFilesCliMenuCommand` და კომენტარში მოქცეული ფაილები.
-  - „Sync Registry“-ის „Exclude record from sync“ ჩანაწერს გამორიცხავს, მაგრამ უკან დაბრუნება UI-ში არ შეუძლია. ახლა ეს მხოლოდ JSON-ის ხელით რედაქტირებით ხდება (`RegistrySyncState.ExcludedKeys`). დაემატოს გამორიცხულების სია და დაბრუნება (C5-ის შემდეგ მომხმარებლის გადაწყვეტილება).
-  - ძველი სინქრონიზაციის ბრძანებები და Sts რედაქტორები `GetSupportToolsServerApiClient`-ის კლიენტს იყენებს (`useConsole: true`). შეცდომისას `ApiClient` მოთხოვნის ტანს ბეჭდავს, `.gitignore` და `.editorconfig` შაბლონების შიგთავსის ჩათვლით. „Sync Registry“ კლიენტს `useConsole: false`-ით ქმნის.
-  - SupportTools-ის მომხმარებლის დოკუმენტაცია (`docs/en|ka/configuration.md`) რეესტრის სინქრონიზაციას საერთოდ არ აღწერს: `SupportToolsServerWebApiClientName`, „Sync Registry“ და D2-ის ავტოსინქრონიზაცია (`AutoSyncWithSupportToolsServer`, `SupportToolsServerSyncTimeoutSeconds`) მხოლოდ CLAUDE.md-შია.
+- **D4** (ყველა გასწორდა, იხ. §2.4)
+  - `SupportToolsServerApiClient.GetGitIgnoreFileNames` გაუმართავია და არავინ იძახებს; მისი ტესტი შეცდომას მალავს. → წაიშალა ტესტთან ერთად.
+  - მკვდარი კოდი: `SupportToolsServerWork.GetGitRepos`, `CheckAndGenerateGuidKeysGitignoreFilesCliMenuCommand` და კომენტარში მოქცეული ფაილები. → წაიშალა.
+  - „Sync Registry“-ის „Exclude record from sync“ ჩანაწერს გამორიცხავს, მაგრამ უკან დაბრუნება UI-ში არ შეუძლია. ახლა ეს მხოლოდ JSON-ის ხელით რედაქტირებით ხდება (`RegistrySyncState.ExcludedKeys`). დაემატოს გამორიცხულების სია და დაბრუნება (C5-ის შემდეგ მომხმარებლის გადაწყვეტილება). → დაემატა „Include excluded record again“.
+  - ძველი სინქრონიზაციის ბრძანებები და Sts რედაქტორები `GetSupportToolsServerApiClient`-ის კლიენტს იყენებს (`useConsole: true`). შეცდომისას `ApiClient` მოთხოვნის ტანს ბეჭდავს, `.gitignore` და `.editorconfig` შაბლონების შიგთავსის ჩათვლით. „Sync Registry“ კლიენტს `useConsole: false`-ით ქმნის. → ძველი ბრძანებები წაიშალა; `GetSupportToolsServerApiClient` კლიენტს `useConsole: false`-ით ქმნის.
+  - SupportTools-ის მომხმარებლის დოკუმენტაცია (`docs/en|ka/configuration.md`) რეესტრის სინქრონიზაციას საერთოდ არ აღწერს: `SupportToolsServerWebApiClientName`, „Sync Registry“ და D2-ის ავტოსინქრონიზაცია (`AutoSyncWithSupportToolsServer`, `SupportToolsServerSyncTimeoutSeconds`) მხოლოდ CLAUDE.md-შია. → `configuration.md`-ს დაემატა „Central registry“.
 
 **გეგმის გარეთაა (ცალკე გასასწორებელი)**
 
