@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using Serilog;
+using SupportToolsServer.Application.GitRepos.GitRemoteHeads;
 using SupportToolsServer.Application.GitRepos.UpdateGitProject;
 using SupportToolsServer.Infrastructure.DependencyInjection;
 using SupportToolsServer.Infrastructure.GitProjects;
@@ -16,7 +17,8 @@ namespace SupportToolsServer.Tests.Infrastructure.DependencyInjection;
 
 public sealed class SupportToolsServerGitProjectsDependencyInjectionTests
 {
-    private static IConfiguration CreateConfiguration(string? workFolder, string? gitProjectsRefreshHours = null)
+    private static IConfiguration CreateConfiguration(string? workFolder, string? gitProjectsRefreshHours = null,
+        string? remoteHeadsCacheMinutes = null)
     {
         var settings = new Dictionary<string, string?> { ["AppOptions:WorkFolder"] = workFolder };
         if (gitProjectsRefreshHours is not null)
@@ -24,14 +26,21 @@ public sealed class SupportToolsServerGitProjectsDependencyInjectionTests
             settings["AppOptions:GitProjectsRefreshHours"] = gitProjectsRefreshHours;
         }
 
+        if (remoteHeadsCacheMinutes is not null)
+        {
+            settings["AppOptions:GitRemoteHeadsCacheMinutes"] = remoteHeadsCacheMinutes;
+        }
+
         return new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
     }
 
-    private static ServiceProvider BuildProvider(string? workFolder, string? gitProjectsRefreshHours = null)
+    private static ServiceProvider BuildProvider(string? workFolder, string? gitProjectsRefreshHours = null,
+        string? remoteHeadsCacheMinutes = null)
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddSupportToolsServerGitProjects(null, CreateConfiguration(workFolder, gitProjectsRefreshHours));
+        services.AddSupportToolsServerGitProjects(null,
+            CreateConfiguration(workFolder, gitProjectsRefreshHours, remoteHeadsCacheMinutes));
         return services.BuildServiceProvider();
     }
 
@@ -53,13 +62,67 @@ public sealed class SupportToolsServerGitProjectsDependencyInjectionTests
                  d.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services,
             d => d.ServiceType == typeof(IGitClient) && d.ImplementationType == typeof(GitClient) &&
-                 d.Lifetime == ServiceLifetime.Scoped);
+                 d.Lifetime == ServiceLifetime.Singleton);
         Assert.Contains(services,
             d => d.ServiceType == typeof(IGitProjectFilesScanner) &&
                  d.ImplementationType == typeof(GitProjectFilesScanner) && d.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services,
             d => d.ServiceType == typeof(IHostedService) &&
                  d.ImplementationType == typeof(GitProjectsRefreshBackgroundService));
+        Assert.Contains(services,
+            d => d.ServiceType == typeof(IGitRemoteHeadsCache) && d.ImplementationType == typeof(GitRemoteHeadsCache) &&
+                 d.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    //One cache for every request, built with the services that the module registers
+    [Fact]
+    public void AddSupportToolsServerGitProjects_ResolvesTheSingleRemoteHeadsCache()
+    {
+        using ServiceProvider provider = BuildProvider("Work");
+        using IServiceScope scope = provider.CreateScope();
+
+        var cache = provider.GetRequiredService<IGitRemoteHeadsCache>();
+
+        Assert.IsType<GitRemoteHeadsCache>(cache);
+        Assert.Same(cache, scope.ServiceProvider.GetRequiredService<IGitRemoteHeadsCache>());
+    }
+
+    [Fact]
+    public void AddSupportToolsServerGitProjects_BindsTheRemoteHeadsCacheLifetime()
+    {
+        using ServiceProvider defaultProvider = BuildProvider("Work");
+        using ServiceProvider provider = BuildProvider("Work", remoteHeadsCacheMinutes: "3");
+
+        Assert.Equal(10,
+            defaultProvider.GetRequiredService<IOptions<AppOptions>>().Value.GitRemoteHeadsCacheMinutes);
+        Assert.Equal(3, provider.GetRequiredService<IOptions<AppOptions>>().Value.GitRemoteHeadsCacheMinutes);
+    }
+
+    [Theory]
+    [InlineData("-1")]
+    [InlineData("1441")]
+    public void AddSupportToolsServerGitProjects_FailsTheStartupValidation_WhenTheCacheLifetimeIsOutOfRange(
+        string remoteHeadsCacheMinutes)
+    {
+        using ServiceProvider provider = BuildProvider("Work", remoteHeadsCacheMinutes: remoteHeadsCacheMinutes);
+
+        var exception = Assert.Throws<OptionsValidationException>(() =>
+            provider.GetRequiredService<IStartupValidator>().Validate());
+
+        Assert.Equal("AppOptions:GitRemoteHeadsCacheMinutes must be between 0 and 1440",
+            Assert.Single(exception.Failures));
+    }
+
+    //0 checks the remote on every request
+    [Theory]
+    [InlineData("0")]
+    [InlineData("1440")]
+    public void AddSupportToolsServerGitProjects_PassesTheStartupValidation_WhenTheCacheLifetimeIsInRange(
+        string remoteHeadsCacheMinutes)
+    {
+        using ServiceProvider provider = BuildProvider("Work", remoteHeadsCacheMinutes: remoteHeadsCacheMinutes);
+
+        provider.GetRequiredService<IStartupValidator>().Validate();
     }
 
     //The clock of the periodic refresh is the system clock, unless the host registered one before (the authentication

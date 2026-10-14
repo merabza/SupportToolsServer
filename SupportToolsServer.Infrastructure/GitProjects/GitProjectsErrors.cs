@@ -7,6 +7,10 @@ public static class GitProjectsErrors
     public static readonly Error WorkFolderIsNotSpecified = Error.Problem(nameof(WorkFolderIsNotSpecified),
         "AppOptions:WorkFolder is not specified");
 
+    //git ls-remote-მა HEAD-ის branch ან commit არ დააბრუნა (მაგალითად, ცარიელი რეპოზიტორია)
+    public static readonly Error RemoteHeadIsNotFound = Error.Problem(nameof(RemoteHeadIsNotFound),
+        "Remote repository has no HEAD branch");
+
     public static Error CannotCreateFolder(string folderName)
     {
         return Error.Problem(nameof(CannotCreateFolder), $"Folder {folderName} does not exist and cannot be created");

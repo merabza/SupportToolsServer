@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -10,6 +11,7 @@ using Moq;
 using Serilog;
 using SupportToolsServer.Application.ApiClients.GetApiClientByName;
 using SupportToolsServer.Application.Environments.GetEnvironmentByName;
+using SupportToolsServer.Application.GitRepos.GetGitRemoteHeads;
 using SupportToolsServer.Application.GitRepos.GetGitRepos;
 using SupportToolsServer.Application.NpmPackages.GetNpmPackageByName;
 using SupportToolsServer.Application.StoredFiles.GetStoredFileByPath;
@@ -26,10 +28,10 @@ namespace SupportToolsServer.Tests.TestInfrastructure;
 //The factory passes the parent keys of a setting as well, with empty values: Serilog takes the empty
 //Serilog:WriteTo:1 for a sink without a name and skips it, so the test hosts write no log file (only to the console).
 //The connection string is valid only in format: the handlers of GET gitrepos, GET environments/{key},
-//GET npmpackages/{key}, GET apiclients/{key} and GET files/content are stubs, so no database is opened. The last four
-//return the name or the path they received, which shows how the route key or the query was decoded; the file comes
-//with the made-up content of TestData. The periodic refresh of the git projects is turned off, as it reads the
-//database at the start
+//GET npmpackages/{key}, GET apiclients/{key}, GET files/content and GET git/gitremoteheads are stubs, so no database is
+//opened. The last five return the name, the path or the names they received, which shows how the route key or the query
+//was decoded; the file comes with the made-up content of TestData. The periodic refresh of the git projects is turned
+//off, as it reads the database at the start
 public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Program>
 {
     public const string ValidApiKey = "valid-test-key";
@@ -68,7 +70,19 @@ public sealed class SupportToolsServerHostFactory : WebApplicationFactory<Progra
             services.AddScoped(_ => NpmPackageNameEchoHandler());
             services.AddScoped(_ => ApiClientNameEchoHandler());
             services.AddScoped(_ => StoredFilePathEchoHandler());
+            services.AddScoped(_ => GitRemoteHeadNamesEchoHandler());
         });
+    }
+
+    //One head per name that the query received, in the received order
+    private static IQueryHandler<GetGitRemoteHeadsQuery, List<StsGitRemoteHeadDataModel>>
+        GitRemoteHeadNamesEchoHandler()
+    {
+        var handler = new Mock<IQueryHandler<GetGitRemoteHeadsQuery, List<StsGitRemoteHeadDataModel>>>();
+        handler.Setup(h => h.Handle(It.IsAny<GetGitRemoteHeadsQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GetGitRemoteHeadsQuery query, CancellationToken _) =>
+                Result.Success(query.GitNames.Select(x => new StsGitRemoteHeadDataModel { GitName = x }).ToList()));
+        return handler.Object;
     }
 
     private static IQueryHandler<GetStoredFileByPathQuery, StsStoredFileDataModel> StoredFilePathEchoHandler()

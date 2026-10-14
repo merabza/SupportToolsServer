@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using SupportToolsServer.Application.GitRepos.GitRemoteHeads;
 using SupportToolsServer.Infrastructure.GitProjects;
 using SupportToolsServer.Tests.TestInfrastructure;
 using SystemTools.SharedKernel;
@@ -316,5 +317,31 @@ public sealed class GitClientTests : IDisposable
     public void Pull_Fails_WhenTheFolderIsNotARepository()
     {
         Assert.True(_sut.Pull(_notARepository).IsFailure);
+    }
+
+    //The remote is read without a clone: a commit pushed by another clone is seen at once
+    [Fact]
+    public void GetRemoteHead_ReturnsTheBranchAndTheLastCommitOfTheRemote()
+    {
+        PushNewCommitToOrigin();
+
+        Result<GitRemoteHead> result = _sut.GetRemoteHead(_origin);
+
+        Assert.Equal(new GitRemoteHead("main", GitRunner.Run(_upstream, "rev-parse HEAD")), result.Value);
+    }
+
+    [Fact]
+    public void GetRemoteHead_Fails_WhenTheRemoteIsEmpty()
+    {
+        string empty = _temp.Combine("empty.git");
+        GitRunner.Run(_temp.Path, $"init -q --bare -b main \"{empty}\"");
+
+        Assert.Equal(GitProjectsErrors.RemoteHeadIsNotFound, _sut.GetRemoteHead(empty).Error);
+    }
+
+    [Fact]
+    public void GetRemoteHead_Fails_WhenTheAddressIsNotARepository()
+    {
+        Assert.True(_sut.GetRemoteHead(_notARepository).IsFailure);
     }
 }

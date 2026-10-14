@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using SupportToolsServer.Application.GitRepos.GitRemoteHeads;
 using SupportToolsServer.Infrastructure.GitProjects;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -60,6 +61,50 @@ public sealed class GitClientArgumentsTests
             ["-C", ProjectPath, "pull"]
         ];
         Assert.Equal(expected, _calls);
+    }
+
+    [Fact]
+    public void GetRemoteHead_PassesTheAddressAfterTheEndOfTheOptions()
+    {
+        CreateClient(string.Empty).GetRemoteHead("--upload-pack=touch x");
+
+        string[] expected = ["ls-remote", "--symref", "--", "--upload-pack=touch x", "HEAD"];
+        Assert.Equal(expected, Assert.Single(_calls));
+    }
+
+    //The output of git on Windows ends its lines with \r\n
+    [Fact]
+    public void GetRemoteHead_ReadsTheBranchAndTheCommitOfHead()
+    {
+        Result<GitRemoteHead> result = CreateClient(
+                "ref: refs/heads/master\tHEAD\r\n1dfa466db703de783bc9929e9bd765f2c870a1f2\tHEAD\r\n")
+            .GetRemoteHead("git@github.com:test/a.git");
+
+        Assert.Equal(new GitRemoteHead("master", "1dfa466db703de783bc9929e9bd765f2c870a1f2"), result.Value);
+    }
+
+    //Only the two HEAD lines count: another ref after them changes neither the branch nor the commit
+    [Fact]
+    public void GetRemoteHead_SkipsTheLinesThatAreNotAboutHead()
+    {
+        Result<GitRemoteHead> result = CreateClient(
+                "ref: refs/heads/main\tHEAD\n1dfa466db703de783bc9929e9bd765f2c870a1f2\tHEAD\n" +
+                "2222222222222222222222222222222222222222\trefs/heads/main\nunexpected\n")
+            .GetRemoteHead("git@github.com:test/a.git");
+
+        Assert.Equal(new GitRemoteHead("main", "1dfa466db703de783bc9929e9bd765f2c870a1f2"), result.Value);
+    }
+
+    //An empty repository has no HEAD; a detached HEAD has no branch
+    [Theory]
+    [InlineData("")]
+    [InlineData("1dfa466db703de783bc9929e9bd765f2c870a1f2\tHEAD\n")]
+    [InlineData("ref: refs/heads/main\tHEAD\n")]
+    public void GetRemoteHead_Fails_WhenTheBranchOrTheCommitIsMissing(string output)
+    {
+        Result<GitRemoteHead> result = CreateClient(output).GetRemoteHead("git@github.com:test/a.git");
+
+        Assert.Equal(GitProjectsErrors.RemoteHeadIsNotFound, result.Error);
     }
 
     [Fact]

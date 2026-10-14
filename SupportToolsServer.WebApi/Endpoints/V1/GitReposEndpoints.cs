@@ -10,8 +10,10 @@ using Microsoft.AspNetCore.Routing;
 using Serilog;
 using SupportToolsServer.Application.GitRepos.DeleteGitRepo;
 using SupportToolsServer.Application.GitRepos.GetGitProjects;
+using SupportToolsServer.Application.GitRepos.GetGitRemoteHeads;
 using SupportToolsServer.Application.GitRepos.GetGitRepoByKey;
 using SupportToolsServer.Application.GitRepos.GetGitRepos;
+using SupportToolsServer.Application.GitRepos.NotifyGitPushed;
 using SupportToolsServer.Application.GitRepos.UpdateGitRepo;
 using SupportToolsServer.Application.GitRepos.UploadGitRepos;
 using SupportToolsServerApiContracts.Models;
@@ -40,6 +42,8 @@ public static class GitReposEndpoints
         group.MapPost(SupportToolsServerApiRoutes.Git.UpdateGitRepo, UpdateGitRepo);
         group.MapDelete(SupportToolsServerApiRoutes.Git.DeleteGitRepo, DeleteGitRepo);
         group.MapGet(SupportToolsServerApiRoutes.Git.GitProjects, GetGitProjects);
+        group.MapGet(SupportToolsServerApiRoutes.Git.GitRemoteHeads, GetGitRemoteHeads);
+        group.MapPost(SupportToolsServerApiRoutes.Git.GitPushed, NotifyGitPushed);
 
         debugLogger?.Information("{MethodName} Finished", nameof(UseGitReposEndpoints));
 
@@ -123,5 +127,33 @@ public static class GitReposEndpoints
 
         return result.Match<List<StsGitProjectDataModel>, Results<Ok<List<StsGitProjectDataModel>>, ProblemHttpResult>>(
             gitProjects => TypedResults.Ok(gitProjects), errors => (ProblemHttpResult)CustomResults.Problem(errors));
+    }
+
+    // GET api/v1/git/gitremoteheads?names={name}&names={name}... (names-ის გარეშე: ყველა რეპოზიტორია)
+    public static async Task<Results<Ok<List<StsGitRemoteHeadDataModel>>, ProblemHttpResult>> GetGitRemoteHeads(
+        [FromQuery] string[]? names, IQueryHandler<GetGitRemoteHeadsQuery, List<StsGitRemoteHeadDataModel>> handler,
+        CancellationToken cancellationToken = default)
+    {
+        Debug.WriteLine($"Call {nameof(GetGitRemoteHeadsQueryHandler)} from {nameof(GetGitRemoteHeads)}");
+
+        Result<List<StsGitRemoteHeadDataModel>> result =
+            await handler.Handle(new GetGitRemoteHeadsQuery(names ?? []), cancellationToken);
+
+        return result
+            .Match<List<StsGitRemoteHeadDataModel>, Results<Ok<List<StsGitRemoteHeadDataModel>>, ProblemHttpResult>>(
+                gitRemoteHeads => TypedResults.Ok(gitRemoteHeads),
+                errors => (ProblemHttpResult)CustomResults.Problem(errors));
+    }
+
+    // POST api/v1/git/gitpushed/{key}
+    public static async Task<Results<Ok, ProblemHttpResult>> NotifyGitPushed([FromRoute] string key,
+        ICommandHandler<NotifyGitPushedCommand> handler, CancellationToken cancellationToken = default)
+    {
+        Debug.WriteLine($"Call {nameof(NotifyGitPushedCommandHandler)} for key {key} from {nameof(NotifyGitPushed)}");
+
+        Result result = await handler.Handle(new NotifyGitPushedCommand(key), cancellationToken);
+
+        return result.Match<Results<Ok, ProblemHttpResult>>(() => TypedResults.Ok(),
+            errors => (ProblemHttpResult)CustomResults.Problem(errors));
     }
 }

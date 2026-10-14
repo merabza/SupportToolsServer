@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using SupportToolsServer.Application.GitRepos.GitRemoteHeads;
 using SupportToolsServer.Application.GitRepos.UpdateGitProject;
 using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared.Errors;
@@ -105,6 +106,45 @@ public sealed class GitClient : IGitClient
     public Result Pull(string projectFolderPath)
     {
         return RunInFolder(projectFolderPath, "pull");
+    }
+
+    //გამოტანა ორი სტრიქონია: "ref: refs/heads/<branch>\tHEAD" და "<commit>\tHEAD". ცარიელ რეპოზიტორიას HEAD არ აქვს
+    public Result<GitRemoteHead> GetRemoteHead(string gitProjectAddress)
+    {
+        Result<string> result = _runGit(["ls-remote", "--symref", "--", gitProjectAddress, "HEAD"]);
+        if (result.IsFailure)
+        {
+            return result.Error;
+        }
+
+        const string branchRefPrefix = "ref: refs/heads/";
+        string? branchName = null;
+        string? commitId = null;
+        foreach (string line in result.Value.Split('\n',
+                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+        {
+            string[] parts = line.Split('\t');
+            if (parts is not [_, "HEAD"])
+            {
+                continue;
+            }
+
+            if (parts[0].StartsWith(branchRefPrefix, StringComparison.Ordinal))
+            {
+                branchName = parts[0][branchRefPrefix.Length..];
+            }
+            else
+            {
+                commitId = parts[0];
+            }
+        }
+
+        if (string.IsNullOrEmpty(branchName) || string.IsNullOrEmpty(commitId))
+        {
+            return GitProjectsErrors.RemoteHeadIsNotFound;
+        }
+
+        return new GitRemoteHead(branchName, commitId);
     }
 
     //არგუმენტები ArgumentList-ით, თითო-თითოდ გადაეცემა: ბრჭყალის ან გამოტოვების შემცველი მისამართი თუ გზა

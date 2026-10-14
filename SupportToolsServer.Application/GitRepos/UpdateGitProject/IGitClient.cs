@@ -1,3 +1,4 @@
+using SupportToolsServer.Application.GitRepos.GitRemoteHeads;
 using SystemTools.SharedKernel;
 
 namespace SupportToolsServer.Application.GitRepos.UpdateGitProject;
@@ -21,4 +22,7 @@ public interface IGitClient
     Result<bool> NeedPull(string projectFolderPath);
 
     Result Pull(string projectFolderPath);
+
+    //remote-ის default branch და მისი commit (git ls-remote --symref): ერთი მიმართვა, ობიექტები არ ჩამოიტვირთება
+    Result<GitRemoteHead> GetRemoteHead(string gitProjectAddress);
 }

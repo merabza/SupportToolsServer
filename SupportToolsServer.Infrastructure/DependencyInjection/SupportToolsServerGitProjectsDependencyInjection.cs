@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
+using SupportToolsServer.Application.GitRepos.GitRemoteHeads;
 using SupportToolsServer.Application.GitRepos.UpdateGitProject;
 using SupportToolsServer.Infrastructure.GitProjects;
 using SupportToolsServer.Infrastructure.Options;
@@ -25,6 +26,10 @@ public static class SupportToolsServerGitProjectsDependencyInjection
             .Validate(options => options.GitProjectsRefreshHours is >= 0 and <= AppOptions.MaxGitProjectsRefreshHours,
                 $"{AppOptions.SectionName}:{nameof(AppOptions.GitProjectsRefreshHours)} must be between 0 and " +
                 $"{AppOptions.MaxGitProjectsRefreshHours}")
+            .Validate(
+                options => options.GitRemoteHeadsCacheMinutes is >= 0 and <= AppOptions.MaxGitRemoteHeadsCacheMinutes,
+                $"{AppOptions.SectionName}:{nameof(AppOptions.GitRemoteHeadsCacheMinutes)} must be between 0 and " +
+                $"{AppOptions.MaxGitRemoteHeadsCacheMinutes}")
             .ValidateOnStart();
 
         services.AddSingleton<GitProjectUpdateQueue>();
@@ -36,8 +41,10 @@ public static class SupportToolsServerGitProjectsDependencyInjection
         services.AddHostedService<GitProjectsRefreshBackgroundService>();
 
         services.AddScoped<IGitsWorkFolder, GitsWorkFolder>();
-        services.AddScoped<IGitClient, GitClient>();
+        //GitClient მდგომარეობას არ ინახავს, ამიტომ singleton-ია: მას singleton ქეშიც იყენებს
+        services.AddSingleton<IGitClient, GitClient>();
         services.AddScoped<IGitProjectFilesScanner, GitProjectFilesScanner>();
+        services.AddSingleton<IGitRemoteHeadsCache, GitRemoteHeadsCache>();
 
         debugLogger?.Information("{MethodName} Finished", nameof(AddSupportToolsServerGitProjects));
 

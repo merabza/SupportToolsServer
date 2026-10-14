@@ -27,6 +27,16 @@ public sealed class GitProjectsErrorsTests
     }
 
     [Fact]
+    public void RemoteHeadIsNotFound_IsAProblemWithItsNameAsTheCode()
+    {
+        Error error = GitProjectsErrors.RemoteHeadIsNotFound;
+
+        Assert.Equal("RemoteHeadIsNotFound", error.Code);
+        Assert.Equal("Remote repository has no HEAD branch", error.Description);
+        Assert.Equal(ErrorType.Problem, error.Type);
+    }
+
+    [Fact]
     public void FolderIsOutsideGitsFolder_IsAProblemNamingTheFolder()
     {
         Error error = GitProjectsErrors.FolderIsOutsideGitsFolder("..");
