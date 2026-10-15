@@ -79,8 +79,8 @@ public sealed class FileStorageQueryHandlersTests
     {
         StsFileStorageDataModel model =
             new FileStorage(FileStorageId.CreateUnique(), "Exchange", "ftp://ftp.example.com/x/", "user-a",
-                "password-a", 
-                //100, 5, 
+                "password-a",
+                100, 5,
                 2, 7).ToContractModel();
 
         Assert.Equal("Exchange", model.Name);

@@ -320,8 +320,8 @@ internal static class TestData
     public static FileStorage NewFileStorage(string name, string? fileStoragePath = "ftp://ftp.example.com/x/",
         string? userName = MadeUpUser, string? password = MadeUpPassword, int version = EntityVersion.Initial)
     {
-        return new FileStorage(FileStorageId.CreateUnique(), name, fileStoragePath, userName, password, 
-            //255, 4, 
+        return new FileStorage(FileStorageId.CreateUnique(), name, fileStoragePath, userName, password,
+            255, 4,
             1,
             version);
     }
