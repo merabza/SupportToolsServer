@@ -322,7 +322,7 @@ internal static class TestData
     {
         return new FileStorage(FileStorageId.CreateUnique(), name, fileStoragePath, userName, password,
             //255, 
-            4,
+            //4,
             1,
             version);
     }

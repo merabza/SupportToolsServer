@@ -91,7 +91,7 @@ public sealed class FileStorageRepositoryTests : IAsyncLifetime
         {
             new FileStorageRepository(context).Add(FileStorage.Create("Archive", @"E:\Archive", null, null,
                 //0, 
-                0,
+                //0,
                 0));
             await context.SaveChangesAsync();
         }
@@ -110,7 +110,7 @@ public sealed class FileStorageRepositoryTests : IAsyncLifetime
         await using SupportToolsServerDbContext context = _database.NewContext();
         new FileStorageRepository(context).Add(FileStorage.Create("Exchange", null, null, null,
             //0, 
-            0,
+            //0,
             0));
 
         await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
@@ -124,7 +124,7 @@ public sealed class FileStorageRepositoryTests : IAsyncLifetime
             FileStorage read = await Read(context, "Exchange");
             read.Update("EXCHANGE", "ftp://ftp.example.com/y/", "user-y", "password-y",
                 //100, 
-                5,
+                //5,
                 2);
             new FileStorageRepository(context).Update(read);
             await context.SaveChangesAsync();
@@ -152,13 +152,13 @@ public sealed class FileStorageRepositoryTests : IAsyncLifetime
         FileStorage readSecond = await Read(second, "Exchange");
         readFirst.Update("Exchange", "ftp://first/", null, null,
             //0, 
-            0,
+            //0,
             0);
         new FileStorageRepository(first).Update(readFirst);
         await first.SaveChangesAsync();
         readSecond.Update("Exchange", "ftp://second/", null, null,
             //0, 
-            0,
+            //0,
             0);
         new FileStorageRepository(second).Update(readSecond);
 
@@ -192,7 +192,7 @@ public sealed class FileStorageRepositoryTests : IAsyncLifetime
         FileStorage readSecond = await Read(second, "Exchange");
         readFirst.Update("Exchange", "ftp://first/", null, null,
             //0, 
-            0,
+            //0,
             0);
         new FileStorageRepository(first).Update(readFirst);
         await first.SaveChangesAsync();
