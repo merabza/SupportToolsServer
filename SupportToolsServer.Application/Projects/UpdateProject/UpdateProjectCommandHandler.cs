@@ -112,7 +112,8 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
         if (stored is null)
         {
             project = Project.Create(model.Name, model.ProjectType, model.ProjectGroupName, model.ProjectDescription,
-                model.MajorVersion, model.MinorVersion, model.UseAlternativeWebAgent, editorConfigFileType?.Id,
+                model.MajorVersion, model.MinorVersion, model.UseAlternativeWebAgent, model.UseLocalPackages,
+                editorConfigFileType?.Id,
                 model.MainProjectName, model.ApiContractsProjectName, model.SpaProjectName, model.DbContextName,
                 model.ProjectShortPrefix, model.ScaffoldSeederProjectName, model.DbContextProjectName,
                 model.NewDataSeedingClassLibProjectName, model.ProgramArchiveDateMask, model.ProgramArchiveExtension,
@@ -130,7 +131,8 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
         else
         {
             stored.Update(model.Name, model.ProjectType, model.ProjectGroupName, model.ProjectDescription,
-                model.MajorVersion, model.MinorVersion, model.UseAlternativeWebAgent, editorConfigFileType?.Id,
+                model.MajorVersion, model.MinorVersion, model.UseAlternativeWebAgent, model.UseLocalPackages,
+                editorConfigFileType?.Id,
                 model.MainProjectName, model.ApiContractsProjectName, model.SpaProjectName, model.DbContextName,
                 model.ProjectShortPrefix, model.ScaffoldSeederProjectName, model.DbContextProjectName,
                 model.NewDataSeedingClassLibProjectName, model.ProgramArchiveDateMask, model.ProgramArchiveExtension,

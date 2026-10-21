@@ -45,10 +45,10 @@ internal static class TestData
         IEnumerable<NpmPackage>? npmPackages = null, IEnumerable<ServerInfo>? serverInfos = null,
         int version = EntityVersion.Initial)
     {
-        var project = new Project(ProjectId.CreateUnique(), name, "Standard", null, null, 1, 0, false, null, null,
+        var project = new Project(ProjectId.CreateUnique(), name, "Standard", null, null, 1, 0, false, false, null, null,
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
             null, null, null, null, null, null, null, null, null, version - 1);
-        project.Update(name, "IsService", "Apps", "Application", 2, 1, false, editorConfigFileType?.Id, name,
+        project.Update(name, "IsService", "Apps", "Application", 2, 1, false, true, editorConfigFileType?.Id, name,
             $"{name}ApiContracts", null, $"{name}DbContext", "ap", $"{name}ScaffoldSeeder", $"{name}Db", null,
             "yyyyMMddHHmmss", ".zip", "yyyyMMdd", ".json", $@"D:\1WorkDotnet\{name}",
             $@"D:\1WorkDotnet\{name}\{name}.slnx", $@"D:\1WorkSecurity\{name}", null,
@@ -119,6 +119,7 @@ internal static class TestData
             ProjectDescription = "Application",
             MajorVersion = 2,
             MinorVersion = 1,
+            UseLocalPackages = true,
             EditorConfigPatternName = editorConfigPatternName,
             MainProjectName = name,
             ApiContractsProjectName = $"{name}ApiContracts",

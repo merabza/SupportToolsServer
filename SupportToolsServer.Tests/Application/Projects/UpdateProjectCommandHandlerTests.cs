@@ -99,6 +99,7 @@ public sealed class UpdateProjectCommandHandlerTests
             MajorVersion = 3,
             MinorVersion = 7,
             UseAlternativeWebAgent = true,
+            UseLocalPackages = true,
             EditorConfigPatternName = "default",
             MainProjectName = "Main",
             ApiContractsProjectName = "ApiContracts",
@@ -212,6 +213,7 @@ public sealed class UpdateProjectCommandHandlerTests
         Assert.Equal(3, added.MajorVersion);
         Assert.Equal(7, added.MinorVersion);
         Assert.True(added.UseAlternativeWebAgent);
+        Assert.True(added.UseLocalPackages);
         Assert.Equal(_editorConfig.Id, added.EditorConfigFileTypeId);
         Assert.Equal("Main", added.MainProjectName);
         Assert.Equal("ApiContracts", added.ApiContractsProjectName);

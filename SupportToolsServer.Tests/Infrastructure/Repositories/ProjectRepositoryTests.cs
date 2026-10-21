@@ -118,7 +118,7 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         IEnumerable<ProjectGitRepo> gitRepos, IEnumerable<ProjectNpmPackage> npmPackages,
         IEnumerable<ProjectRedundantFile> redundantFiles, IEnumerable<ServerInfo>? serverInfos = null)
     {
-        project.Update(project.Name, project.ProjectType, null, null, 1, 0, false, null, null, null, null, null, null,
+        project.Update(project.Name, project.ProjectType, null, null, 1, 0, false, false, null, null, null, null, null, null,
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
             null, null, null, null, null, dev, prodCopy, gitRepos, npmPackages, redundantFiles,
             [ProjectAllowedTool.Create("SeedData")], [], [ProjectRouteClass.Create("Main", "api", "v2", "/main")],
@@ -299,7 +299,7 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
     {
         Project project = TestData.NewProject("AppC", gitRepos: child == "git" ? [_repoA, _repoA] : [],
             npmPackages: child == "npm" ? [_react, _react] : []);
-        project.Update("AppC", "Standard", null, null, 1, 0, false, null, null, null, null, null, null, null, null,
+        project.Update("AppC", "Standard", null, null, 1, 0, false, false, null, null, null, null, null, null, null, null,
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
             null, null, null, null, null, project.GitRepos, project.NpmPackages,
             child == "file" ? [ProjectRedundantFile.Create("a"), ProjectRedundantFile.Create("a")] : [],

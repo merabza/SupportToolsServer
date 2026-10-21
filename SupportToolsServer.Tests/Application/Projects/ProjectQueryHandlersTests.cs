@@ -221,7 +221,7 @@ public sealed class ProjectQueryHandlersTests
     {
         Project project = TestData.NewProject("AppA", gitRepos: [_repoB, _seeder, _repoA],
             scaffoldSeederGitRepos: [_seeder, _repoA], npmPackages: [_yup, _react]);
-        project.Update(project.Name, project.ProjectType, null, null, 1, 0, false, null, null, null, null, null, null,
+        project.Update(project.Name, project.ProjectType, null, null, 1, 0, false, false, null, null, null, null, null, null,
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
             null, null, null, null, null, null, null, project.GitRepos, project.NpmPackages,
             [ProjectRedundantFile.Create("web.config"), ProjectRedundantFile.Create("*.PDB")],
