@@ -258,6 +258,30 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         Assert.Equal(1, stored.Version);
     }
 
+    //The column's default is true, but EF sends the value of the entity, false included
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Add_StoresUseLocalPackagesAsGiven(bool useLocalPackages)
+    {
+        Project project = TestData.NewProject("AppC");
+        if (!useLocalPackages)
+        {
+            Update(project, null, null, [], [], []);
+        }
+
+        Assert.Equal(useLocalPackages, project.UseLocalPackages);
+        await using (SupportToolsServerDbContext context = _database.NewContext())
+        {
+            new ProjectRepository(context).Add(project);
+            await context.SaveChangesAsync();
+        }
+
+        Project? stored = await Stored("AppC");
+        Assert.NotNull(stored);
+        Assert.Equal(useLocalPackages, stored.UseLocalPackages);
+    }
+
     [Fact]
     public async Task Add_IsRefusedOnSave_WhenTheNameIsAlreadyStored()
     {
