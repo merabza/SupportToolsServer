@@ -159,7 +159,6 @@ public sealed class ProjectCreatorSettingsHandlersOnSqliteTests : IAsyncLifetime
         Assert.Equal(ProjectCreatorSettingsId.Singleton, stored.Id);
         StsProjectCreatorSettingsDataModel read = (await Get()).Value;
         Assert.Equal(4, read.IndentSize);
-        Assert.Equal("FakeHost", read.FakeHostProjectName);
         Assert.Equal(@"D:\1WorkDotnet", read.ProjectsFolderPathReal);
         Assert.Equal(@"D:\1WorkSecurity", read.SecretsFolderPathReal);
         Assert.Equal("PAZISI", read.ProductionServerName);

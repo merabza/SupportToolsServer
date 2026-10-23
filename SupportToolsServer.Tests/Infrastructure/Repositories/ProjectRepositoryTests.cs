@@ -47,8 +47,8 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         _repoA = TestData.NewGitRepo("RepoA", _gitIgnoreFileType);
         _repoB = TestData.NewGitRepo("RepoB", _gitIgnoreFileType);
         _appA = TestData.NewProject("AppA", _editorConfig, TestData.NewDatabaseParameters(_connection),
-            TestData.NewDatabaseParameters(_connection, _smartSchema, _fileStorage, "AppAProdCopy"), [_repoA],
-            [_repoB], [_react],
+            TestData.NewDatabaseParameters(_connection, _smartSchema, _fileStorage, "AppAProdCopy"), [_repoA, _repoB],
+            [_react],
             [
                 TestData.NewServerInfo(_pazisi, _prod, _webAgent,
                     TestData.NewDatabaseParameters(_connection, _smartSchema, _fileStorage, "AppA")),
@@ -100,7 +100,7 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         await using SupportToolsServerDbContext check = _database.NewContext();
         List<string> rows =
         [
-            .. await check.Set<ProjectGitRepo>().AsNoTracking().Select(x => "git " + x.Kind).ToListAsync(),
+            .. await check.Set<ProjectGitRepo>().AsNoTracking().Select(_ => "git").ToListAsync(),
             .. await check.Set<ProjectNpmPackage>().AsNoTracking().Select(_ => "npm").ToListAsync(),
             .. await check.Set<ProjectRedundantFile>().AsNoTracking().Select(x => "file " + x.FileName).ToListAsync(),
             .. await check.Set<ProjectAllowedTool>().AsNoTracking().Select(x => "tool " + x.ToolName).ToListAsync(),
@@ -119,8 +119,8 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         IEnumerable<ProjectRedundantFile> redundantFiles, IEnumerable<ServerInfo>? serverInfos = null)
     {
         project.Update(project.Name, project.ProjectType, null, null, 1, 0, false, false, null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-            null, null, null, null, null, dev, prodCopy, gitRepos, npmPackages, redundantFiles,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, dev, prodCopy, gitRepos,
+            npmPackages, redundantFiles,
             [ProjectAllowedTool.Create("SeedData")], [], [ProjectRouteClass.Create("Main", "api", "v2", "/main")],
             serverInfos ?? []);
     }
@@ -174,9 +174,9 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         Assert.Equal(120, prodCopy.CommandTimeOut);
         Assert.True(prodCopy.Compress);
         Assert.Null(prodCopy.Verify);
-        Assert.Equal(
-            [(_repoA.Id, EProjectGitRepoKind.Main), (_repoB.Id, EProjectGitRepoKind.ScaffoldSeed)],
-            found.GitRepos.Select(x => (x.GitRepoId, x.Kind)).OrderBy(x => x.Kind));
+        Assert.Equal(2, found.GitRepos.Count);
+        Assert.Contains(found.GitRepos, x => x.GitRepoId.Equals(_repoA.Id));
+        Assert.Contains(found.GitRepos, x => x.GitRepoId.Equals(_repoB.Id));
         Assert.Equal("/upload", Assert.Single(found.Endpoints).EndpointRoute);
         Assert.Equal("v1", Assert.Single(found.RouteClasses).ApiVersion);
         ServerInfo pazisi = found.ServerInfos.Single(x => x.ServerId == _pazisi.Id);
@@ -291,23 +291,6 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
     }
 
-    //A git may be in a project once in each role
-    [Fact]
-    public async Task Add_StoresTheSameGitInBothRoles()
-    {
-        await using (SupportToolsServerDbContext context = _database.NewContext())
-        {
-            new ProjectRepository(context).Add(TestData.NewProject("AppC", gitRepos: [_repoA],
-                scaffoldSeederGitRepos: [_repoA]));
-            await context.SaveChangesAsync();
-        }
-
-        Project? stored = await Stored("AppC");
-        Assert.NotNull(stored);
-        Assert.Equal([EProjectGitRepoKind.Main, EProjectGitRepoKind.ScaffoldSeed],
-            stored.GitRepos.Select(x => x.Kind).Order());
-    }
-
     //The unique indexes of the children keep one child of a key per project: one server info of a server and an
     //environment, and one tool per server info
     [Theory]
@@ -324,8 +307,8 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         Project project = TestData.NewProject("AppC", gitRepos: child == "git" ? [_repoA, _repoA] : [],
             npmPackages: child == "npm" ? [_react, _react] : []);
         project.Update("AppC", "Standard", null, null, 1, 0, false, false, null, null, null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-            null, null, null, null, null, project.GitRepos, project.NpmPackages,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, project.GitRepos,
+            project.NpmPackages,
             child == "file" ? [ProjectRedundantFile.Create("a"), ProjectRedundantFile.Create("a")] : [],
             child == "tool" ? [ProjectAllowedTool.Create("a"), ProjectAllowedTool.Create("a")] : [],
             child == "endpoint"
@@ -442,7 +425,7 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         {
             Project read = await ReadForUpdate(context, "AppA");
             Update(read, null, TestData.NewDatabaseParameters(databaseName: "Other"),
-                [ProjectGitRepo.Create(_repoB.Id, EProjectGitRepoKind.Main)], [],
+                [ProjectGitRepo.Create(_repoB.Id)], [],
                 [ProjectRedundantFile.Create("*.pdb"), ProjectRedundantFile.Create("*.xml")]);
             new ProjectRepository(context).Update(read);
             await context.SaveChangesAsync();
@@ -455,7 +438,7 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         DatabaseParameters prodCopy = Assert.IsType<DatabaseParameters>(stored.ProdCopyDatabaseParameters);
         Assert.Null(prodCopy.DbConnectionId);
         Assert.Equal("Other", prodCopy.DatabaseName);
-        Assert.Equal([(_repoB.Id, EProjectGitRepoKind.Main)], stored.GitRepos.Select(x => (x.GitRepoId, x.Kind)));
+        Assert.Equal([_repoB.Id], stored.GitRepos.Select(x => x.GitRepoId));
         Assert.Empty(stored.NpmPackages);
         Assert.Equal(["*.pdb", "*.xml"], stored.RedundantFiles.Select(x => x.FileName).Order());
         Assert.Empty(stored.Endpoints);
@@ -463,7 +446,7 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         Assert.Equal(2, stored.Version);
         Assert.Equal(
         [
-            "endpoint Upload", "file *.pdb", "file *.pdb", "file *.xml", "git Main", "route Main", "route Main",
+            "endpoint Upload", "file *.pdb", "file *.pdb", "file *.xml", "git", "route Main", "route Main",
             "tool SeedData", "tool SeedData"
         ], await StoredChildRows());
     }

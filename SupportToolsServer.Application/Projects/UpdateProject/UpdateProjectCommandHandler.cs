@@ -115,14 +115,11 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
                 model.MajorVersion, model.MinorVersion, model.UseAlternativeWebAgent, model.UseLocalPackages,
                 editorConfigFileType?.Id,
                 model.MainProjectName, model.ApiContractsProjectName, model.SpaProjectName, model.DbContextName,
-                model.ProjectShortPrefix, model.ScaffoldSeederProjectName, model.DbContextProjectName,
-                model.NewDataSeedingClassLibProjectName, model.ProgramArchiveDateMask, model.ProgramArchiveExtension,
+                model.ProgramArchiveDateMask, model.ProgramArchiveExtension,
                 model.ParametersFileDateMask, model.ParametersFileExtension, model.ProjectFolderName,
                 model.SolutionFileName, model.ProjectSecurityFolderPath, model.MigrationStartupProjectFilePath,
                 model.MigrationProjectFilePath, model.DataSeederRulesByTableStartupProjectFilePath,
-                model.OldDataConvertorForDataSeeder, model.SeedProjectFilePath, model.SeedProjectParametersFilePath,
-                model.ExcludesRulesParametersFilePath, model.AppSetEnKeysJsonFileName, model.MigrationSqlFilesFolder,
-                model.PrepareProdCopyDatabaseProjectFilePath, model.PrepareProdCopyDatabaseProjectParametersFilePath,
+                model.OldDataConvertorForDataSeeder, model.AppSetEnKeysJsonFileName,
                 model.PairedDbObjectsResultFileName, model.KeyGuidPart, devDatabaseParameters,
                 prodCopyDatabaseParameters, gitRepos, npmPackages, redundantFiles, allowedTools, endpoints,
                 routeClasses, serverInfos);
@@ -134,14 +131,11 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
                 model.MajorVersion, model.MinorVersion, model.UseAlternativeWebAgent, model.UseLocalPackages,
                 editorConfigFileType?.Id,
                 model.MainProjectName, model.ApiContractsProjectName, model.SpaProjectName, model.DbContextName,
-                model.ProjectShortPrefix, model.ScaffoldSeederProjectName, model.DbContextProjectName,
-                model.NewDataSeedingClassLibProjectName, model.ProgramArchiveDateMask, model.ProgramArchiveExtension,
+                model.ProgramArchiveDateMask, model.ProgramArchiveExtension,
                 model.ParametersFileDateMask, model.ParametersFileExtension, model.ProjectFolderName,
                 model.SolutionFileName, model.ProjectSecurityFolderPath, model.MigrationStartupProjectFilePath,
                 model.MigrationProjectFilePath, model.DataSeederRulesByTableStartupProjectFilePath,
-                model.OldDataConvertorForDataSeeder, model.SeedProjectFilePath, model.SeedProjectParametersFilePath,
-                model.ExcludesRulesParametersFilePath, model.AppSetEnKeysJsonFileName, model.MigrationSqlFilesFolder,
-                model.PrepareProdCopyDatabaseProjectFilePath, model.PrepareProdCopyDatabaseProjectParametersFilePath,
+                model.OldDataConvertorForDataSeeder, model.AppSetEnKeysJsonFileName,
                 model.PairedDbObjectsResultFileName, model.KeyGuidPart, devDatabaseParameters,
                 prodCopyDatabaseParameters, gitRepos, npmPackages, redundantFiles, allowedTools, endpoints,
                 routeClasses, serverInfos);
@@ -162,33 +156,25 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
         return project.Version;
     }
 
-    //git-ები ერთხელ იკითხება (თუ პროექტს ისინი აქვს) და სახელით რეგისტრის გარეშე ედრება: ჯერ პროექტის git-ები, მერე
-    //scaffold seeder-ისა
+    //git-ები ერთხელ იკითხება (თუ პროექტს ისინი აქვს) და სახელით რეგისტრის გარეშე ედრება
     private async Task<List<ProjectGitRepo>> FindGitRepos(StsProjectDataModel model, ReferencedRecords references,
         CancellationToken cancellationToken)
     {
         List<ProjectGitRepo> gitRepos = [];
-        if (model.GitProjectNames.Count == 0 && model.ScaffoldSeederGitProjectNames.Count == 0)
+        if (model.GitProjectNames.Count == 0)
         {
             return gitRepos;
         }
 
         List<GitRepo> allGitRepos = await _gitRepoRepository.GetAll(cancellationToken);
 
-        foreach ((List<string> names, EProjectGitRepoKind kind) in new[]
-                 {
-                     (model.GitProjectNames, EProjectGitRepoKind.Main),
-                     (model.ScaffoldSeederGitProjectNames, EProjectGitRepoKind.ScaffoldSeed)
-                 })
+        foreach (string name in model.GitProjectNames)
         {
-            foreach (string name in names)
+            GitRepo? gitRepo = references.Find(name, GitRepoContractMapper.EntityName,
+                x => allGitRepos.Find(y => SameName(y.Name, x)));
+            if (gitRepo is not null)
             {
-                GitRepo? gitRepo = references.Find(name, GitRepoContractMapper.EntityName,
-                    x => allGitRepos.Find(y => SameName(y.Name, x)));
-                if (gitRepo is not null)
-                {
-                    gitRepos.Add(ProjectGitRepo.Create(gitRepo.Id, kind));
-                }
+                gitRepos.Add(ProjectGitRepo.Create(gitRepo.Id));
             }
         }
 

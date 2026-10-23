@@ -105,10 +105,6 @@ public sealed class UpdateProjectCommandHandlerTests
             ApiContractsProjectName = "ApiContracts",
             SpaProjectName = "Spa",
             DbContextName = "DbContext",
-            ProjectShortPrefix = "Prefix",
-            ScaffoldSeederProjectName = "ScaffoldSeeder",
-            DbContextProjectName = "DbContextProject",
-            NewDataSeedingClassLibProjectName = "NewDataSeeding",
             ProgramArchiveDateMask = "ArchiveMask",
             ProgramArchiveExtension = "ArchiveExtension",
             ParametersFileDateMask = "ParametersMask",
@@ -120,13 +116,7 @@ public sealed class UpdateProjectCommandHandlerTests
             MigrationProjectFilePath = "Migration",
             DataSeederRulesByTableStartupProjectFilePath = "SeederRules",
             OldDataConvertorForDataSeeder = "OldDataConvertor",
-            SeedProjectFilePath = "Seed",
-            SeedProjectParametersFilePath = "SeedParameters",
-            ExcludesRulesParametersFilePath = "ExcludesRules",
             AppSetEnKeysJsonFileName = "AppSetEnKeys",
-            MigrationSqlFilesFolder = "MigrationSql",
-            PrepareProdCopyDatabaseProjectFilePath = "PrepareProdCopy",
-            PrepareProdCopyDatabaseProjectParametersFilePath = "PrepareProdCopyParameters",
             PairedDbObjectsResultFileName = "PairedDbObjects",
             KeyGuidPart = TestData.MadeUpKeyGuidPart,
             DevDatabaseParameters = new StsDatabaseParametersDataModel
@@ -148,7 +138,6 @@ public sealed class UpdateProjectCommandHandlerTests
                 BackupType = "Diff"
             },
             GitProjectNames = ["repoa", "RepoB"],
-            ScaffoldSeederGitProjectNames = ["RepoA"],
             FrontNpmPackageNames = ["REACT"],
             RedundantFileNames = ["*.pdb", "*.xml"],
             AllowToolsList = ["SeedData"],
@@ -219,10 +208,6 @@ public sealed class UpdateProjectCommandHandlerTests
         Assert.Equal("ApiContracts", added.ApiContractsProjectName);
         Assert.Equal("Spa", added.SpaProjectName);
         Assert.Equal("DbContext", added.DbContextName);
-        Assert.Equal("Prefix", added.ProjectShortPrefix);
-        Assert.Equal("ScaffoldSeeder", added.ScaffoldSeederProjectName);
-        Assert.Equal("DbContextProject", added.DbContextProjectName);
-        Assert.Equal("NewDataSeeding", added.NewDataSeedingClassLibProjectName);
         Assert.Equal("ArchiveMask", added.ProgramArchiveDateMask);
         Assert.Equal("ArchiveExtension", added.ProgramArchiveExtension);
         Assert.Equal("ParametersMask", added.ParametersFileDateMask);
@@ -234,13 +219,7 @@ public sealed class UpdateProjectCommandHandlerTests
         Assert.Equal("Migration", added.MigrationProjectFilePath);
         Assert.Equal("SeederRules", added.DataSeederRulesByTableStartupProjectFilePath);
         Assert.Equal("OldDataConvertor", added.OldDataConvertorForDataSeeder);
-        Assert.Equal("Seed", added.SeedProjectFilePath);
-        Assert.Equal("SeedParameters", added.SeedProjectParametersFilePath);
-        Assert.Equal("ExcludesRules", added.ExcludesRulesParametersFilePath);
         Assert.Equal("AppSetEnKeys", added.AppSetEnKeysJsonFileName);
-        Assert.Equal("MigrationSql", added.MigrationSqlFilesFolder);
-        Assert.Equal("PrepareProdCopy", added.PrepareProdCopyDatabaseProjectFilePath);
-        Assert.Equal("PrepareProdCopyParameters", added.PrepareProdCopyDatabaseProjectParametersFilePath);
         Assert.Equal("PairedDbObjects", added.PairedDbObjectsResultFileName);
         Assert.Equal(TestData.MadeUpKeyGuidPart, added.KeyGuidPart);
         DatabaseParameters dev = Assert.IsType<DatabaseParameters>(added.DevDatabaseParameters);
@@ -260,11 +239,7 @@ public sealed class UpdateProjectCommandHandlerTests
         Assert.True(dev.Verify);
         Assert.Equal("Diff", dev.BackupType);
         Assert.Null(added.ProdCopyDatabaseParameters);
-        Assert.Equal(
-            [
-                (_repoA.Id, EProjectGitRepoKind.Main), (_repoB.Id, EProjectGitRepoKind.Main),
-                (_repoA.Id, EProjectGitRepoKind.ScaffoldSeed)
-            ], added.GitRepos.Select(x => (x.GitRepoId, x.Kind)));
+        Assert.Equal([_repoA.Id, _repoB.Id], added.GitRepos.Select(x => x.GitRepoId));
         Assert.Equal([_react.Id], added.NpmPackages.Select(x => x.NpmPackageId));
         Assert.Equal(["*.pdb", "*.xml"], added.RedundantFiles.Select(x => x.FileName));
         Assert.Equal(["SeedData"], added.AllowedTools.Select(x => x.ToolName));
@@ -358,7 +333,7 @@ public sealed class UpdateProjectCommandHandlerTests
         GivenStored("AppA", TestData.NewProject("AppA", version: 2));
         StsProjectDataModel model = TestData.ProjectModel("AppA", "strict",
             TestData.DatabaseParametersModel("Pc9.Sql", "Hourly", "Backups"),
-            TestData.DatabaseParametersModel("Pc8.Sql", "Reduce", "Exchange"), ["RepoA", "RepoX"], ["RepoX", "RepoY"],
+            TestData.DatabaseParametersModel("Pc8.Sql", "Reduce", "Exchange"), ["RepoA", "RepoX", "RepoY"],
             ["react", "left-pad"],
             [
                 TestData.ServerInfoModel("bee", "Stage", "bee.WebAgent", TestData.DatabaseParametersModel("Pc7.Sql")),
@@ -401,10 +376,10 @@ public sealed class UpdateProjectCommandHandlerTests
     public async Task Handle_ReplacesTheStoredProjectWithItsChildrenAndReturnsItsNextVersion()
     {
         Project stored = TestData.NewProject("AppA", _editorConfig, TestData.NewDatabaseParameters(_connection),
-            null, [_repoA], [_repoB], [_react], [TestData.NewServerInfo(_pazisi, _prod, _webAgent)], 3);
+            null, [_repoA], [_react], [TestData.NewServerInfo(_pazisi, _prod, _webAgent)], 3);
         GivenStored("APPA", stored);
         StsProjectDataModel model = TestData.ProjectModel("APPA", null, null,
-            TestData.DatabaseParametersModel("Pc1.Sql", "Reduce", null, "AppAProdCopy"), ["RepoB"], [], [],
+            TestData.DatabaseParametersModel("Pc1.Sql", "Reduce", null, "AppAProdCopy"), ["RepoB"], [],
             [TestData.ServerInfoModel("dl360", "Test", serverSidePort: 5050)], 3);
         model.RedundantFileNames = [];
         model.Endpoints = [];
@@ -421,7 +396,7 @@ public sealed class UpdateProjectCommandHandlerTests
         Assert.Equal(_smartSchema.Id, prodCopy.SmartSchemaId);
         Assert.Null(prodCopy.FileStorageId);
         Assert.Equal("AppAProdCopy", prodCopy.DatabaseName);
-        Assert.Equal([(_repoB.Id, EProjectGitRepoKind.Main)], stored.GitRepos.Select(x => (x.GitRepoId, x.Kind)));
+        Assert.Equal([_repoB.Id], stored.GitRepos.Select(x => x.GitRepoId));
         Assert.Empty(stored.NpmPackages);
         Assert.Empty(stored.RedundantFiles);
         Assert.Equal(["SeedData"], stored.AllowedTools.Select(x => x.ToolName));

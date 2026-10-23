@@ -41,10 +41,6 @@ internal static class ProjectContractMapper
             ApiContractsProjectName = project.ApiContractsProjectName,
             SpaProjectName = project.SpaProjectName,
             DbContextName = project.DbContextName,
-            ProjectShortPrefix = project.ProjectShortPrefix,
-            ScaffoldSeederProjectName = project.ScaffoldSeederProjectName,
-            DbContextProjectName = project.DbContextProjectName,
-            NewDataSeedingClassLibProjectName = project.NewDataSeedingClassLibProjectName,
             ProgramArchiveDateMask = project.ProgramArchiveDateMask,
             ProgramArchiveExtension = project.ProgramArchiveExtension,
             ParametersFileDateMask = project.ParametersFileDateMask,
@@ -56,21 +52,14 @@ internal static class ProjectContractMapper
             MigrationProjectFilePath = project.MigrationProjectFilePath,
             DataSeederRulesByTableStartupProjectFilePath = project.DataSeederRulesByTableStartupProjectFilePath,
             OldDataConvertorForDataSeeder = project.OldDataConvertorForDataSeeder,
-            SeedProjectFilePath = project.SeedProjectFilePath,
-            SeedProjectParametersFilePath = project.SeedProjectParametersFilePath,
-            ExcludesRulesParametersFilePath = project.ExcludesRulesParametersFilePath,
             AppSetEnKeysJsonFileName = project.AppSetEnKeysJsonFileName,
-            MigrationSqlFilesFolder = project.MigrationSqlFilesFolder,
-            PrepareProdCopyDatabaseProjectFilePath = project.PrepareProdCopyDatabaseProjectFilePath,
-            PrepareProdCopyDatabaseProjectParametersFilePath = project.PrepareProdCopyDatabaseProjectParametersFilePath,
             PairedDbObjectsResultFileName = project.PairedDbObjectsResultFileName,
             KeyGuidPart = project.KeyGuidPart,
             DevDatabaseParameters = project.DevDatabaseParameters?.ToContractModel(names.DatabaseServerConnections,
                 names.SmartSchemas, names.FileStorages),
             ProdCopyDatabaseParameters = project.ProdCopyDatabaseParameters?.ToContractModel(
                 names.DatabaseServerConnections, names.SmartSchemas, names.FileStorages),
-            GitProjectNames = GitNames(project, EProjectGitRepoKind.Main, names),
-            ScaffoldSeederGitProjectNames = GitNames(project, EProjectGitRepoKind.ScaffoldSeed, names),
+            GitProjectNames = Sorted(project.GitRepos.Select(x => names.GitRepos[x.GitRepoId])),
             FrontNpmPackageNames = Sorted(project.NpmPackages.Select(x => names.NpmPackages[x.NpmPackageId])),
             RedundantFileNames = Sorted(project.RedundantFiles.Select(x => x.FileName)),
             AllowToolsList = Sorted(project.AllowedTools.Select(x => x.ToolName)),
@@ -192,11 +181,6 @@ internal static class ProjectContractMapper
                 yield return $"{EntityName} {project.Name} / {key}";
             }
         }
-    }
-
-    private static List<string> GitNames(Project project, EProjectGitRepoKind kind, ProjectReferenceNames names)
-    {
-        return Sorted(project.GitRepos.Where(x => x.Kind == kind).Select(x => names.GitRepos[x.GitRepoId]));
     }
 
     private static List<string> Sorted(IEnumerable<string> values)

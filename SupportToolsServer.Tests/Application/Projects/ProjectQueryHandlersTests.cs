@@ -108,7 +108,7 @@ public sealed class ProjectQueryHandlersTests
         _projects.Setup(r => r.GetAll(It.IsAny<CancellationToken>())).ReturnsAsync([
             TestData.NewProject("AppB", version: 2),
             TestData.NewProject("appA", _editorConfig, TestData.NewDatabaseParameters(_connection), null, [_repoA],
-                [_seeder], [_react], [TestData.NewServerInfo(_pazisi, _prod, _webAgent)], 4),
+                [_react], [TestData.NewServerInfo(_pazisi, _prod, _webAgent)], 4),
             TestData.NewProject("AppC")
         ]);
         using var cancellation = new CancellationTokenSource();
@@ -122,7 +122,6 @@ public sealed class ProjectQueryHandlersTests
         Assert.Equal(["default", null, null], result.Value.Select(x => x.EditorConfigPatternName));
         Assert.Equal("Pc1.Sql", result.Value[0].DevDatabaseParameters!.DbConnectionName);
         Assert.Equal(["repoA"], result.Value[0].GitProjectNames);
-        Assert.Equal(["Seeder"], result.Value[0].ScaffoldSeederGitProjectNames);
         Assert.Equal(["react"], result.Value[0].FrontNpmPackageNames);
         StsServerInfoDataModel serverInfo = Assert.Single(result.Value[0].ServerInfos);
         Assert.Equal("PAZISI", serverInfo.ServerName);
@@ -147,7 +146,7 @@ public sealed class ProjectQueryHandlersTests
     {
         _projects.Setup(r => r.GetByName("APPA", It.IsAny<CancellationToken>())).ReturnsAsync(
             TestData.NewProject("AppA", _editorConfig, null,
-                TestData.NewDatabaseParameters(_connection, _smartSchema, _fileStorage), [_repoB], [], [_yup],
+                TestData.NewDatabaseParameters(_connection, _smartSchema, _fileStorage), [_repoB], [_yup],
                 [TestData.NewServerInfo(_dl360, _test, null, null, TestData.NewDatabaseParameters(_connection))], 5));
 
         Result<StsProjectDataModel> result = await GetByName("APPA");
@@ -189,7 +188,7 @@ public sealed class ProjectQueryHandlersTests
     {
         Project project = TestData.NewProject("AppA", _editorConfig, TestData.NewDatabaseParameters(_connection),
             TestData.NewDatabaseParameters(_connection, _smartSchema, _fileStorage, "AppAProdCopy"), [_repoA],
-            [_seeder], [_react],
+            [_react],
             [
                 TestData.NewServerInfo(_pazisi, _prod, _webAgent,
                     TestData.NewDatabaseParameters(_connection, _smartSchema, _fileStorage, "AppA"),
@@ -198,7 +197,7 @@ public sealed class ProjectQueryHandlersTests
             ], 7);
         StsProjectDataModel expected = TestData.ProjectModel("AppA", "default",
             TestData.DatabaseParametersModel("Pc1.Sql"),
-            TestData.DatabaseParametersModel("Pc1.Sql", "Reduce", "Backups", "AppAProdCopy"), ["repoA"], ["Seeder"],
+            TestData.DatabaseParametersModel("Pc1.Sql", "Reduce", "Backups", "AppAProdCopy"), ["repoA"],
             ["react"],
             [
                 TestData.ServerInfoModel("PAZISI", "Prod", "PAZISI.WebAgent",
@@ -214,16 +213,15 @@ public sealed class ProjectQueryHandlersTests
     }
 
     //The lists of the client are sets or dictionaries, so the contract sorts them, ignoring case, for a stable hash on
-    //the client: the gits of each role, the packages, the files and the tools by name, the endpoints and the route
-    //classes by their key, the server infos by the server and the environment and their tools by name
+    //the client: the gits, the packages, the files and the tools by name, the endpoints and the route classes by their
+    //key, the server infos by the server and the environment and their tools by name
     [Fact]
     public void ToContractModel_SortsEveryListByNameIgnoringCase()
     {
-        Project project = TestData.NewProject("AppA", gitRepos: [_repoB, _seeder, _repoA],
-            scaffoldSeederGitRepos: [_seeder, _repoA], npmPackages: [_yup, _react]);
+        Project project = TestData.NewProject("AppA", gitRepos: [_repoB, _seeder, _repoA], npmPackages: [_yup, _react]);
         project.Update(project.Name, project.ProjectType, null, null, 1, 0, false, false, null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-            null, null, null, null, null, null, null, project.GitRepos, project.NpmPackages,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, project.GitRepos,
+            project.NpmPackages,
             [ProjectRedundantFile.Create("web.config"), ProjectRedundantFile.Create("*.PDB")],
             [ProjectAllowedTool.Create("SeedData"), ProjectAllowedTool.Create("CorrectNewDatabase")],
             [
@@ -244,7 +242,6 @@ public sealed class ProjectQueryHandlersTests
         StsProjectDataModel model = project.ToContractModel(Names());
 
         Assert.Equal(["repoA", "RepoB", "Seeder"], model.GitProjectNames);
-        Assert.Equal(["repoA", "Seeder"], model.ScaffoldSeederGitProjectNames);
         Assert.Equal(["react", "Yup"], model.FrontNpmPackageNames);
         Assert.Equal(["*.PDB", "web.config"], model.RedundantFileNames);
         Assert.Equal(["CorrectNewDatabase", "SeedData"], model.AllowToolsList);

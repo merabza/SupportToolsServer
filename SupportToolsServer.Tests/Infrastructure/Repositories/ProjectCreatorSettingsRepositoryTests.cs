@@ -72,15 +72,14 @@ public sealed class ProjectCreatorSettingsRepositoryTests : IAsyncLifetime
     [Fact]
     public async Task Get_ReadsTheSingletonWithEveryValueWithoutTrackingIt()
     {
-        await Store(ProjectCreatorSettings.Create(4, "FakeHost", @"D:\1WorkDotnet", @"D:\1WorkSecurity", _server.Id,
-            _prod.Id, _connection.Id, _backups.Id, _reduce.Id));
+        await Store(ProjectCreatorSettings.Create(4, @"D:\1WorkDotnet", @"D:\1WorkSecurity", _server.Id, _prod.Id,
+            _connection.Id, _backups.Id, _reduce.Id));
         await using SupportToolsServerDbContext context = _database.NewContext();
 
         ProjectCreatorSettings read = await Read(context);
 
         Assert.Equal(ProjectCreatorSettingsId.Singleton, read.Id);
         Assert.Equal(4, read.IndentSize);
-        Assert.Equal("FakeHost", read.FakeHostProjectName);
         Assert.Equal(@"D:\1WorkDotnet", read.ProjectsFolderPathReal);
         Assert.Equal(@"D:\1WorkSecurity", read.SecretsFolderPathReal);
         Assert.Equal(_server.Id, read.ProductionServerId);
@@ -108,7 +107,7 @@ public sealed class ProjectCreatorSettingsRepositoryTests : IAsyncLifetime
     public async Task Add_IsRefusedOnSave_WhenTheKeyIsNotTheFixedOne()
     {
         var other = new ProjectCreatorSettings(new ProjectCreatorSettingsId(Guid.NewGuid()), 4, null, null, null,
-            null, null, null, null, null, 1);
+            null, null, null, null, 1);
         await using SupportToolsServerDbContext context = _database.NewContext();
         new ProjectCreatorSettingsRepository(context).Add(other);
 
@@ -146,7 +145,7 @@ public sealed class ProjectCreatorSettingsRepositoryTests : IAsyncLifetime
         await using (SupportToolsServerDbContext context = _database.NewContext())
         {
             ProjectCreatorSettings read = await Read(context);
-            read.Update(2, "Host", @"D:\Projects", null, null, _prod.Id, null, _backups.Id, null);
+            read.Update(2, @"D:\Projects", null, null, _prod.Id, null, _backups.Id, null);
             new ProjectCreatorSettingsRepository(context).Update(read);
             await context.SaveChangesAsync();
         }
@@ -154,7 +153,6 @@ public sealed class ProjectCreatorSettingsRepositoryTests : IAsyncLifetime
         ProjectCreatorSettings stored = await Stored();
         Assert.Equal(ProjectCreatorSettingsId.Singleton, stored.Id);
         Assert.Equal(2, stored.IndentSize);
-        Assert.Equal("Host", stored.FakeHostProjectName);
         Assert.Equal(@"D:\Projects", stored.ProjectsFolderPathReal);
         Assert.Null(stored.SecretsFolderPathReal);
         Assert.Null(stored.ProductionServerId);
@@ -174,16 +172,16 @@ public sealed class ProjectCreatorSettingsRepositoryTests : IAsyncLifetime
         await using SupportToolsServerDbContext second = _database.NewContext();
         ProjectCreatorSettings readFirst = await Read(first);
         ProjectCreatorSettings readSecond = await Read(second);
-        readFirst.Update(2, "first", null, null, null, null, null, null, null);
+        readFirst.Update(2, "first", null, null, null, null, null, null);
         new ProjectCreatorSettingsRepository(first).Update(readFirst);
         await first.SaveChangesAsync();
-        readSecond.Update(8, "second", null, null, null, null, null, null, null);
+        readSecond.Update(8, "second", null, null, null, null, null, null);
         new ProjectCreatorSettingsRepository(second).Update(readSecond);
 
         await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => second.SaveChangesAsync());
 
         ProjectCreatorSettings stored = await Stored();
-        Assert.Equal("first", stored.FakeHostProjectName);
+        Assert.Equal("first", stored.ProjectsFolderPathReal);
         Assert.Equal(2, stored.Version);
     }
 

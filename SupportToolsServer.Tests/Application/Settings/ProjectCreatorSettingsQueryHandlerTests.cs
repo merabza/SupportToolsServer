@@ -63,7 +63,7 @@ public sealed class ProjectCreatorSettingsQueryHandlerTests
         Assert.True(result.IsSuccess);
         Assert.Equal(0, result.Value.Version);
         Assert.Equal(0, result.Value.IndentSize);
-        Assert.Null(result.Value.FakeHostProjectName);
+        Assert.Null(result.Value.ProjectsFolderPathReal);
         Assert.Null(result.Value.ProductionServerName);
         _servers.Verify(r => r.GetAll(It.IsAny<CancellationToken>()), Times.Never);
         _environments.Verify(r => r.GetAll(It.IsAny<CancellationToken>()), Times.Never);
@@ -127,7 +127,6 @@ public sealed class ProjectCreatorSettingsQueryHandlerTests
             new Dictionary<SmartSchemaId, string> { [_reduce.Id] = "Reduce" });
 
         Assert.Equal(4, model.IndentSize);
-        Assert.Equal("FakeHost", model.FakeHostProjectName);
         Assert.Equal(@"D:\1WorkDotnet", model.ProjectsFolderPathReal);
         Assert.Equal(@"D:\1WorkSecurity", model.SecretsFolderPathReal);
         Assert.Equal("dl360", model.ProductionServerName);

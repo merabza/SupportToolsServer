@@ -87,7 +87,6 @@ public sealed class UpdateProjectCreatorSettingsCommandHandlerTests
         Assert.NotNull(added);
         Assert.Equal(ProjectCreatorSettingsId.Singleton, added.Id);
         Assert.Equal(4, added.IndentSize);
-        Assert.Equal("FakeHost", added.FakeHostProjectName);
         Assert.Equal(@"D:\1WorkDotnet", added.ProjectsFolderPathReal);
         Assert.Equal(@"D:\1WorkSecurity", added.SecretsFolderPathReal);
         Assert.Equal(_server.Id, added.ProductionServerId);

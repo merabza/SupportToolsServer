@@ -82,17 +82,16 @@ public sealed class
         ProjectCreatorSettings projectCreatorSettings;
         if (stored is null)
         {
-            projectCreatorSettings = ProjectCreatorSettings.Create(model.IndentSize, model.FakeHostProjectName,
-                model.ProjectsFolderPathReal, model.SecretsFolderPathReal, productionServer?.Id,
-                productionEnvironment?.Id, developerDbConnection?.Id, databaseExchangeFileStorage?.Id,
-                useSmartSchema?.Id);
+            projectCreatorSettings = ProjectCreatorSettings.Create(model.IndentSize, model.ProjectsFolderPathReal,
+                model.SecretsFolderPathReal, productionServer?.Id, productionEnvironment?.Id,
+                developerDbConnection?.Id, databaseExchangeFileStorage?.Id, useSmartSchema?.Id);
             _projectCreatorSettingsRepository.Add(projectCreatorSettings);
         }
         else
         {
-            stored.Update(model.IndentSize, model.FakeHostProjectName, model.ProjectsFolderPathReal,
-                model.SecretsFolderPathReal, productionServer?.Id, productionEnvironment?.Id,
-                developerDbConnection?.Id, databaseExchangeFileStorage?.Id, useSmartSchema?.Id);
+            stored.Update(model.IndentSize, model.ProjectsFolderPathReal, model.SecretsFolderPathReal,
+                productionServer?.Id, productionEnvironment?.Id, developerDbConnection?.Id,
+                databaseExchangeFileStorage?.Id, useSmartSchema?.Id);
             _projectCreatorSettingsRepository.Update(stored);
             projectCreatorSettings = stored;
         }

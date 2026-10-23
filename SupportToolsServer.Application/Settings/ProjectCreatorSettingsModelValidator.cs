@@ -19,10 +19,6 @@ public sealed class ProjectCreatorSettingsModelValidator : AbstractValidator<Sts
 {
     public ProjectCreatorSettingsModelValidator()
     {
-        RuleFor(x => x.FakeHostProjectName).OptionalWithMaxLength(
-            _ => nameof(StsProjectCreatorSettingsDataModel.FakeHostProjectName),
-            ProjectCreatorSettings.FakeHostProjectNameMaxLength);
-
         RuleFor(x => x.ProjectsFolderPathReal).OptionalWithMaxLength(
             _ => nameof(StsProjectCreatorSettingsDataModel.ProjectsFolderPathReal),
             ProjectCreatorSettings.ProjectsFolderPathRealMaxLength);

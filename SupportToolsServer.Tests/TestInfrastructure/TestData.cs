@@ -41,24 +41,19 @@ internal static class TestData
     //one route class. The children come with the update that gives the stored version, as the constructor takes none
     public static Project NewProject(string name, EditorConfigFileType? editorConfigFileType = null,
         DatabaseParameters? devDatabaseParameters = null, DatabaseParameters? prodCopyDatabaseParameters = null,
-        IEnumerable<GitRepo>? gitRepos = null, IEnumerable<GitRepo>? scaffoldSeederGitRepos = null,
-        IEnumerable<NpmPackage>? npmPackages = null, IEnumerable<ServerInfo>? serverInfos = null,
-        int version = EntityVersion.Initial)
+        IEnumerable<GitRepo>? gitRepos = null, IEnumerable<NpmPackage>? npmPackages = null,
+        IEnumerable<ServerInfo>? serverInfos = null, int version = EntityVersion.Initial)
     {
         var project = new Project(ProjectId.CreateUnique(), name, "Standard", null, null, 1, 0, false, false, null, null,
-            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null, null, version - 1);
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+            version - 1);
         project.Update(name, "IsService", "Apps", "Application", 2, 1, false, true, editorConfigFileType?.Id, name,
-            $"{name}ApiContracts", null, $"{name}DbContext", "ap", $"{name}ScaffoldSeeder", $"{name}Db", null,
-            "yyyyMMddHHmmss", ".zip", "yyyyMMdd", ".json", $@"D:\1WorkDotnet\{name}",
-            $@"D:\1WorkDotnet\{name}\{name}.slnx", $@"D:\1WorkSecurity\{name}", null,
-            $@"D:\1WorkDotnet\{name}\{name}Db\{name}Db.csproj", null, null, null, null, null, null, null, null, null,
-            null, MadeUpKeyGuidPart, devDatabaseParameters, prodCopyDatabaseParameters,
-            [
-                .. (gitRepos ?? []).Select(x => ProjectGitRepo.Create(x.Id, EProjectGitRepoKind.Main)),
-                .. (scaffoldSeederGitRepos ?? []).Select(x =>
-                    ProjectGitRepo.Create(x.Id, EProjectGitRepoKind.ScaffoldSeed))
-            ], (npmPackages ?? []).Select(x => ProjectNpmPackage.Create(x.Id)), [ProjectRedundantFile.Create("*.pdb")],
+            $"{name}ApiContracts", null, $"{name}DbContext", "yyyyMMddHHmmss", ".zip", "yyyyMMdd", ".json",
+            $@"D:\1WorkDotnet\{name}", $@"D:\1WorkDotnet\{name}\{name}.slnx", $@"D:\1WorkSecurity\{name}", null,
+            $@"D:\1WorkDotnet\{name}\{name}Db\{name}Db.csproj", null, null, null, null, MadeUpKeyGuidPart,
+            devDatabaseParameters, prodCopyDatabaseParameters,
+            (gitRepos ?? []).Select(x => ProjectGitRepo.Create(x.Id)),
+            (npmPackages ?? []).Select(x => ProjectNpmPackage.Create(x.Id)), [ProjectRedundantFile.Create("*.pdb")],
             [ProjectAllowedTool.Create("SeedData")],
             [ProjectEndpoint.Create("Upload", "Upload", "/upload", true, "Post", "Command", null, false)],
             [ProjectRouteClass.Create("Main", "api", "v1", "/main")], serverInfos ?? []);
@@ -108,8 +103,7 @@ internal static class TestData
     public static StsProjectDataModel ProjectModel(string name, string? editorConfigPatternName = null,
         StsDatabaseParametersDataModel? devDatabaseParameters = null,
         StsDatabaseParametersDataModel? prodCopyDatabaseParameters = null, List<string>? gitProjectNames = null,
-        List<string>? scaffoldSeederGitProjectNames = null, List<string>? frontNpmPackageNames = null,
-        List<StsServerInfoDataModel>? serverInfos = null, int version = 0)
+        List<string>? frontNpmPackageNames = null, List<StsServerInfoDataModel>? serverInfos = null, int version = 0)
     {
         return new StsProjectDataModel
         {
@@ -124,9 +118,6 @@ internal static class TestData
             MainProjectName = name,
             ApiContractsProjectName = $"{name}ApiContracts",
             DbContextName = $"{name}DbContext",
-            ProjectShortPrefix = "ap",
-            ScaffoldSeederProjectName = $"{name}ScaffoldSeeder",
-            DbContextProjectName = $"{name}Db",
             ProgramArchiveDateMask = "yyyyMMddHHmmss",
             ProgramArchiveExtension = ".zip",
             ParametersFileDateMask = "yyyyMMdd",
@@ -139,7 +130,6 @@ internal static class TestData
             DevDatabaseParameters = devDatabaseParameters,
             ProdCopyDatabaseParameters = prodCopyDatabaseParameters,
             GitProjectNames = gitProjectNames ?? [],
-            ScaffoldSeederGitProjectNames = scaffoldSeederGitProjectNames ?? [],
             FrontNpmPackageNames = frontNpmPackageNames ?? [],
             RedundantFileNames = ["*.pdb"],
             AllowToolsList = ["SeedData"],
@@ -237,9 +227,9 @@ internal static class TestData
         FileStorage? databaseExchangeFileStorage = null, SmartSchema? useSmartSchema = null,
         int version = EntityVersion.Initial)
     {
-        return new ProjectCreatorSettings(ProjectCreatorSettingsId.Singleton, 4, "FakeHost", @"D:\1WorkDotnet",
-            @"D:\1WorkSecurity", productionServer?.Id, productionEnvironment?.Id, developerDbConnection?.Id,
-            databaseExchangeFileStorage?.Id, useSmartSchema?.Id, version);
+        return new ProjectCreatorSettings(ProjectCreatorSettingsId.Singleton, 4, @"D:\1WorkDotnet", @"D:\1WorkSecurity",
+            productionServer?.Id, productionEnvironment?.Id, developerDbConnection?.Id, databaseExchangeFileStorage?.Id,
+            useSmartSchema?.Id, version);
     }
 
     //version is the expected version of an upsert: 0 creates the singleton
@@ -250,7 +240,6 @@ internal static class TestData
         return new StsProjectCreatorSettingsDataModel
         {
             IndentSize = 4,
-            FakeHostProjectName = "FakeHost",
             ProjectsFolderPathReal = @"D:\1WorkDotnet",
             SecretsFolderPathReal = @"D:\1WorkSecurity",
             ProductionServerName = productionServerName,

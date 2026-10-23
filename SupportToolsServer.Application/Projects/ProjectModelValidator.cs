@@ -41,14 +41,6 @@ public sealed class ProjectModelValidator : AbstractValidator<StsProjectDataMode
             Project.CodeNameMaxLength);
         OptionalText(x => x.SpaProjectName, nameof(StsProjectDataModel.SpaProjectName), Project.CodeNameMaxLength);
         OptionalText(x => x.DbContextName, nameof(StsProjectDataModel.DbContextName), Project.CodeNameMaxLength);
-        OptionalText(x => x.ProjectShortPrefix, nameof(StsProjectDataModel.ProjectShortPrefix),
-            Project.CodeNameMaxLength);
-        OptionalText(x => x.ScaffoldSeederProjectName, nameof(StsProjectDataModel.ScaffoldSeederProjectName),
-            Project.CodeNameMaxLength);
-        OptionalText(x => x.DbContextProjectName, nameof(StsProjectDataModel.DbContextProjectName),
-            Project.CodeNameMaxLength);
-        OptionalText(x => x.NewDataSeedingClassLibProjectName,
-            nameof(StsProjectDataModel.NewDataSeedingClassLibProjectName), Project.CodeNameMaxLength);
 
         OptionalText(x => x.ProgramArchiveDateMask, nameof(StsProjectDataModel.ProgramArchiveDateMask),
             Project.MaskMaxLength);
@@ -71,20 +63,8 @@ public sealed class ProjectModelValidator : AbstractValidator<StsProjectDataMode
             nameof(StsProjectDataModel.DataSeederRulesByTableStartupProjectFilePath), Project.PathMaxLength);
         OptionalText(x => x.OldDataConvertorForDataSeeder, nameof(StsProjectDataModel.OldDataConvertorForDataSeeder),
             Project.PathMaxLength);
-        OptionalText(x => x.SeedProjectFilePath, nameof(StsProjectDataModel.SeedProjectFilePath),
-            Project.PathMaxLength);
-        OptionalText(x => x.SeedProjectParametersFilePath, nameof(StsProjectDataModel.SeedProjectParametersFilePath),
-            Project.PathMaxLength);
-        OptionalText(x => x.ExcludesRulesParametersFilePath,
-            nameof(StsProjectDataModel.ExcludesRulesParametersFilePath), Project.PathMaxLength);
         OptionalText(x => x.AppSetEnKeysJsonFileName, nameof(StsProjectDataModel.AppSetEnKeysJsonFileName),
             Project.PathMaxLength);
-        OptionalText(x => x.MigrationSqlFilesFolder, nameof(StsProjectDataModel.MigrationSqlFilesFolder),
-            Project.PathMaxLength);
-        OptionalText(x => x.PrepareProdCopyDatabaseProjectFilePath,
-            nameof(StsProjectDataModel.PrepareProdCopyDatabaseProjectFilePath), Project.PathMaxLength);
-        OptionalText(x => x.PrepareProdCopyDatabaseProjectParametersFilePath,
-            nameof(StsProjectDataModel.PrepareProdCopyDatabaseProjectParametersFilePath), Project.PathMaxLength);
         OptionalText(x => x.PairedDbObjectsResultFileName, nameof(StsProjectDataModel.PairedDbObjectsResultFileName),
             Project.PathMaxLength);
 
@@ -97,8 +77,6 @@ public sealed class ProjectModelValidator : AbstractValidator<StsProjectDataMode
             new DatabaseParametersModelValidator(nameof(StsProjectDataModel.ProdCopyDatabaseParameters)));
 
         NameList(x => x.GitProjectNames, nameof(StsProjectDataModel.GitProjectNames), GitRepo.NameMaxLength);
-        NameList(x => x.ScaffoldSeederGitProjectNames, nameof(StsProjectDataModel.ScaffoldSeederGitProjectNames),
-            GitRepo.NameMaxLength);
         NameList(x => x.FrontNpmPackageNames, nameof(StsProjectDataModel.FrontNpmPackageNames),
             NpmPackage.NameMaxLength);
         NameList(x => x.RedundantFileNames, nameof(StsProjectDataModel.RedundantFileNames),

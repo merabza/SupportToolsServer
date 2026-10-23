@@ -117,7 +117,7 @@ SupportTools რამდენიმე კომპიუტერზე მ�
 | 1WorkSecurity-ის ფაილები, რომლებზეც რეესტრი მიუთითებს | დიახ, ღიად | B8, C6 | `ServerInfo.AppSettingsJsonSourceFileName` და სხვა |
 | `GitProjects` | არა (გამოთვლადია) | B9 | არ სინქრონიზდება. სერვერი მათ თავისი კლონებიდან ითვლის (`GET git/gitprojects`), კლიენტი კი „Update Git Projects From SupportToolsServer“-ით ჩამოტვირთავს |
 | `Archivers` | არა | — | კომპიუტერის exe გზებია; runtime-ში არავინ კითხულობს |
-| კომპიუტერის ველები | არა | C1 | `SupportToolsServerWebApiClientName`, `LogFolder`, `LogGitWork`, `GitExecutablePath`, `WorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `TempFolder`, `CodeGenerateTestFolder`, `SecurityFolder`, `ScaffoldSeedersWorkFolder`, `PublisherWorkFolder`, `LocalInstallerSettings`, `RecentCommands*`. ახალი ველები: `MachineName`, `CurrentMachineServerName`, `PathMappings`, `RegistrySyncState` და ავტოსინქრონიზაციის ალამი |
+| კომპიუტერის ველები | არა | C1 | `SupportToolsServerWebApiClientName`, `LogFolder`, `LogGitWork`, `GitExecutablePath`, `WorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `TempFolder`, `CodeGenerateTestFolder`, `SecurityFolder`, `PublisherWorkFolder`, `LocalInstallerSettings`, `RecentCommands*`. ახალი ველები: `MachineName`, `CurrentMachineServerName`, `PathMappings`, `RegistrySyncState` და ავტოსინქრონიზაციის ალამი |
 
 ### 4.2 სერვერის აგრეგატები
 
@@ -166,7 +166,7 @@ FK-ების წესი: მითითება სხვა აგრე
   - Push: პირიქით.
   - Windows კომპიუტერზე, რომელსაც იგივე განლაგება აქვს, mapping არ სჭირდება და არაფერი იცვლება.
 - **რომელი ველია გზა:**
-  - `ProjectModel`: `ProjectFolderName`, `SolutionFileName`, `ProjectSecurityFolderPath`, `MigrationStartupProjectFilePath`, `MigrationProjectFilePath`, `SeedProjectFilePath`, `SeedProjectParametersFilePath`, `DataSeederRulesByTableStartupProjectFilePath`, `OldDataConvertorForDataSeeder`, `ExcludesRulesParametersFilePath`, `AppSetEnKeysJsonFileName`, `MigrationSqlFilesFolder`, `PrepareProdCopyDatabaseProjectFilePath`, `PrepareProdCopyDatabaseProjectParametersFilePath`, `PairedDbObjectsResultFileName`.
+  - `ProjectModel`: `ProjectFolderName`, `SolutionFileName`, `ProjectSecurityFolderPath`, `MigrationStartupProjectFilePath`, `MigrationProjectFilePath`, `DataSeederRulesByTableStartupProjectFilePath`, `OldDataConvertorForDataSeeder`, `AppSetEnKeysJsonFileName`, `PairedDbObjectsResultFileName`. ScaffoldSeeder-ის მექანიზმის გზები (`SeedProjectFilePath`, `SeedProjectParametersFilePath`, `ExcludesRulesParametersFilePath`, `MigrationSqlFilesFolder`, `PrepareProdCopyDatabaseProjectFilePath`, `PrepareProdCopyDatabaseProjectParametersFilePath`) 2026-10-22-ს წაიშალა კლიენტიდან, კონტრაქტიდან და სერვერიდან.
   - `ServerInfoModel`: `AppSettingsJsonSourceFileName`, `AppSettingsEncodedJsonFileName`.
   - `AppProjectCreatorAllParameters`: `ProjectsFolderPathReal`, `SecretsFolderPathReal`.
   - `FileStorageData.FileStoragePath`, თუ ლოკალური გზაა და არა URL.
@@ -362,7 +362,7 @@ flowchart LR
 5. `GitProjectsUpdater.cs:261`: `GitProjects`-ის გასაღები csproj-ის სახელია გლობალურად, ამიტომ ორ რეპოში ერთნაირი სახელი ერთმანეთს გადაეწერება. B9: სერვერი ორივე პროექტს ინახავს, კლიენტის ოფცია კი ლოკალური სკანირების წესით ირჩევს და გაფრთხილებას ბეჭდავს (მომხმარებლის არჩევანი). 2026-10-07-ს ასეთი სახელი ერთია: `SystemTools.DependencyInjection` (CrawlerConsole და SystemTools).
 6. `LoadGitsFromCloneFileCommand` (107-117) git-ებს `GitIgnorePatternName`-ის გარეშე ქმნის; `Gits.Add` და `Single()` exception-ს ისვრის.
 7. `CloneInfoFileCliMenuCommand.GetDefCloneFileName` ცარიელი `GitProjects`-ისას exception-ს ისვრის (20, 26).
-8. Export/Import: scaffold seeder-ის git-ები არ ექსპორტდება; Import არსებულ git-ებს არ გადაწერს, დოკუმენტაცია კი სხვას ამბობს.
+8. Export/Import: scaffold seeder-ის git-ები არ ექსპორტდება; Import არსებულ git-ებს არ გადაწერს, დოკუმენტაცია კი სხვას ამბობს. → scaffold seeder-ის git-ები 2026-10-22-ს ScaffoldSeeder-ის მექანიზმთან ერთად წაიშალა.
 9. `UpdateGitIgnoreFilesToolAction.cs:46` არაკლონირებულ რეპოზე `DirectoryNotFoundException`-ით ჩავარდება.
 10. `EProjectTools.AnaliseDevDatabase` / `AnaliseProdCopyDatabase` სტრატეგია არ აქვს.
 11. `EditParametersInSequenceCliMenuCommand` ყოველთვის ჩავარდება (`ParentMenuName` არასოდეს ივსება).

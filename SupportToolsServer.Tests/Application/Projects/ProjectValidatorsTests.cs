@@ -26,7 +26,7 @@ public sealed class ProjectValidatorsTests
     private static StsProjectDataModel ModelWithReferences()
     {
         return TestData.ProjectModel("AppA", "default", TestData.DatabaseParametersModel("Pc1.Sql", "Reduce", "Backups"),
-            TestData.DatabaseParametersModel("Pc1.Sql"), ["RepoA", "RepoB"], ["RepoA"], ["react", "@reduxjs/toolkit"]);
+            TestData.DatabaseParametersModel("Pc1.Sql"), ["RepoA", "RepoB"], ["react", "@reduxjs/toolkit"]);
     }
 
     [Fact]
@@ -121,10 +121,6 @@ public sealed class ProjectValidatorsTests
     [InlineData(nameof(StsProjectDataModel.ApiContractsProjectName), 100)]
     [InlineData(nameof(StsProjectDataModel.SpaProjectName), 100)]
     [InlineData(nameof(StsProjectDataModel.DbContextName), 100)]
-    [InlineData(nameof(StsProjectDataModel.ProjectShortPrefix), 100)]
-    [InlineData(nameof(StsProjectDataModel.ScaffoldSeederProjectName), 100)]
-    [InlineData(nameof(StsProjectDataModel.DbContextProjectName), 100)]
-    [InlineData(nameof(StsProjectDataModel.NewDataSeedingClassLibProjectName), 100)]
     [InlineData(nameof(StsProjectDataModel.ProgramArchiveDateMask), 50)]
     [InlineData(nameof(StsProjectDataModel.ProgramArchiveExtension), 50)]
     [InlineData(nameof(StsProjectDataModel.ParametersFileDateMask), 50)]
@@ -136,13 +132,7 @@ public sealed class ProjectValidatorsTests
     [InlineData(nameof(StsProjectDataModel.MigrationProjectFilePath), 260)]
     [InlineData(nameof(StsProjectDataModel.DataSeederRulesByTableStartupProjectFilePath), 260)]
     [InlineData(nameof(StsProjectDataModel.OldDataConvertorForDataSeeder), 260)]
-    [InlineData(nameof(StsProjectDataModel.SeedProjectFilePath), 260)]
-    [InlineData(nameof(StsProjectDataModel.SeedProjectParametersFilePath), 260)]
-    [InlineData(nameof(StsProjectDataModel.ExcludesRulesParametersFilePath), 260)]
     [InlineData(nameof(StsProjectDataModel.AppSetEnKeysJsonFileName), 260)]
-    [InlineData(nameof(StsProjectDataModel.MigrationSqlFilesFolder), 260)]
-    [InlineData(nameof(StsProjectDataModel.PrepareProdCopyDatabaseProjectFilePath), 260)]
-    [InlineData(nameof(StsProjectDataModel.PrepareProdCopyDatabaseProjectParametersFilePath), 260)]
     [InlineData(nameof(StsProjectDataModel.PairedDbObjectsResultFileName), 260)]
     [InlineData(nameof(StsProjectDataModel.KeyGuidPart), 256)]
     public void ModelValidator_RejectsALongerValueNamingTheProject(string propertyName, int maxLength)
@@ -213,7 +203,6 @@ public sealed class ProjectValidatorsTests
     //JSON can still send null for a list; the client sends its missing lists as empty ones
     [Theory]
     [InlineData(nameof(StsProjectDataModel.GitProjectNames))]
-    [InlineData(nameof(StsProjectDataModel.ScaffoldSeederGitProjectNames))]
     [InlineData(nameof(StsProjectDataModel.FrontNpmPackageNames))]
     [InlineData(nameof(StsProjectDataModel.RedundantFileNames))]
     [InlineData(nameof(StsProjectDataModel.AllowToolsList))]
@@ -230,7 +219,6 @@ public sealed class ProjectValidatorsTests
 
     [Theory]
     [InlineData(nameof(StsProjectDataModel.GitProjectNames), null)]
-    [InlineData(nameof(StsProjectDataModel.ScaffoldSeederGitProjectNames), "")]
     [InlineData(nameof(StsProjectDataModel.FrontNpmPackageNames), " ")]
     [InlineData(nameof(StsProjectDataModel.RedundantFileNames), "")]
     [InlineData(nameof(StsProjectDataModel.AllowToolsList), null)]
@@ -244,7 +232,6 @@ public sealed class ProjectValidatorsTests
 
     [Theory]
     [InlineData(nameof(StsProjectDataModel.GitProjectNames), 50)]
-    [InlineData(nameof(StsProjectDataModel.ScaffoldSeederGitProjectNames), 50)]
     [InlineData(nameof(StsProjectDataModel.FrontNpmPackageNames), 214)]
     [InlineData(nameof(StsProjectDataModel.RedundantFileNames), 260)]
     [InlineData(nameof(StsProjectDataModel.AllowToolsList), 50)]
@@ -258,10 +245,9 @@ public sealed class ProjectValidatorsTests
             $"AppA.{propertyName} Is Longer Than {maxLength} Characters");
     }
 
-    //A list is a set: a name may be in it once, and the names match without case. One git may be in both git lists
+    //A list is a set: a name may be in it once, and the names match without case
     [Theory]
     [InlineData(nameof(StsProjectDataModel.GitProjectNames))]
-    [InlineData(nameof(StsProjectDataModel.ScaffoldSeederGitProjectNames))]
     [InlineData(nameof(StsProjectDataModel.FrontNpmPackageNames))]
     [InlineData(nameof(StsProjectDataModel.RedundantFileNames))]
     [InlineData(nameof(StsProjectDataModel.AllowToolsList))]
@@ -272,15 +258,6 @@ public sealed class ProjectValidatorsTests
             new List<string> { "Same", "Other", "SAME" });
 
         AssertSingleError(Validate(model), "ValuesNotUnique", $"AppA.{propertyName} Values Are Not Unique");
-    }
-
-    [Fact]
-    public void ModelValidator_AcceptsTheSameGitInBothGitLists()
-    {
-        StsProjectDataModel model = ModelWithReferences();
-        model.ScaffoldSeederGitProjectNames = ["repoa", "RepoB"];
-
-        Assert.True(Validate(model).IsValid);
     }
 
     [Fact]

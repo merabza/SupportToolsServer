@@ -58,14 +58,13 @@ public sealed class DeleteGitRepoCommandHandlerTests
         _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    //The projects that use the git, as a project git or as a scaffold seeder git, in name order and each once
+    //The projects that use the git, in name order
     [Fact]
     public async Task Handle_ReturnsRecordIsInUseWithTheProjects_WhenProjectsUseTheGit()
     {
         _gitRepos.Setup(r => r.GetByName("RepoA", It.IsAny<CancellationToken>())).ReturnsAsync(_stored);
-        _projectList.AddRange(TestData.NewProject("Zeta", scaffoldSeederGitRepos: [_stored]),
-            TestData.NewProject("AppB", gitRepos: [_stored], scaffoldSeederGitRepos: [_stored]),
-            TestData.NewProject("AppC"));
+        _projectList.AddRange(TestData.NewProject("Zeta", gitRepos: [_stored]),
+            TestData.NewProject("AppB", gitRepos: [_stored]), TestData.NewProject("AppC"));
 
         Result result = await Handle("RepoA");
 

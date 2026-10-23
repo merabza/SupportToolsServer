@@ -66,7 +66,7 @@ public sealed class ProjectHandlersOnSqliteTests : IAsyncLifetime
     private static StsProjectDataModel ModelWithReferences(int version)
     {
         return TestData.ProjectModel("AppA", "default", TestData.DatabaseParametersModel("Pc1.Sql", "Reduce"),
-            TestData.DatabaseParametersModel("Pc1.Sql", null, "Backups", "AppAProdCopy"), ["RepoA"], ["RepoB"],
+            TestData.DatabaseParametersModel("Pc1.Sql", null, "Backups", "AppAProdCopy"), ["RepoA", "RepoB"],
             ["@reduxjs/toolkit", "react"],
             [
                 TestData.ServerInfoModel("PAZISI", "Prod", "PAZISI.WebAgent",
@@ -169,7 +169,7 @@ public sealed class ProjectHandlersOnSqliteTests : IAsyncLifetime
     {
         await Upsert(ModelWithReferences(0));
         StsProjectDataModel changed = TestData.ProjectModel("APPA", "strict", null,
-            TestData.DatabaseParametersModel(null, "Reduce"), ["RepoB"], ["RepoB"], [], version: 1);
+            TestData.DatabaseParametersModel(null, "Reduce"), ["RepoB"], [], version: 1);
         changed.RedundantFileNames = ["*.pdb", "*.xml"];
         changed.AllowToolsList = [];
         changed.Endpoints[0].EndpointRoute = "/upload/v2";
@@ -185,7 +185,6 @@ public sealed class ProjectHandlersOnSqliteTests : IAsyncLifetime
         Assert.Null(read.ProdCopyDatabaseParameters!.DbConnectionName);
         Assert.Equal("Reduce", read.ProdCopyDatabaseParameters.SmartSchemaName);
         Assert.Equal(["RepoB"], read.GitProjectNames);
-        Assert.Equal(["RepoB"], read.ScaffoldSeederGitProjectNames);
         Assert.Empty(read.FrontNpmPackageNames);
         Assert.Equal(["*.pdb", "*.xml"], read.RedundantFileNames);
         Assert.Empty(read.AllowToolsList);
@@ -193,7 +192,7 @@ public sealed class ProjectHandlersOnSqliteTests : IAsyncLifetime
         Assert.Equal("Git", Assert.Single(read.RouteClasses).Name);
         Assert.Empty(read.ServerInfos);
         Assert.Equal(2, read.Version);
-        Assert.Equal(2 + 2 + 1 + 1, await StoredChildRowCount());
+        Assert.Equal(1 + 2 + 1 + 1, await StoredChildRowCount());
     }
 
     //Server infos are added, removed and changed with the aggregate. The pair of PAZISI and Prod is kept, so the save
@@ -269,7 +268,7 @@ public sealed class ProjectHandlersOnSqliteTests : IAsyncLifetime
     public async Task Upsert_ReturnsEveryMissingReferenceInOneError_AndWritesNothing()
     {
         StsProjectDataModel model = TestData.ProjectModel("AppA", "none",
-            TestData.DatabaseParametersModel("Pc2.Sql", "Daily", "Exchange"), null, ["RepoA", "RepoZ"], [],
+            TestData.DatabaseParametersModel("Pc2.Sql", "Daily", "Exchange"), null, ["RepoA", "RepoZ"],
             ["left-pad"],
             [
                 TestData.ServerInfoModel("srv9", "Prod", "srv9.WebAgent"),
@@ -386,7 +385,7 @@ public sealed class ProjectHandlersOnSqliteTests : IAsyncLifetime
     public async Task DeleteOfAReferencedRecord_ReturnsRecordIsInUse_UntilNoProjectUsesIt()
     {
         await Upsert(ModelWithReferences(0));
-        await Upsert(TestData.ProjectModel("AppB", "default", null, null, ["RepoA"], [], ["react"],
+        await Upsert(TestData.ProjectModel("AppB", "default", null, null, ["RepoA"], ["react"],
             [TestData.ServerInfoModel("PAZISI", "Test", null, null, TestData.DatabaseParametersModel("Pc1.Sql"))]));
 
         List<Result> refused = await DeleteEveryReferencedRecord();

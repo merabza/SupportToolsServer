@@ -38,7 +38,6 @@ public sealed class ProjectCreatorSettingsValidatorsTests
         StsProjectCreatorSettingsDataModel model =
             TestData.ProjectCreatorSettingsModel(value, value, value, value, value);
         model.IndentSize = -1;
-        model.FakeHostProjectName = value;
         model.ProjectsFolderPathReal = value;
         model.SecretsFolderPathReal = value;
 
@@ -50,7 +49,6 @@ public sealed class ProjectCreatorSettingsValidatorsTests
     {
         StsProjectCreatorSettingsDataModel model = TestData.ProjectCreatorSettingsModel(new string('s', 100),
             new string('e', 50), new string('c', 100), new string('f', 100), new string('m', 100));
-        model.FakeHostProjectName = new string('h', 100);
         model.ProjectsFolderPathReal = new string('p', 260);
         model.SecretsFolderPathReal = new string('x', 260);
 
@@ -58,7 +56,6 @@ public sealed class ProjectCreatorSettingsValidatorsTests
     }
 
     [Theory]
-    [InlineData(nameof(StsProjectCreatorSettingsDataModel.FakeHostProjectName), 100)]
     [InlineData(nameof(StsProjectCreatorSettingsDataModel.ProjectsFolderPathReal), 260)]
     [InlineData(nameof(StsProjectCreatorSettingsDataModel.SecretsFolderPathReal), 260)]
     [InlineData(nameof(StsProjectCreatorSettingsDataModel.ProductionServerName), 100)]

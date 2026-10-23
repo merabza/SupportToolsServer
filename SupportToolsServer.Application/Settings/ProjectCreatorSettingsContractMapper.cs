@@ -28,7 +28,6 @@ internal static class ProjectCreatorSettingsContractMapper
         return new StsProjectCreatorSettingsDataModel
         {
             IndentSize = projectCreatorSettings.IndentSize,
-            FakeHostProjectName = projectCreatorSettings.FakeHostProjectName,
             ProjectsFolderPathReal = projectCreatorSettings.ProjectsFolderPathReal,
             SecretsFolderPathReal = projectCreatorSettings.SecretsFolderPathReal,
             ProductionServerName = serverNames.GetName(projectCreatorSettings.ProductionServerId),
