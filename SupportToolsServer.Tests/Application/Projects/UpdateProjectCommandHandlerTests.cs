@@ -174,6 +174,7 @@ public sealed class UpdateProjectCommandHandlerTests
                     AppSettingsJsonSourceFileName = "AppSettingsSource",
                     AppSettingsEncodedJsonFileName = "AppSettingsEncoded",
                     ServiceUserName = "ServiceUser",
+                    OpenPort = true,
                     AllowToolsList = ["ProgramUpdater", "ServiceStarter"],
                     CurrentDatabaseParameters =
                         TestData.DatabaseParametersModel("Pc1.Sql", "Reduce", "Backups", "CurrentDb"),
@@ -254,9 +255,9 @@ public sealed class UpdateProjectCommandHandlerTests
         ServerInfo serverInfo = Assert.Single(added.ServerInfos);
         Assert.Equal((_pazisi.Id, _prod.Id, _webAgent.Id),
             (serverInfo.ServerId, serverInfo.EnvironmentId, serverInfo.WebAgentForCheckId));
-        Assert.Equal((5022, "ApiVersionId", "AppSettingsSource", "AppSettingsEncoded", "ServiceUser"),
+        Assert.Equal((5022, "ApiVersionId", "AppSettingsSource", "AppSettingsEncoded", "ServiceUser", true),
             (serverInfo.ServerSidePort, serverInfo.ApiVersionId, serverInfo.AppSettingsJsonSourceFileName,
-                serverInfo.AppSettingsEncodedJsonFileName, serverInfo.ServiceUserName));
+                serverInfo.AppSettingsEncodedJsonFileName, serverInfo.ServiceUserName, serverInfo.OpenPort));
         Assert.Equal(["ProgramUpdater", "ServiceStarter"], serverInfo.AllowedTools.Select(x => x.ToolName));
         DatabaseParameters current = Assert.IsType<DatabaseParameters>(serverInfo.CurrentDatabaseParameters);
         Assert.Equal((_connection.Id, _smartSchema.Id, _fileStorage.Id, "CurrentDb"),

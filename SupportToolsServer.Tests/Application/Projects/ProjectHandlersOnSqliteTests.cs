@@ -206,6 +206,7 @@ public sealed class ProjectHandlersOnSqliteTests : IAsyncLifetime
         StsServerInfoDataModel kept = TestData.ServerInfoModel("pazisi", "PROD", null, null,
             TestData.DatabaseParametersModel("Pc1.Sql", null, null, "AppANew"), 5050);
         kept.AllowToolsList = ["ServiceStopper", "ServiceStarter"];
+        kept.OpenPort = false;
         changed.ServerInfos = [kept, TestData.ServerInfoModel("bee", "Prod", "PAZISI.WebAgent")];
 
         Result<int> updated = await Upsert(changed);
@@ -216,6 +217,8 @@ public sealed class ProjectHandlersOnSqliteTests : IAsyncLifetime
         StsServerInfoDataModel pazisi = read.ServerInfos[1];
         Assert.Null(pazisi.WebAgentNameForCheck);
         Assert.Equal(5050, pazisi.ServerSidePort);
+        Assert.False(pazisi.OpenPort);
+        Assert.True(read.ServerInfos[0].OpenPort);
         Assert.Equal(["ServiceStarter", "ServiceStopper"], pazisi.AllowToolsList);
         Assert.Null(pazisi.CurrentDatabaseParameters);
         Assert.Equal("Pc1.Sql", pazisi.NewDatabaseParameters!.DbConnectionName);

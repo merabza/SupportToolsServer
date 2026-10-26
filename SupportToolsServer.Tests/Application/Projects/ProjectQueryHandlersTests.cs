@@ -229,14 +229,14 @@ public sealed class ProjectQueryHandlersTests
                 ProjectEndpoint.Create("Get", null, null, false, "Get", "Query", null, false)
             ], [ProjectRouteClass.Create("main", null, null, null), ProjectRouteClass.Create("Git", null, null, null)],
             [
-                ServerInfo.Create(_pazisi.Id, _test.Id, null, 0, null, null, null, null, null, null,
+                ServerInfo.Create(_pazisi.Id, _test.Id, null, 0, null, null, null, null, false, null, null,
                     [
                         ServerInfoAllowedTool.Create("VersionChecker"), ServerInfoAllowedTool.Create("programUpdater"),
                         ServerInfoAllowedTool.Create("AppSettingsEncoder")
                     ]),
-                ServerInfo.Create(_dl360.Id, _prod.Id, null, 0, null, null, null, null, null, null, []),
-                ServerInfo.Create(_pazisi.Id, _prod.Id, null, 0, null, null, null, null, null, null, []),
-                ServerInfo.Create(_bee.Id, _test.Id, null, 0, null, null, null, null, null, null, [])
+                ServerInfo.Create(_dl360.Id, _prod.Id, null, 0, null, null, null, null, false, null, null, []),
+                ServerInfo.Create(_pazisi.Id, _prod.Id, null, 0, null, null, null, null, false, null, null, []),
+                ServerInfo.Create(_bee.Id, _test.Id, null, 0, null, null, null, null, false, null, null, [])
             ]);
 
         StsProjectDataModel model = project.ToContractModel(Names());
