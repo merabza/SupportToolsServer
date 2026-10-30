@@ -113,7 +113,7 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
         {
             project = Project.Create(model.Name, model.ProjectType, model.ProjectGroupName, model.ProjectDescription,
                 model.MajorVersion, model.MinorVersion, model.UseAlternativeWebAgent, model.UseLocalPackages,
-                editorConfigFileType?.Id,
+                model.UsesDatabase, editorConfigFileType?.Id,
                 model.MainProjectName, model.ApiContractsProjectName, model.SpaProjectName, model.DbContextName,
                 model.ProgramArchiveDateMask, model.ProgramArchiveExtension,
                 model.ParametersFileDateMask, model.ParametersFileExtension, model.ProjectFolderName,
@@ -129,7 +129,7 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
         {
             stored.Update(model.Name, model.ProjectType, model.ProjectGroupName, model.ProjectDescription,
                 model.MajorVersion, model.MinorVersion, model.UseAlternativeWebAgent, model.UseLocalPackages,
-                editorConfigFileType?.Id,
+                model.UsesDatabase, editorConfigFileType?.Id,
                 model.MainProjectName, model.ApiContractsProjectName, model.SpaProjectName, model.DbContextName,
                 model.ProgramArchiveDateMask, model.ProgramArchiveExtension,
                 model.ParametersFileDateMask, model.ParametersFileExtension, model.ProjectFolderName,

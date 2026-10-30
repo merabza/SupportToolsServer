@@ -100,6 +100,7 @@ public sealed class UpdateProjectCommandHandlerTests
             MinorVersion = 7,
             UseAlternativeWebAgent = true,
             UseLocalPackages = true,
+            UsesDatabase = false,
             EditorConfigPatternName = "default",
             MainProjectName = "Main",
             ApiContractsProjectName = "ApiContracts",
@@ -204,6 +205,7 @@ public sealed class UpdateProjectCommandHandlerTests
         Assert.Equal(7, added.MinorVersion);
         Assert.True(added.UseAlternativeWebAgent);
         Assert.True(added.UseLocalPackages);
+        Assert.False(added.UsesDatabase);
         Assert.Equal(_editorConfig.Id, added.EditorConfigFileTypeId);
         Assert.Equal("Main", added.MainProjectName);
         Assert.Equal("ApiContracts", added.ApiContractsProjectName);

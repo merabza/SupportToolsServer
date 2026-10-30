@@ -44,10 +44,10 @@ internal static class TestData
         IEnumerable<GitRepo>? gitRepos = null, IEnumerable<NpmPackage>? npmPackages = null,
         IEnumerable<ServerInfo>? serverInfos = null, int version = EntityVersion.Initial)
     {
-        var project = new Project(ProjectId.CreateUnique(), name, "Standard", null, null, 1, 0, false, false, null, null,
+        var project = new Project(ProjectId.CreateUnique(), name, "Standard", null, null, 1, 0, false, false, true, null, null,
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
             version - 1);
-        project.Update(name, "IsService", "Apps", "Application", 2, 1, false, true, editorConfigFileType?.Id, name,
+        project.Update(name, "IsService", "Apps", "Application", 2, 1, false, true, false, editorConfigFileType?.Id, name,
             $"{name}ApiContracts", null, $"{name}DbContext", "yyyyMMddHHmmss", ".zip", "yyyyMMdd", ".json",
             $@"D:\1WorkDotnet\{name}", $@"D:\1WorkDotnet\{name}\{name}.slnx", $@"D:\1WorkSecurity\{name}", null,
             $@"D:\1WorkDotnet\{name}\{name}Db\{name}Db.csproj", null, null, null, null, MadeUpKeyGuidPart,
@@ -115,6 +115,7 @@ internal static class TestData
             MajorVersion = 2,
             MinorVersion = 1,
             UseLocalPackages = true,
+            UsesDatabase = false,
             EditorConfigPatternName = editorConfigPatternName,
             MainProjectName = name,
             ApiContractsProjectName = $"{name}ApiContracts",

@@ -36,6 +36,7 @@ internal static class ProjectContractMapper
             MinorVersion = project.MinorVersion,
             UseAlternativeWebAgent = project.UseAlternativeWebAgent,
             UseLocalPackages = project.UseLocalPackages,
+            UsesDatabase = project.UsesDatabase,
             EditorConfigPatternName = names.EditorConfigFileTypes.GetName(project.EditorConfigFileTypeId),
             MainProjectName = project.MainProjectName,
             ApiContractsProjectName = project.ApiContractsProjectName,
