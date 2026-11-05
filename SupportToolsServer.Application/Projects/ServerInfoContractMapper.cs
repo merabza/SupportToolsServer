@@ -43,6 +43,7 @@ internal static class ServerInfoContractMapper
             AppSettingsEncodedJsonFileName = serverInfo.AppSettingsEncodedJsonFileName,
             ServiceUserName = serverInfo.ServiceUserName,
             OpenPort = serverInfo.OpenPort,
+            SpaEnvMode = serverInfo.SpaEnvMode,
             AllowToolsList =
                 [.. serverInfo.AllowedTools.Select(x => x.ToolName).Order(StringComparer.OrdinalIgnoreCase)],
             CurrentDatabaseParameters = serverInfo.CurrentDatabaseParameters?.ToContractModel(

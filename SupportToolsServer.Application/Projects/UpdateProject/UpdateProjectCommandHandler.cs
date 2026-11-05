@@ -244,8 +244,9 @@ public sealed class UpdateProjectCommandHandler : ICommandHandler<UpdateProjectC
             serverInfos.Add(ServerInfo.Create(server.Id, environment.Id, webAgentForCheck?.Id,
                 serverInfoModel.ServerSidePort, serverInfoModel.ApiVersionId,
                 serverInfoModel.AppSettingsJsonSourceFileName, serverInfoModel.AppSettingsEncodedJsonFileName,
-                serverInfoModel.ServiceUserName, serverInfoModel.OpenPort, currentDatabaseParameters,
-                newDatabaseParameters, serverInfoModel.AllowToolsList.Select(ServerInfoAllowedTool.Create)));
+                serverInfoModel.ServiceUserName, serverInfoModel.OpenPort, serverInfoModel.SpaEnvMode,
+                currentDatabaseParameters, newDatabaseParameters,
+                serverInfoModel.AllowToolsList.Select(ServerInfoAllowedTool.Create)));
         }
 
         return serverInfos;

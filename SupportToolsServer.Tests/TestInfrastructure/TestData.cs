@@ -67,7 +67,7 @@ internal static class TestData
     {
         return ServerInfo.Create(server.Id, environment.Id, webAgentForCheck?.Id, serverSidePort, "v1",
             $@"D:\1WorkSecurity\App\{server.Name}\appsettings.json",
-            $@"D:\1WorkSecurity\App\{server.Name}\appsettingsEncoded.json", "deployer", true,
+            $@"D:\1WorkSecurity\App\{server.Name}\appsettingsEncoded.json", "deployer", true, "staging",
             currentDatabaseParameters, newDatabaseParameters, [ServerInfoAllowedTool.Create("ProgramUpdater")]);
     }
 
@@ -87,6 +87,7 @@ internal static class TestData
             AppSettingsEncodedJsonFileName = $@"D:\1WorkSecurity\App\{serverName}\appsettingsEncoded.json",
             ServiceUserName = "deployer",
             OpenPort = true,
+            SpaEnvMode = "staging",
             AllowToolsList = ["ProgramUpdater"],
             CurrentDatabaseParameters = currentDatabaseParameters,
             NewDatabaseParameters = newDatabaseParameters

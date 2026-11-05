@@ -207,6 +207,7 @@ public sealed class ProjectHandlersOnSqliteTests : IAsyncLifetime
             TestData.DatabaseParametersModel("Pc1.Sql", null, null, "AppANew"), 5050);
         kept.AllowToolsList = ["ServiceStopper", "ServiceStarter"];
         kept.OpenPort = false;
+        kept.SpaEnvMode = null;
         changed.ServerInfos = [kept, TestData.ServerInfoModel("bee", "Prod", "PAZISI.WebAgent")];
 
         Result<int> updated = await Upsert(changed);
@@ -219,6 +220,8 @@ public sealed class ProjectHandlersOnSqliteTests : IAsyncLifetime
         Assert.Equal(5050, pazisi.ServerSidePort);
         Assert.False(pazisi.OpenPort);
         Assert.True(read.ServerInfos[0].OpenPort);
+        Assert.Null(pazisi.SpaEnvMode);
+        Assert.Equal("staging", read.ServerInfos[0].SpaEnvMode);
         Assert.Equal(["ServiceStarter", "ServiceStopper"], pazisi.AllowToolsList);
         Assert.Null(pazisi.CurrentDatabaseParameters);
         Assert.Equal("Pc1.Sql", pazisi.NewDatabaseParameters!.DbConnectionName);

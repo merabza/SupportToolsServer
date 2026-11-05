@@ -59,7 +59,8 @@ public sealed class ServerInfoValidatorsTests
             ApiVersionId = value,
             AppSettingsJsonSourceFileName = value,
             AppSettingsEncodedJsonFileName = value,
-            ServiceUserName = value
+            ServiceUserName = value,
+            SpaEnvMode = value
         };
 
         Assert.True(Validate(serverInfo).IsValid);
@@ -77,6 +78,7 @@ public sealed class ServerInfoValidatorsTests
             AppSettingsJsonSourceFileName = new string('j', 260),
             AppSettingsEncodedJsonFileName = new string('c', 260),
             ServiceUserName = new string('u', 128),
+            SpaEnvMode = new string('m', 50),
             AllowToolsList = [new string('t', 50)],
             CurrentDatabaseParameters = new StsDatabaseParametersDataModel { DatabaseName = new string('d', 128) }
         };
@@ -146,6 +148,7 @@ public sealed class ServerInfoValidatorsTests
     [InlineData(nameof(StsServerInfoDataModel.AppSettingsJsonSourceFileName), 260)]
     [InlineData(nameof(StsServerInfoDataModel.AppSettingsEncodedJsonFileName), 260)]
     [InlineData(nameof(StsServerInfoDataModel.ServiceUserName), 128)]
+    [InlineData(nameof(StsServerInfoDataModel.SpaEnvMode), 50)]
     public void ServerInfoValidator_RejectsALongerValueNamingTheServerInfo(string propertyName, int maxLength)
     {
         StsServerInfoDataModel serverInfo = ServerInfoWithEveryValue();

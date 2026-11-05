@@ -52,6 +52,9 @@ public sealed class ServerInfoModelValidator : AbstractValidator<StsServerInfoDa
         RuleFor(x => x.ServiceUserName).OptionalWithMaxLength(
             x => ValueName(x, nameof(StsServerInfoDataModel.ServiceUserName)), ServerInfo.ServiceUserNameMaxLength);
 
+        RuleFor(x => x.SpaEnvMode).OptionalWithMaxLength(
+            x => ValueName(x, nameof(StsServerInfoDataModel.SpaEnvMode)), ServerInfo.SpaEnvModeMaxLength);
+
         //ინსტრუმენტების სია (სიმრავლე): ცარიელი სია დასაშვებია, მაგრამ არა null. ყოველი სახელი შევსებულია, სვეტზე
         //გრძელი არ არის და სიაში ერთხელ გვხვდება, რეგისტრის გარეშე
         RuleFor(x => x.AllowToolsList).NotNull()

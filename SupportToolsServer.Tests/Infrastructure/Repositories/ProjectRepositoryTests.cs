@@ -183,9 +183,9 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
         Assert.Equal((_prod.Id, _webAgent.Id, 5022), (pazisi.EnvironmentId, pazisi.WebAgentForCheckId,
             pazisi.ServerSidePort));
         Assert.Equal(("v1", @"D:\1WorkSecurity\App\PAZISI\appsettings.json",
-                @"D:\1WorkSecurity\App\PAZISI\appsettingsEncoded.json", "deployer", true),
+                @"D:\1WorkSecurity\App\PAZISI\appsettingsEncoded.json", "deployer", true, "staging"),
             (pazisi.ApiVersionId, pazisi.AppSettingsJsonSourceFileName, pazisi.AppSettingsEncodedJsonFileName,
-                pazisi.ServiceUserName, pazisi.OpenPort));
+                pazisi.ServiceUserName, pazisi.OpenPort, pazisi.SpaEnvMode));
         DatabaseParameters current = Assert.IsType<DatabaseParameters>(pazisi.CurrentDatabaseParameters);
         Assert.Equal((_connection.Id, _smartSchema.Id, _fileStorage.Id, "AppA"),
             (current.DbConnectionId, current.SmartSchemaId, current.FileStorageId, current.DatabaseName));
@@ -329,7 +329,7 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
                 ],
                 "servertool" =>
                 [
-                    ServerInfo.Create(_pazisi.Id, _prod.Id, null, 0, null, null, null, null, false, null, null,
+                    ServerInfo.Create(_pazisi.Id, _prod.Id, null, 0, null, null, null, null, false, null, null, null,
                         [ServerInfoAllowedTool.Create("a"), ServerInfoAllowedTool.Create("a")])
                 ],
                 _ => []
@@ -462,7 +462,7 @@ public sealed class ProjectRepositoryTests : IAsyncLifetime
             Update(read, read.DevDatabaseParameters, read.ProdCopyDatabaseParameters, read.GitRepos, read.NpmPackages,
                 read.RedundantFiles,
                 [
-                    ServerInfo.Create(_pazisi.Id, _prod.Id, null, 6000, null, null, null, null, false, null,
+                    ServerInfo.Create(_pazisi.Id, _prod.Id, null, 6000, null, null, null, null, false, null, null,
                         TestData.NewDatabaseParameters(databaseName: "Next"),
                         [
                             ServerInfoAllowedTool.Create("ProgramUpdater"),
