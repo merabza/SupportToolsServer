@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -101,13 +103,13 @@ public sealed class SupportToolsServerGitProjectsDependencyInjectionTests
     [Theory]
     [InlineData("-1")]
     [InlineData("1441")]
-    public void AddSupportToolsServerGitProjects_FailsTheStartupValidation_WhenTheCacheLifetimeIsOutOfRange(
+    public async Task AddSupportToolsServerGitProjects_FailsTheStartupValidation_WhenTheCacheLifetimeIsOutOfRange(
         string remoteHeadsCacheMinutes)
     {
         using ServiceProvider provider = BuildProvider("Work", remoteHeadsCacheMinutes: remoteHeadsCacheMinutes);
 
-        var exception = Assert.Throws<OptionsValidationException>(() =>
-            provider.GetRequiredService<IStartupValidator>().Validate());
+        var exception = await Assert.ThrowsAsync<OptionsValidationException>(async () =>
+            await provider.GetRequiredService<IAsyncStartupValidator>().ValidateAsync(CancellationToken.None));
 
         Assert.Equal("AppOptions:GitRemoteHeadsCacheMinutes must be between 0 and 1440",
             Assert.Single(exception.Failures));
@@ -117,12 +119,12 @@ public sealed class SupportToolsServerGitProjectsDependencyInjectionTests
     [Theory]
     [InlineData("0")]
     [InlineData("1440")]
-    public void AddSupportToolsServerGitProjects_PassesTheStartupValidation_WhenTheCacheLifetimeIsInRange(
+    public async Task AddSupportToolsServerGitProjects_PassesTheStartupValidation_WhenTheCacheLifetimeIsInRange(
         string remoteHeadsCacheMinutes)
     {
         using ServiceProvider provider = BuildProvider("Work", remoteHeadsCacheMinutes: remoteHeadsCacheMinutes);
 
-        provider.GetRequiredService<IStartupValidator>().Validate();
+        await provider.GetRequiredService<IAsyncStartupValidator>().ValidateAsync(CancellationToken.None);
     }
 
     //The clock of the periodic refresh is the system clock, unless the host registered one before (the authentication
@@ -185,13 +187,13 @@ public sealed class SupportToolsServerGitProjectsDependencyInjectionTests
     [Theory]
     [InlineData("-1")]
     [InlineData("721")]
-    public void AddSupportToolsServerGitProjects_FailsTheStartupValidation_WhenTheRefreshPeriodIsOutOfRange(
+    public async Task AddSupportToolsServerGitProjects_FailsTheStartupValidation_WhenTheRefreshPeriodIsOutOfRange(
         string gitProjectsRefreshHours)
     {
         using ServiceProvider provider = BuildProvider("Work", gitProjectsRefreshHours);
 
-        var exception = Assert.Throws<OptionsValidationException>(() =>
-            provider.GetRequiredService<IStartupValidator>().Validate());
+        var exception = await Assert.ThrowsAsync<OptionsValidationException>(async () =>
+            await provider.GetRequiredService<IAsyncStartupValidator>().ValidateAsync(CancellationToken.None));
 
         Assert.Equal("AppOptions:GitProjectsRefreshHours must be between 0 and 720", Assert.Single(exception.Failures));
     }
@@ -199,34 +201,34 @@ public sealed class SupportToolsServerGitProjectsDependencyInjectionTests
     [Theory]
     [InlineData("0")]
     [InlineData("720")]
-    public void AddSupportToolsServerGitProjects_PassesTheStartupValidation_WhenTheRefreshPeriodIsInRange(
+    public async Task AddSupportToolsServerGitProjects_PassesTheStartupValidation_WhenTheRefreshPeriodIsInRange(
         string gitProjectsRefreshHours)
     {
         using ServiceProvider provider = BuildProvider("Work", gitProjectsRefreshHours);
 
-        provider.GetRequiredService<IStartupValidator>().Validate();
+        await provider.GetRequiredService<IAsyncStartupValidator>().ValidateAsync(CancellationToken.None);
     }
 
     [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void AddSupportToolsServerGitProjects_FailsTheStartupValidation_WhenTheWorkFolderIsEmpty(string? workFolder)
+    public async Task AddSupportToolsServerGitProjects_FailsTheStartupValidation_WhenTheWorkFolderIsEmpty(string? workFolder)
     {
         using ServiceProvider provider = BuildProvider(workFolder);
 
-        var exception = Assert.Throws<OptionsValidationException>(() =>
-            provider.GetRequiredService<IStartupValidator>().Validate());
+        var exception = await Assert.ThrowsAsync<OptionsValidationException>(async () =>
+            await provider.GetRequiredService<IAsyncStartupValidator>().ValidateAsync(CancellationToken.None));
 
         Assert.Equal("AppOptions:WorkFolder is not specified", Assert.Single(exception.Failures));
     }
 
     [Fact]
-    public void AddSupportToolsServerGitProjects_PassesTheStartupValidation_WhenTheWorkFolderIsSpecified()
+    public async Task AddSupportToolsServerGitProjects_PassesTheStartupValidation_WhenTheWorkFolderIsSpecified()
     {
         using ServiceProvider provider = BuildProvider("Work");
 
-        provider.GetRequiredService<IStartupValidator>().Validate();
+        await provider.GetRequiredService<IAsyncStartupValidator>().ValidateAsync(CancellationToken.None);
     }
 
     [Fact]
