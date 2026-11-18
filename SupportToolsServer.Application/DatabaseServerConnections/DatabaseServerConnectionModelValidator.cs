@@ -43,6 +43,10 @@ public sealed class DatabaseServerConnectionModelValidator : AbstractValidator<S
             x => ValueName(x, nameof(StsDatabaseServerConnectionDataModel.ServerPass)),
             DatabaseServerConnection.ServerPassMaxLength);
 
+        RuleFor(x => x.DatabaseName).OptionalWithMaxLength(
+            x => ValueName(x, nameof(StsDatabaseServerConnectionDataModel.DatabaseName)),
+            DatabaseServerConnection.DatabaseNameMaxLength);
+
         //ცარიელი სია დასაშვებია, მაგრამ არა null (კლიენტის null dictionary ცარიელ სიად გადაიცემა)
         RuleFor(x => x.DatabaseFoldersSets).NotNull()
             .WithErrorCode(nameof(SupportToolsServerApiClientErrors.ValueRequired)).WithMessage(x =>

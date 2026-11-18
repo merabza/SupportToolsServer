@@ -69,14 +69,15 @@ public sealed class
         {
             connection = DatabaseServerConnection.Create(model.Name, model.DatabaseServerProvider, dbWebAgentId,
                 model.RemoteDbConnectionName, model.ServerAddress, model.WindowsNtIntegratedSecurity, model.ServerUser,
-                model.ServerPass, model.TrustServerCertificate, model.ConnectionTimeOut, model.Encrypt, foldersSets);
+                model.ServerPass, model.TrustServerCertificate, model.ConnectionTimeOut, model.Encrypt,
+                model.DatabaseName, foldersSets);
             _databaseServerConnectionRepository.Add(connection);
         }
         else
         {
             stored.Update(model.Name, model.DatabaseServerProvider, dbWebAgentId, model.RemoteDbConnectionName,
                 model.ServerAddress, model.WindowsNtIntegratedSecurity, model.ServerUser, model.ServerPass,
-                model.TrustServerCertificate, model.ConnectionTimeOut, model.Encrypt, foldersSets);
+                model.TrustServerCertificate, model.ConnectionTimeOut, model.Encrypt, model.DatabaseName, foldersSets);
             _databaseServerConnectionRepository.Update(stored);
             connection = stored;
         }

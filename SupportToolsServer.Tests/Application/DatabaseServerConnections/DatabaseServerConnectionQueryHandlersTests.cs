@@ -106,6 +106,7 @@ public sealed class DatabaseServerConnectionQueryHandlersTests
         Assert.True(model.TrustServerCertificate);
         Assert.Equal(30, model.ConnectionTimeOut);
         Assert.True(model.Encrypt);
+        Assert.Equal("AppDb", model.DatabaseName);
         Assert.Equal(["Archive", "default", "Second"], model.DatabaseFoldersSets.Select(x => x.Name));
         Assert.Equal(@"D:\Archive\Bak", model.DatabaseFoldersSets[0].Backup);
         Assert.Equal(@"D:\Archive\Data", model.DatabaseFoldersSets[0].Data);

@@ -30,6 +30,7 @@ internal static class DatabaseServerConnectionContractMapper
             TrustServerCertificate = connection.TrustServerCertificate,
             ConnectionTimeOut = connection.ConnectionTimeOut,
             Encrypt = connection.Encrypt,
+            DatabaseName = connection.DatabaseName,
             DatabaseFoldersSets =
             [
                 .. connection.DatabaseFoldersSets.OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase).Select(x =>

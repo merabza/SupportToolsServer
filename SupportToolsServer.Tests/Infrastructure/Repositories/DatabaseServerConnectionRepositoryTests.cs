@@ -106,6 +106,7 @@ public sealed class DatabaseServerConnectionRepositoryTests : IAsyncLifetime
         Assert.True(found.TrustServerCertificate);
         Assert.Equal(30, found.ConnectionTimeOut);
         Assert.True(found.Encrypt);
+        Assert.Equal("AppDb", found.DatabaseName);
         Assert.Equal(["Default", "Second"], FoldersSetsOf(found));
         DatabaseFoldersSet foldersSet = found.DatabaseFoldersSets.Single(x => x.Name == "Default");
         Assert.Equal(@"D:\Default\Bak", foldersSet.Backup);
@@ -156,7 +157,7 @@ public sealed class DatabaseServerConnectionRepositoryTests : IAsyncLifetime
         await using (SupportToolsServerDbContext context = _database.NewContext())
         {
             new DatabaseServerConnectionRepository(context).Add(DatabaseServerConnection.Create("Pc3.Sql",
-                "WebAgent", _webAgent.Id, null, null, false, null, null, false, 15, false,
+                "WebAgent", _webAgent.Id, null, null, false, null, null, false, 15, false, "Pc3Db",
                 [DatabaseFoldersSet.Create("Default", @"E:\Bak", null, null)]));
             await context.SaveChangesAsync();
         }
@@ -167,6 +168,7 @@ public sealed class DatabaseServerConnectionRepositoryTests : IAsyncLifetime
         Assert.Equal(_webAgent.Id, stored.DbWebAgentId);
         Assert.Null(stored.ServerUser);
         Assert.Null(stored.ServerPass);
+        Assert.Equal("Pc3Db", stored.DatabaseName);
         DatabaseFoldersSet foldersSet = Assert.Single(stored.DatabaseFoldersSets);
         Assert.Equal(@"E:\Bak", foldersSet.Backup);
         Assert.Null(foldersSet.Data);
@@ -212,7 +214,7 @@ public sealed class DatabaseServerConnectionRepositoryTests : IAsyncLifetime
         await using (SupportToolsServerDbContext context = _database.NewContext())
         {
             DatabaseServerConnection read = await ReadForUpdate(context, "Pc1.Sql");
-            read.Update("PC1.SQL", "SqlServer", null, null, "pc9", false, null, null, false, 60, false,
+            read.Update("PC1.SQL", "SqlServer", null, null, "pc9", false, null, null, false, 60, false, null,
             [
                 DatabaseFoldersSet.Create("Default", @"E:\NewBak", null, null),
                 DatabaseFoldersSet.Create("Third", @"F:\Bak", null, null)
@@ -227,6 +229,7 @@ public sealed class DatabaseServerConnectionRepositoryTests : IAsyncLifetime
         Assert.Null(stored.DbWebAgentId);
         Assert.Equal("pc9", stored.ServerAddress);
         Assert.Null(stored.ServerPass);
+        Assert.Null(stored.DatabaseName);
         Assert.Equal(60, stored.ConnectionTimeOut);
         Assert.Equal(["Default", "Third"], FoldersSetsOf(stored));
         Assert.Equal(2, stored.Version);
@@ -243,11 +246,11 @@ public sealed class DatabaseServerConnectionRepositoryTests : IAsyncLifetime
         await using SupportToolsServerDbContext second = _database.NewContext();
         DatabaseServerConnection readFirst = await ReadForUpdate(first, "Pc1.Sql");
         DatabaseServerConnection readSecond = await ReadForUpdate(second, "Pc1.Sql");
-        readFirst.Update("Pc1.Sql", "SqlServer", null, null, "first", false, null, null, false, 0, false,
+        readFirst.Update("Pc1.Sql", "SqlServer", null, null, "first", false, null, null, false, 0, false, null,
             [DatabaseFoldersSet.Create("First", @"G:\Bak", null, null)]);
         new DatabaseServerConnectionRepository(first).Update(readFirst);
         await first.SaveChangesAsync();
-        readSecond.Update("Pc1.Sql", "SqlServer", null, null, "second", false, null, null, false, 0, false,
+        readSecond.Update("Pc1.Sql", "SqlServer", null, null, "second", false, null, null, false, 0, false, null,
             [DatabaseFoldersSet.Create("Second", @"H:\Bak", null, null)]);
         new DatabaseServerConnectionRepository(second).Update(readSecond);
 
@@ -299,7 +302,7 @@ public sealed class DatabaseServerConnectionRepositoryTests : IAsyncLifetime
         await using SupportToolsServerDbContext second = _database.NewContext();
         DatabaseServerConnection readFirst = await ReadForUpdate(first, "Pc1.Sql");
         DatabaseServerConnection readSecond = await Read(second, "Pc1.Sql");
-        readFirst.Update("Pc1.Sql", "SqlServer", null, null, "first", false, null, null, false, 0, false, []);
+        readFirst.Update("Pc1.Sql", "SqlServer", null, null, "first", false, null, null, false, 0, false, null, []);
         new DatabaseServerConnectionRepository(first).Update(readFirst);
         await first.SaveChangesAsync();
         new DatabaseServerConnectionRepository(second).Delete(readSecond);

@@ -354,10 +354,10 @@ internal static class TestData
         IEnumerable<string>? foldersSetNames = null, int version = EntityVersion.Initial)
     {
         var connection = new DatabaseServerConnection(DatabaseServerConnectionId.CreateUnique(), name, "SqlServer",
-            null, null, null, false, null, null, false, 0, false, version - 1);
+            null, null, null, false, null, null, false, 0, false, null, version - 1);
         connection.Update(name, "SqlServer", dbWebAgent?.Id, "Main", "pc1", true, MadeUpUser, MadeUpPassword, true, 30,
-            true, (foldersSetNames ?? []).Select(x => DatabaseFoldersSet.Create(x, $@"D:\{x}\Bak", $@"D:\{x}\Data",
-                $@"D:\{x}\Log")));
+            true, "AppDb", (foldersSetNames ?? []).Select(x => DatabaseFoldersSet.Create(x, $@"D:\{x}\Bak",
+                $@"D:\{x}\Data", $@"D:\{x}\Log")));
         return connection;
     }
 
@@ -377,6 +377,7 @@ internal static class TestData
             TrustServerCertificate = true,
             ConnectionTimeOut = 30,
             Encrypt = true,
+            DatabaseName = "AppDb",
             DatabaseFoldersSets =
             [
                 .. (foldersSetNames ?? []).Select(x => new StsDatabaseFoldersSetDataModel

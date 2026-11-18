@@ -74,6 +74,7 @@ public sealed class UpdateDatabaseServerConnectionCommandHandlerTests
         Assert.True(added.TrustServerCertificate);
         Assert.Equal(30, added.ConnectionTimeOut);
         Assert.True(added.Encrypt);
+        Assert.Equal("AppDb", added.DatabaseName);
         Assert.Equal(["Default", "Second"], added.DatabaseFoldersSets.Select(x => x.Name));
         Assert.Equal(@"D:\Default\Bak", added.DatabaseFoldersSets[0].Backup);
         Assert.Equal(@"D:\Default\Data", added.DatabaseFoldersSets[0].Data);
@@ -144,6 +145,7 @@ public sealed class UpdateDatabaseServerConnectionCommandHandlerTests
             TestData.DatabaseServerConnectionModel("PC1.SQL", null, ["Default", "New"], 3);
         model.DatabaseServerProvider = "WebAgent";
         model.ServerPass = null;
+        model.DatabaseName = null;
 
         Result<int> result = await Handle(model);
 
@@ -153,6 +155,7 @@ public sealed class UpdateDatabaseServerConnectionCommandHandlerTests
         Assert.Equal("WebAgent", stored.DatabaseServerProvider);
         Assert.Null(stored.DbWebAgentId);
         Assert.Null(stored.ServerPass);
+        Assert.Null(stored.DatabaseName);
         Assert.Equal(["Default", "New"], stored.DatabaseFoldersSets.Select(x => x.Name));
         Assert.Equal(4, stored.Version);
         _connections.Verify(r => r.Add(It.IsAny<DatabaseServerConnection>()), Times.Never);

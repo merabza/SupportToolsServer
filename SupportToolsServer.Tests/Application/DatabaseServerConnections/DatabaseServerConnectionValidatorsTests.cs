@@ -40,6 +40,7 @@ public sealed class DatabaseServerConnectionValidatorsTests
         model.ServerAddress = value;
         model.ServerUser = value;
         model.ServerPass = value;
+        model.DatabaseName = value;
         model.DatabaseFoldersSets = [new StsDatabaseFoldersSetDataModel { Name = "Default" }];
 
         Assert.True(Validate(model).IsValid);
@@ -55,6 +56,7 @@ public sealed class DatabaseServerConnectionValidatorsTests
         model.ServerAddress = new string('a', 256);
         model.ServerUser = new string('u', 128);
         model.ServerPass = new string('s', 256);
+        model.DatabaseName = new string('g', 128);
         model.DatabaseFoldersSets =
         [
             new StsDatabaseFoldersSetDataModel
@@ -104,6 +106,7 @@ public sealed class DatabaseServerConnectionValidatorsTests
     [InlineData(nameof(StsDatabaseServerConnectionDataModel.ServerAddress), 256)]
     [InlineData(nameof(StsDatabaseServerConnectionDataModel.ServerUser), 128)]
     [InlineData(nameof(StsDatabaseServerConnectionDataModel.ServerPass), 256)]
+    [InlineData(nameof(StsDatabaseServerConnectionDataModel.DatabaseName), 128)]
     public void ModelValidator_RejectsALongerValueNamingTheConnection(string propertyName, int maxLength)
     {
         StsDatabaseServerConnectionDataModel model = TestData.DatabaseServerConnectionModel("Pc1.Sql");
